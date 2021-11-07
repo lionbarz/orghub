@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Core;
+using Core.Actions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace UnitTests
@@ -15,7 +16,8 @@ namespace UnitTests
         public void TestMotionStatus()
         {
             var person = new Person();
-            var motion = new MotionToAdjourn(person, DateTimeOffset.Now);
+            var action = new Adjourn(DateTimeOffset.Now);
+            var motion = new Motion(person, action);
             Assert.AreEqual(MotionStatus.Introduced, motion.GetStatus());
             var vote = new Vote(new List<Person>() { person });
             motion.Vote = vote;

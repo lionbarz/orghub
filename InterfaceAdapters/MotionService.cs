@@ -14,7 +14,7 @@ namespace InterfaceAdapters
             _database = database;
         }
         
-        public async Task MakeMotionAsync(Guid groupId, MotionToCreateOrganization motion)
+        public async Task MakeMotionAsync(Guid groupId, Motion motion)
         {
             var group = await _database.GetGroupAsync(groupId);
             group.Move(motion);

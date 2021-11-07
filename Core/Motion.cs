@@ -1,17 +1,23 @@
 ﻿using System;
-using System.Threading.Tasks;
+using Core.Actions;
 
 namespace Core
 {
     /// <summary>
-    /// Represents any motion that can be moved by a member of a group.
+    /// A motion that can be moved by a member of a group
+    /// for a particular action.
     /// </summary>
-    public abstract class Motion
+    public class Motion
     {
         /// <summary>
         /// Uniquely identifies this motion.
         /// </summary>
         public Guid Id { get; }
+        
+        /// <summary>
+        /// The action that is being moved.
+        /// </summary>
+        public IAction Action { get; private set; }
         
         /// <summary>
         /// The vote for the current motion, or null if there's no vote.
@@ -22,18 +28,6 @@ namespace Core
         /// The person who initiated the motion.
         /// </summary>
         public Person Mover { get; private init; }
-        
-        /// <summary>
-        /// The official text of this motion which
-        /// describes it in detail and explains it.
-        /// </summary>
-        public abstract string GetText();
-
-        /// <summary>
-        /// Actions to perform when the motion passes.
-        /// TODO: Pass whatever interfaces/objects it needs to act on.
-        /// </summary>
-        public abstract Task OnPassage();
 
         /// <summary>
         /// Get the current vote, if any.
@@ -75,10 +69,12 @@ namespace Core
         /// Create a new motion.
         /// </summary>
         /// <param name="mover">Whoever moved this motion.</param>
-        protected Motion(Person mover)
+        /// <param name="action">The action that is being moved.</param>
+        public Motion(Person mover, IAction action)
         {
             Id = Guid.NewGuid();
             Mover = mover;
+            Action = action;
         }
     }
 }
