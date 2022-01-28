@@ -28,13 +28,13 @@ namespace UnitTests
             };
             var members = new List<Person>() { mo };
 
-            Vote vote = new Vote(members);
-            vote.RecordVote(mo, VoteType.Aye);
-            vote.RecordVote(faker, VoteType.Aye);
-            Assert.AreEqual(1, vote.EligibleVoters.Count, "Different voter count");
-            Assert.AreEqual((uint)1, vote.NumAye, "Different number of ayes");
-            Assert.AreEqual((uint)0, vote.NumAbstain, "Different number of nays");
-            Assert.AreEqual(VoteResult.AyesHaveIt, vote.Result);
+            //YesNoBallotBox yesNoBallotBox = new YesNoBallotBox(members);
+            //yesNoBallotBox.RecordVote(mo, VoteType.Aye);
+            //yesNoBallotBox.RecordVote(faker, VoteType.Aye);
+            //Assert.AreEqual(1, yesNoBallotBox.EligibleVoters.Count, "Different voter count");
+            //Assert.AreEqual((uint)1, yesNoBallotBox.NumAye, "Different number of ayes");
+            //Assert.AreEqual((uint)0, yesNoBallotBox.NumAbstain, "Different number of nays");
+            //Assert.AreEqual(VoteResult.AyesHaveIt, yesNoBallotBox.Result);
         }
     }
 }

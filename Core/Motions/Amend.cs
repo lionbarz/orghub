@@ -1,18 +1,18 @@
-﻿namespace Core.Actions
+﻿namespace Core.Motions
 {
     /// <summary>
     /// Amending one action with something else..
     /// </summary>
     /// <typeparam name="T">The type of action being amended.</typeparam>
-    public class Amend<T> : IAction where T : IAction
+    public class Amend<T> : IMotion where T : IMotion
     {
         private T OriginalAction { get; set; }
         private T AmendedAction { get; set; }
 
-        public Amend(T originalAction, T amendedActionAction)
+        public Amend(T originalAction, T amendedAction)
         {
             OriginalAction = originalAction;
-            AmendedAction = amendedActionAction;
+            AmendedAction = amendedAction;
         }
 
         public string GetText()

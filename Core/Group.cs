@@ -16,10 +16,9 @@ namespace Core
         public Guid Id { get; set; }
         
         /// <summary>
-        /// The bylaws governing the organization.
-        /// For mass meetings (non-permanent societies), it's null.
+        /// The bylaws governing the group.
         /// </summary>
-        public Bylaws? Bylaws { get; set; }
+        public Bylaws Bylaws { get; private init; }
         
         /// <summary>
         /// Current members of the organization.
@@ -27,47 +26,74 @@ namespace Core
         public ICollection<Person> Members { get; private init; }
         
         /// <summary>
-        /// Motions made by this group.
+        /// The person chairing the organization.
         /// </summary>
-        public IList<Motion> Motions { get; private init; }
-        
+        public Person? Chair { get; private set; }
+
+        /// <summary>
+        /// Past and future meetings of this group.
+        /// </summary>
+        public ICollection<Meeting> Meetings { get; private init; }
+
         /// <summary>
         /// Constructor.
         /// </summary>
-        public Group()
+        private Group()
         {
+            Id = Guid.NewGuid();
+            Bylaws = Bylaws.MassMeeting();
             Members = new List<Person>();
-            Motions = new List<Motion>();
+            Meetings = new List<Meeting>();
         }
 
-        /// <summary>
-        /// Adds a new member to the organization.
-        /// </summary>
-        public void AddMember(Person person)
+        public static Group NewInstance(IEnumerable<Person> members)
         {
-            Members.Add(person);
-        }
-
-        /// <summary>
-        /// Make a motion.
-        /// </summary>
-        public void Move(Motion motion)
-        {
-            Motions.Add(motion);
-        }
-
-        /// <summary>
-        /// Get whatever motion is active now, or null.
-        /// </summary>
-        public Motion? GetActiveMotion()
-        {
-            if (!Motions.Any())
+            var membersArray = members as Person[] ?? members.ToArray();
+            
+            if (!membersArray.Any())
             {
-                return null;
+                throw new ArgumentException("A group must have at least one member.");
             }
             
-            // TODO
-            return null;
+            var group = new Group();
+            
+            foreach (var member in membersArray)
+            {
+                group.Members.Add(member);
+            }
+
+            return group;
+        }
+
+        public void SetChairperson(Person person)
+        {
+            if (!Members.Contains(person))
+            {
+                throw new ArgumentException($"{person.Name} is not a member of the group.");
+            }
+
+            Chair = person;
+        }
+
+        public Meeting CreateMeeting(DateTimeOffset startTime)
+        {
+            if (!IsEnoughNoticeGiven(DateTimeOffset.Now, startTime, Bylaws.MinimumMeetingNotice))
+            {
+                throw new ArgumentException($"{Bylaws.MinimumMeetingNotice} notice required.");
+            }
+
+            // TODO: This fixes the number in time. Need to pull in real time.
+            int quorum = Bylaws.MeetingQuorum.GetQuorumNumber(Members.Count);
+
+            var meeting = Meeting.NewInstance(Chair, startTime, quorum);
+            Meetings.Add(meeting);
+            return meeting;
+        }
+        
+        private static bool IsEnoughNoticeGiven(DateTimeOffset currentTime, DateTimeOffset meetingTime,
+            TimeSpan requiredNotice)
+        {
+            return meetingTime - currentTime >= requiredNotice;
         }
     }
 }

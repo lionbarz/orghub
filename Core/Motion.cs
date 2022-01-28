@@ -7,7 +7,7 @@ namespace Core
     /// A motion that can be moved by a member of a group
     /// for a particular action.
     /// </summary>
-    public class Motion
+    internal class Motion
     {
         /// <summary>
         /// Uniquely identifies this motion.
@@ -20,49 +20,29 @@ namespace Core
         public IAction Action { get; private set; }
         
         /// <summary>
-        /// The vote for the current motion, or null if there's no vote.
-        /// </summary>
-        private Vote? _vote;
-        
-        /// <summary>
         /// The person who initiated the motion.
         /// </summary>
         public Person Mover { get; private init; }
 
         /// <summary>
-        /// Get the current vote, if any.
+        /// The vote for the current motion, or null if hasn't been voted on.
         /// </summary>
-        /// <exception cref="Exception">If setting a vote that already exists.</exception>
-        public Vote? Vote
-        {
-            get => _vote;
-            set
-            {
-                if (_vote != null)
-                {
-                    throw new Exception("Voting as already started.");
-                }
-
-                _vote = value;
-            }
-        }
+        public YesNoBallotBox? BallotBox { get; private set; }
 
         /// <summary>
-        /// Gets the status, ie what stage of its lifetime the motion is in.
+        /// Starts the vote on this motion, which creates a ballot box to start
+        /// accepting ballots.
         /// </summary>
-        public MotionStatus GetStatus()
+        /// <param name="eligibilityVerifier">How to verify vote eligibility.</param>
+        /// <exception cref="Exception">If voting has already started.</exception>
+        public void StartVote(IVoterEligibilityVerifier eligibilityVerifier)
         {
-            if (Vote != null && Vote.IsVoteCompleted())
+            if (BallotBox != null)
             {
-                return Vote.Result == VoteResult.AyesHaveIt ? MotionStatus.Adopted : MotionStatus.Dropped;
-            }
-            
-            if (Vote != null && !Vote.IsVoteCompleted())
-            {
-                return MotionStatus.Voting;
+                throw new ApplicationException("Voting has already started.");
             }
 
-            return MotionStatus.Introduced;
+            BallotBox = new YesNoBallotBox(eligibilityVerifier);
         }
 
         /// <summary>

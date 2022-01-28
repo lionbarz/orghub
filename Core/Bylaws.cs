@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+﻿using System;
 
 namespace Core
 {
@@ -17,5 +17,30 @@ namespace Core
         /// The mission of the organization.
         /// </summary>
         public string Mission { get; set; }
+        
+        /// <summary>
+        /// The minimum amount of advanced notice that
+        /// a group needs to be given before a meeting.
+        /// </summary>
+        public TimeSpan MinimumMeetingNotice { get; set; }
+        
+        /// <summary>
+        /// The required quorum in a meeting.
+        /// </summary>
+        public Quorum MeetingQuorum { get; set; }
+
+        public Bylaws(string name, string mission)
+        {
+            Name = name;
+            Mission = mission;
+        }
+
+        public static Bylaws MassMeeting()
+        {
+            return new Bylaws("Mass Meeting", "Conduct new business")
+            {
+                MinimumMeetingNotice = TimeSpan.FromDays(3)
+            };
+        }
     }
 }

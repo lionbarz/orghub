@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Threading.Tasks;
 
-namespace Core.Actions
+namespace Core.Motions
 {
-    public class Adjourn : IAction
+    public class Adjourn : IMotion
     {
         private readonly DateTimeOffset _nextMeetingTime;
 

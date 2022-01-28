@@ -1,8 +1,8 @@
 ﻿using System.Threading.Tasks;
 
-namespace Core.Actions
+namespace Core.Motions
 {
-    public class CreateOrganization : IAction
+    public class CreateOrganization : IMotion
     {
         private Bylaws Bylaws { get; }
         

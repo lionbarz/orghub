@@ -1,11 +1,11 @@
 ﻿using System.Threading.Tasks;
 
-namespace Core.Actions
+namespace Core.Motions
 {
     /// <summary>
     /// Resolve whatever the resolution text says.
     /// </summary>
-    public class Resolve : IAction
+    public class Resolve : IMotion
     {
         private string Resolution { get; }
         
