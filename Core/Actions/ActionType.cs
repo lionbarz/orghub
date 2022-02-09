@@ -7,5 +7,6 @@
         MoveToAdjourn,
         Speak,
         YieldTheFloor,
+        MoveCustom
     }
 }

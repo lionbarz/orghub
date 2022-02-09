@@ -97,12 +97,25 @@ namespace Core
             State = MeetingState.InOrder;
         }
 
-        public void Act(MeetingAttendee actor, ActionType action)
+        public void Act(MeetingAttendee actor, IAction action)
         {
             IMeetingState currentState = MeetingStates.Last();
+            
+            Console.WriteLine($"State: {currentState.GetDescription()}");
+            Console.WriteLine($"Action: {action.Describe(actor.Person)}");
 
+            if (action is MoveToAdjourn)
+            {
+                // Right now we immediately adjourn as soon as anyone suggests it.
+                while (MeetingStates.Last() is not AdjournedState)
+                {
+                    MeetingStates.RemoveLast();
+                }
+                return;
+            }
+            
             if (currentState.TryHandleAction(actor, action, out IMeetingState? newState,
-                out ActionType? resultingAction))
+                out IAction? resultingAction))
             {
                 if (newState != null)
                 {
@@ -115,7 +128,7 @@ namespace Core
                 
                 if (resultingAction != null)
                 {
-                    Act(actor, resultingAction.Value);
+                    Act(actor, resultingAction);
                 }
             }
             else

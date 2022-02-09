@@ -2,6 +2,7 @@
 using Core;
 using Core.Actions;
 using Core.MeetingStates;
+using Core.Motions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace UnitTests
@@ -48,7 +49,7 @@ namespace UnitTests
         }
 
         [TestMethod]
-        public void StartSpeakAdjourn()
+        public void StartSpeakMoveAdjourn()
         {
             // Stage
             var mo = new Person()
@@ -75,13 +76,15 @@ namespace UnitTests
             meeting.AddAttendee(roniAttendee);
             
             // Act
-            meeting.Act(moAttendee, ActionType.CallMeetingToOrder);
+            meeting.Act(moAttendee, new CallMeetingToOrder());
             Assert.IsInstanceOfType(meeting.GetMeetingState(), typeof(OpenFloorState));
-            meeting.Act(roniAttendee, ActionType.Speak);
+            meeting.Act(roniAttendee, new Speak());
             Assert.IsInstanceOfType(meeting.GetMeetingState(), typeof(SpeakerHasFloorState));
-            meeting.Act(moAttendee, ActionType.ExpireSpeakerTime);
+            meeting.Act(moAttendee, new ExpireSpeakerTime());
             Assert.IsInstanceOfType(meeting.GetMeetingState(), typeof(OpenFloorState));
-            meeting.Act(moAttendee, ActionType.MoveToAdjourn);
+            meeting.Act(roniAttendee, new Move(new Resolve(roniAttendee.Person, "Go exploring")));
+            Assert.IsInstanceOfType(meeting.GetMeetingState(), typeof(DebateState));
+            meeting.Act(moAttendee, new MoveToAdjourn());
             Assert.IsInstanceOfType(meeting.GetMeetingState(), typeof(AdjournedState));
 
             // Verify

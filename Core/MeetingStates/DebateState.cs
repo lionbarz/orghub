@@ -1,12 +1,21 @@
 ﻿using System.Collections.Generic;
 using Core.Actions;
+using Core.Motions;
 
 namespace Core.MeetingStates
 {
-    public class OpenFloorState : IMeetingState
+    public class DebateState : IMeetingState
     {
-        public bool TryHandleAction(MeetingAttendee actor, IAction action, out IMeetingState? newState,
-            out IAction? resultingAction)
+        /// <summary>
+        /// The motion being debated.
+        /// </summary>
+        private IMotion Motion { get; }
+        public DebateState(IMotion motion)
+        {
+            Motion = motion;
+        }
+        
+        public bool TryHandleAction(MeetingAttendee actor, IAction action, out IMeetingState? newState, out IAction? resultingAction)
         {
             newState = null;
             resultingAction = null;
@@ -14,19 +23,13 @@ namespace Core.MeetingStates
             if (action is MoveToAdjourn)
             {
                 // Right now moves to adjourn are automatically approved unanimously.
+                resultingAction = new MoveToAdjourn();
                 return true;
             }
 
             if (action is Speak)
             {
                 newState = new SpeakerHasFloorState(actor);
-                return true;
-            }
-
-            if (action is Move moveAction)
-            {
-                // Right now automatically moves to debate.
-                newState = new DebateState(moveAction.Motion);
                 return true;
             }
 
@@ -40,7 +43,7 @@ namespace Core.MeetingStates
 
         public string GetDescription()
         {
-            return "The floor is open for suggestions and speakers.";
+            return $"Should we adopt: {Motion.GetText()}";
         }
     }
 }

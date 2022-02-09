@@ -5,16 +5,16 @@ namespace Core.Motions
     /// <summary>
     /// Resolve whatever the resolution text says.
     /// </summary>
-    public class Resolve : IMotion
+    public class Resolve : MotionBase
     {
         private string Resolution { get; }
-        
-        public Resolve(string resolution)
+
+        public Resolve(Person mover, string resolution) : base(mover)
         {
             Resolution = resolution;
         }
 
-        public string GetText()
+        public override string GetText()
         {
             return Resolution;
         }

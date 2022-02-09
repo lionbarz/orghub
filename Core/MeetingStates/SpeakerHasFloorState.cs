@@ -17,18 +17,18 @@ namespace Core.MeetingStates
             Speaker = speaker;
         }
         
-        public bool TryHandleAction(MeetingAttendee actor, ActionType action, out IMeetingState? newState,
-            out ActionType? resultingAction)
+        public bool TryHandleAction(MeetingAttendee actor, IAction action, out IMeetingState? newState,
+            out IAction? resultingAction)
         {
             newState = null;
             resultingAction = null;
             
-            if (actor.IsChair && action == ActionType.ExpireSpeakerTime)
+            if (actor.IsChair && action is ExpireSpeakerTime)
             {
                 return true;
             }
 
-            if (actor == Speaker && action == ActionType.YieldTheFloor)
+            if (actor == Speaker && action is YieldTheFloor)
             {
                 return true;
             }
@@ -36,9 +36,26 @@ namespace Core.MeetingStates
             return false;
         }
 
-        public IEnumerable<ActionType> GetSupportedActions()
+        public IEnumerable<ActionType> GetSupportedActions(MeetingAttendee attendee)
         {
-            return new[] { ActionType.YieldTheFloor, ActionType.ExpireSpeakerTime };
+            var actions = new List<ActionType>();
+
+            if (attendee.IsChair)
+            {
+                actions.Add(ActionType.ExpireSpeakerTime);
+            }
+
+            if (attendee == Speaker)
+            {
+                actions.Add(ActionType.YieldTheFloor);
+            }
+
+            return actions;
+        }
+
+        public string GetDescription()
+        {
+            return $"{Speaker.Person.Name} is speaking.";
         }
     }
 }

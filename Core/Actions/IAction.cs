@@ -1,4 +1,5 @@
-﻿namespace Core.Actions
+﻿
+namespace Core.Actions
 {
     /// <summary>
     /// Actions that can be taken during a meeting, such
@@ -11,18 +12,25 @@
         /// Whether the chair can invoke this action.
         /// </summary>
         /// <returns></returns>
-        public bool IsAvailableToChairs();
+        public bool IsAvailableToChairs { get; }
 
         /// <summary>
         /// Whether a member can invoke this action.
         /// </summary>
         /// <returns></returns>
-        public bool IsAvailableToMembers();
+        public bool IsAvailableToMembers { get; }
 
         /// <summary>
         /// Whether a meeting guest can invoke this action.
         /// </summary>
         /// <returns></returns>
-        public bool IsAvailableToGuests();
+        public bool IsAvailableToGuests { get; }
+
+        /// <summary>
+        /// Describe the action as taken by this person.
+        /// </summary>
+        /// <param name="person"></param>
+        /// <returns></returns>
+        public string Describe(Person person);
     }
 }
