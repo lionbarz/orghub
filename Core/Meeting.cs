@@ -16,10 +16,10 @@ namespace Core
     public class Meeting
     {
         /// <summary>
-        /// Tracks the state of the meeting.
+        /// Uniquely identifies this meeting.
         /// </summary>
-        public MeetingState State { get; private set; }
-        
+        public Guid Id { get; }
+
         /// <summary>
         /// When the meeting will start.
         /// </summary>
@@ -56,15 +56,15 @@ namespace Core
         /// The stack of meeting states. The last is the latest.
         /// It always starts with an adjourned state.
         /// </summary>
-        private LinkedList<IMeetingState> MeetingStates { get; init; }
+        private LinkedList<IMeetingState> MeetingStates { get; }
 
         private Meeting(Person chair, DateTimeOffset startTime, int quorum)
         {
+            Id = Guid.NewGuid();
             StartTime = startTime;
             Attendees = new List<MeetingAttendee>();
             Chair = chair;
             Quorum = quorum;
-            State = MeetingState.Adjourned;
             MeetingStates = new LinkedList<IMeetingState>();
             MeetingStates.AddLast(new AdjournedState());
         }
@@ -92,13 +92,15 @@ namespace Core
             Attendees.Remove(attendee);
         }
 
-        public void CallToOrder()
+        public void Act(Guid personId, IAction action)
         {
-            State = MeetingState.InOrder;
-        }
+            MeetingAttendee? actor = Attendees.FirstOrDefault(x => x.Person.Id == personId);
 
-        public void Act(MeetingAttendee actor, IAction action)
-        {
+            if (actor == null)
+            {
+                throw new ArgumentException($"No person with ID {personId} is in the meeting.");
+            }
+            
             IMeetingState currentState = MeetingStates.Last();
             
             Console.WriteLine($"State: {currentState.GetDescription()}");
@@ -128,7 +130,7 @@ namespace Core
                 
                 if (resultingAction != null)
                 {
-                    Act(actor, resultingAction);
+                    Act(actor.Person.Id, resultingAction);
                 }
             }
             else

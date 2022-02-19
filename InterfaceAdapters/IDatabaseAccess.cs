@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Core;
 
@@ -11,5 +12,10 @@ namespace InterfaceAdapters
         Task<Group> GetGroupAsync(Guid groupId);
         Task AddPersonAsync(Person person);
         Task<Person> GetPersonAsync(Guid personId);
+
+        Task AddMeetingAsync(Meeting meeting);
+        Task<IEnumerable<Meeting>> ListMeetingsAsync();
+        Task UpdateMeetingAsync(Meeting meeting);
+        Task<Meeting> GetMeetingAsync(Guid id);
     }
 }

@@ -29,7 +29,7 @@ namespace Core.MeetingStates
 
         public string GetDescription()
         {
-            return "The meeting isn't in session, meaning it ended or hasn't started yet.";
+            return "The meeting isn't in session.";
         }
     }
 }

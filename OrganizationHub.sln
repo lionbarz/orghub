@@ -10,6 +10,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTests", "UnitTests\Unit
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InterfaceAdapters", "InterfaceAdapters\InterfaceAdapters.csproj", "{FAD6D997-98D2-4009-A767-B89886582E8F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebService", "WebService\WebService.csproj", "{278E0663-652E-4969-9894-05B2DF35278A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -36,5 +38,9 @@ Global
 		{FAD6D997-98D2-4009-A767-B89886582E8F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FAD6D997-98D2-4009-A767-B89886582E8F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FAD6D997-98D2-4009-A767-B89886582E8F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{278E0663-652E-4969-9894-05B2DF35278A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{278E0663-652E-4969-9894-05B2DF35278A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{278E0663-652E-4969-9894-05B2DF35278A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{278E0663-652E-4969-9894-05B2DF35278A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

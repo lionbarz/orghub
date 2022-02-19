@@ -13,6 +13,7 @@ namespace Databases
     {
         private readonly Dictionary<Guid, Group> _groupDict = new();
         private readonly Dictionary<Guid, Person> _personDict = new();
+        private readonly Dictionary<Guid, Meeting> _meetingDict = new();
 
         public Task AddGroupAsync(Group group)
         {
@@ -39,6 +40,28 @@ namespace Databases
         public Task<Person> GetPersonAsync(Guid personId)
         {
             return Task.FromResult(_personDict[personId]);
+        }
+
+        public Task AddMeetingAsync(Meeting meeting)
+        {
+            _meetingDict[meeting.Id] = meeting;
+            return Task.CompletedTask;
+        }
+
+        public async Task<IEnumerable<Meeting>> ListMeetingsAsync()
+        {
+            return _meetingDict.Values;
+        }
+
+        public Task UpdateMeetingAsync(Meeting meeting)
+        {
+            _meetingDict[meeting.Id] = meeting;
+            return Task.CompletedTask;
+        }
+
+        public async Task<Meeting> GetMeetingAsync(Guid id)
+        {
+            return _meetingDict[id];
         }
     }
 }
