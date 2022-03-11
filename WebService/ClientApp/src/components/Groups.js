@@ -30,6 +30,16 @@ export class Groups extends Component {
             </div>
         );
     }
+    
+    addGroup = async () => {
+        const requestOptions = {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ userId: localStorage.getItem('userId') })
+        };
+        const response = await fetch('group', requestOptions);
+        await this.populateGroupData();
+    }
 
     render() {
         let contents = this.state.loading
@@ -40,6 +50,7 @@ export class Groups extends Component {
             <div>
                 <h1 id="tabelLabel" >Groups</h1>
                 {contents}
+                <button className="btn btn-primary" onClick={() => this.addGroup()}>Add Group</button>
             </div>
         );
     }

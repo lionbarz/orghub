@@ -85,7 +85,7 @@ namespace UnitTests
             Assert.IsInstanceOfType(meeting.GetMeetingState(), typeof(SpeakerHasFloorState));
             meeting.Act(moAttendee, new ExpireSpeakerTime());
             Assert.IsInstanceOfType(meeting.GetMeetingState(), typeof(OpenFloorState));
-            meeting.Act(roniAttendee, new Move(new Resolve(roni, "Go exploring")));
+            meeting.Act(roniAttendee, new Move(new Resolve("Go exploring")));
             Assert.IsInstanceOfType(meeting.GetMeetingState(), typeof(DebateState));
             meeting.Act(moAttendee, new MoveToAdjourn());
             Assert.IsInstanceOfType(meeting.GetMeetingState(), typeof(AdjournedState));

@@ -1,6 +1,6 @@
 ﻿namespace WebService.Models;
 
-public class ElectChairRequest
+public class ElectChairRequest : GenericUserRequest
 {
     public string NomineeName { get; set; }
 }

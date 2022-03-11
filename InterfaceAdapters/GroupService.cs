@@ -18,16 +18,12 @@ namespace InterfaceAdapters
             _database = database;
         }
 
-        public Task AddGroupAsync(Group group)
+        public async Task<UXGroup> AddGroupAsync(Guid userId)
         {
-            if (group.Bylaws != null)
-            {
-                throw new Exception(
-                    "Cannot add a group with bylaws. Bylaws must be approved by a vote which will create a group.");
-            }
-
-            _database.AddGroupAsync(group);
-            return Task.CompletedTask;
+            var chair = await _database.GetPersonAsync(userId);
+            var group = Group.MassMeeting(chair);
+            await _database.AddGroupAsync(group);
+            return ToUxGroup(group);
         }
 
         public async Task<IEnumerable<UXGroup>> GetGroupsAsync()
@@ -35,7 +31,7 @@ namespace InterfaceAdapters
             var groups = await _database.GetGroupsAsync();
             return groups.Select(ToUxGroup);
         }
-        
+
         public async Task<UXGroup> GetGroupAsync(Guid id)
         {
             var group = await _database.GetGroupAsync(id);
@@ -62,17 +58,17 @@ namespace InterfaceAdapters
             };
         }
 
-        public async Task ActAsync(string authToken, Guid groupId, IAction action)
+        public async Task ActAsync(Guid userId, Guid groupId, IAction action)
         {
-            var actor = await _database.GetPersonAsync(MeetingService._userId); // TODO: Login
+            var actor = await _database.GetPersonAsync(userId);
             var group = await _database.GetGroupAsync(groupId);
             group.TakeAction(actor, action);
             await _database.UpdateGroupAsync(group);
         }
 
-        public async Task ElectChair(Guid groupId, string nomineeName)
+        public async Task ElectChair(Guid userId, Guid groupId, string nomineeName)
         {
-            var actor = await _database.GetPersonAsync(MeetingService._userId); // TODO: Login
+            var actor = await _database.GetPersonAsync(userId);
             Person nominee = new Person(nomineeName);
             IMotion motion = new ElectChair(nominee);
             IAction action = new Move(motion);
@@ -81,9 +77,9 @@ namespace InterfaceAdapters
             await _database.UpdateGroupAsync(group);
         }
 
-        public async Task MoveResolution(Guid groupId, string resolution)
+        public async Task MoveResolution(Guid userId, Guid groupId, string resolution)
         {
-            var actor = await _database.GetPersonAsync(MeetingService._userId); // TODO: Login
+            var actor = await _database.GetPersonAsync(userId);
             var motion = new Resolve(resolution);
             var group = await _database.GetGroupAsync(groupId);
             var action = new Move(motion);

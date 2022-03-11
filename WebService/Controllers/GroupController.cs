@@ -18,7 +18,7 @@ public class GroupController : ControllerBase
 
     [HttpGet]
     [Route("group")]
-    public async Task<IEnumerable<UXGroup>> Get()
+    public async Task<IEnumerable<UXGroup>> List()
     {
         return await _groupService.GetGroupsAsync();
     }
@@ -29,42 +29,50 @@ public class GroupController : ControllerBase
     {
         return await _groupService.GetGroupAsync(Guid.Parse(id));
     }
+    
+    [HttpPost]
+    [Route("group")]
+    public async Task AddGroup([FromBody] GenericUserRequest request)
+    {
+        IAction action = new CallMeetingToOrder();
+        await _groupService.AddGroupAsync(Guid.Parse(request.UserId));
+    }
 
     [HttpPost]
     [Route("group/{id}/action/calltoorder")]
-    public async Task ActionCallToOrder(string id)
+    public async Task ActionCallToOrder(string id, [FromBody] GenericUserRequest request)
     {
         IAction action = new CallMeetingToOrder();
-        await _groupService.ActAsync("blah", Guid.Parse(id), action);
+        await _groupService.ActAsync(Guid.Parse(request.UserId), Guid.Parse(id), action);
     }
 
     [HttpPost]
     [Route("group/{id}/action/adjourn")]
-    public async Task ActionAdjourn(string id)
+    public async Task ActionAdjourn(string id, [FromBody] GenericUserRequest request)
     {
         IAction action = new MoveToAdjourn();
-        await _groupService.ActAsync("blah", Guid.Parse(id), action);
+        await _groupService.ActAsync(Guid.Parse(request.UserId), Guid.Parse(id), action);
     }
 
     [HttpPost]
     [Route("group/{id}/action/declaremotionpassed")]
-    public async Task ActionDeclareMotionPassed(string id)
+    public async Task ActionDeclareMotionPassed(string id, [FromBody] GenericUserRequest request)
     {
         IAction action = new DeclareMotionPassed();
-        await _groupService.ActAsync("blah", Guid.Parse(id), action);
+        await _groupService.ActAsync(Guid.Parse(request.UserId), Guid.Parse(id), action);
     }
 
     [HttpPost]
     [Route("group/{id}/action/electchair")]
     public async Task ActionElectChair(string id, [FromBody] ElectChairRequest request)
     {
-        await _groupService.ElectChair(Guid.Parse(id), request.NomineeName);
+        await _groupService.ElectChair(Guid.Parse(request.UserId), Guid.Parse(id), request.NomineeName);
     }
 
     [HttpPost]
     [Route("group/{id}/action/moveresolution")]
     public async Task ActionMoveResolution(string id, [FromBody] MoveResolutionRequest request)
     {
-        await _groupService.MoveResolution(Guid.Parse(id), request.Text);
+        await _groupService.MoveResolution(Guid.Parse(request.UserId), Guid.Parse(id), request.Text);
     }
 }

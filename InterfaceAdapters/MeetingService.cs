@@ -11,10 +11,7 @@ namespace InterfaceAdapters
     public class MeetingService
     {
         private readonly IDatabaseAccess _db;
-        
-        // TODO: HACK INSTEAD OF LOIGGINGIN IN 
-        public static Guid _userId = Guid.NewGuid();
-        
+
         public MeetingService(IDatabaseAccess db)
         {
             _db = db;
@@ -29,7 +26,7 @@ namespace InterfaceAdapters
 
         public async Task<UXMeeting> AddMeeting(UXMeeting m)
         {
-            var person = new Person("Mohamed") { Id = _userId };
+            var person = new Person("Mohamed");
             var meeting = Meeting.NewInstance(person, DateTimeOffset.Now, 0);
             meeting.AddAttendee(new MeetingAttendee() { IsChair = true, IsMember = true, Person = person});
             await _db.AddMeetingAsync(meeting);

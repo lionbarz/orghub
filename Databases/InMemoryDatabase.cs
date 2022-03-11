@@ -17,16 +17,6 @@ namespace Databases
         private readonly Dictionary<Guid, Person> _personDict = new();
         private readonly Dictionary<Guid, Meeting> _meetingDict = new();
 
-        public InMemoryDatabase()
-        {
-            var mo = new Person("Mo")
-            {
-                Id = MeetingService._userId,
-            };
-            
-            AddPersonAsync(mo);
-            AddGroupAsync(Group.MassMeeting(mo));
-        }
         public Task AddGroupAsync(Group group)
         {
             _groupDict[group.Id] = group;
