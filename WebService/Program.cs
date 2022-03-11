@@ -9,6 +9,8 @@ builder.Services.AddControllersWithViews();
 
 // DI stuff
 builder.Services.AddScoped<MeetingService>();
+builder.Services.AddScoped<GroupService>();
+builder.Services.AddScoped<PersonService>();
 builder.Services.AddSingleton<IDatabaseAccess, InMemoryDatabase>();
 
 var app = builder.Build();
@@ -29,12 +31,6 @@ app.MapControllerRoute(
     name: "default",
     pattern: "{controller}/{action=Index}/{id?}");
 
-app.MapControllerRoute(
-    name: "actions",
-    pattern: "action/start",
-    defaults: new { controller = "Action", action = "Start" });
-
 app.MapFallbackToFile("index.html");
-;
 
 app.Run();

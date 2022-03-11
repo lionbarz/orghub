@@ -10,9 +10,16 @@ namespace Core.MeetingStates
         /// The motion being debated.
         /// </summary>
         private IMotion Motion { get; }
-        public DebateState(IMotion motion)
+        
+        /// <summary>
+        /// Can be used to set group properties.
+        /// </summary>
+        private IGroupModifier GroupModifier { get; }
+        
+        public DebateState(IMotion motion, IGroupModifier groupModifier)
         {
             Motion = motion;
+            GroupModifier = groupModifier;
         }
         
         public bool TryHandleAction(MeetingAttendee actor, IAction action, out IMeetingState? newState, out IAction? resultingAction)
@@ -33,6 +40,16 @@ namespace Core.MeetingStates
                 return true;
             }
 
+            if (action is DeclareMotionPassed && actor.IsChair)
+            {
+                if (Motion is IActionableMotion actionableMotion)
+                {
+                    actionableMotion.TakeActionAsync(GroupModifier);
+                }
+                
+                return true;
+            }
+
             return false;
         }
 
@@ -43,7 +60,7 @@ namespace Core.MeetingStates
 
         public string GetDescription()
         {
-            return $"Should we adopt: {Motion.GetText()}";
+            return $"Debating \"{Motion.GetText()}\"";
         }
     }
 }

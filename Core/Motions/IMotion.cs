@@ -7,11 +7,6 @@
     public interface IMotion
     {
         /// <summary>
-        /// The person who introduced this motion.
-        /// </summary>
-        public Person Mover { get; }
-        
-        /// <summary>
         /// The official text of this action which
         /// is exactly what a group is bound by.
         /// </summary>

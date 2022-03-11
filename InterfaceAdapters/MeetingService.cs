@@ -29,7 +29,7 @@ namespace InterfaceAdapters
 
         public async Task<UXMeeting> AddMeeting(UXMeeting m)
         {
-            var person = new Person() { Id = _userId, Name = "Mohamed" };
+            var person = new Person("Mohamed") { Id = _userId };
             var meeting = Meeting.NewInstance(person, DateTimeOffset.Now, 0);
             meeting.AddAttendee(new MeetingAttendee() { IsChair = true, IsMember = true, Person = person});
             await _db.AddMeetingAsync(meeting);
@@ -51,7 +51,8 @@ namespace InterfaceAdapters
         {
             var meeting = await _db.GetMeetingAsync(meetingId);
             // TODO: Return a status.
-            meeting.Act(personId, action);
+            throw new NotImplementedException();
+            //meeting.Act(personId, action);
             await _db.UpdateMeetingAsync(meeting);
         }
     }

@@ -6,13 +6,20 @@ namespace Core.MeetingStates
 {
     public class AdjournedState : IMeetingState
     {
+        private IGroupModifier GroupModifier { get; }
+        
+        public AdjournedState(IGroupModifier groupModifier)
+        {
+            GroupModifier = groupModifier;
+        }
+        
         public bool TryHandleAction(MeetingAttendee actor, IAction action, out IMeetingState? newState,
             out IAction? resultingAction)
         {
             if (actor.IsChair && action is CallMeetingToOrder)
             {
                 // TODO: Automatically put the agenda item?
-                newState = new OpenFloorState();
+                newState = new OpenFloorState(GroupModifier);
                 resultingAction = null;
                 return true;
             }
@@ -29,7 +36,7 @@ namespace Core.MeetingStates
 
         public string GetDescription()
         {
-            return "The meeting isn't in session.";
+            return "The group is adjourned.";
         }
     }
 }

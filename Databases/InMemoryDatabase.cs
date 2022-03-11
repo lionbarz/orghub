@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Core;
 using InterfaceAdapters;
+using InterfaceAdapters.Models;
 
 namespace Databases
 {
@@ -15,6 +17,16 @@ namespace Databases
         private readonly Dictionary<Guid, Person> _personDict = new();
         private readonly Dictionary<Guid, Meeting> _meetingDict = new();
 
+        public InMemoryDatabase()
+        {
+            var mo = new Person("Mo")
+            {
+                Id = MeetingService._userId,
+            };
+            
+            AddPersonAsync(mo);
+            AddGroupAsync(Group.MassMeeting(mo));
+        }
         public Task AddGroupAsync(Group group)
         {
             _groupDict[group.Id] = group;
@@ -29,6 +41,11 @@ namespace Databases
         public Task<Group> GetGroupAsync(Guid groupId)
         {
             return Task.FromResult(_groupDict[groupId]);
+        }
+
+        public async Task<IEnumerable<Group>> GetGroupsAsync()
+        {
+            return _groupDict.Values;
         }
 
         public Task AddPersonAsync(Person person)

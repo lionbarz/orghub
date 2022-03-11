@@ -1,4 +1,6 @@
-﻿using Core.Actions;
+﻿using Core;
+using Core.Actions;
+using Core.Motions;
 using InterfaceAdapters;
 using InterfaceAdapters.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -10,11 +12,14 @@ namespace WebService.Controllers;
 public class MeetingController : ControllerBase
 {
     private readonly MeetingService _meetingService;
+    private readonly PersonService _personService;
+    
     public static Guid _userId = MeetingService._userId;
     
-    public MeetingController(MeetingService meetingService)
+    public MeetingController(MeetingService meetingService, PersonService personService)
     {
         _meetingService = meetingService;
+        _personService = personService;
     }
     
     [HttpGet]
@@ -41,6 +46,7 @@ public class MeetingController : ControllerBase
     {
         string actionName = request.ActionName;
         string meetingIdString = request.MeetingIdString;
+        //Person actionTaker = await _personService.GetPersonAsync(_userId);
         
         IAction? action = null;
 
@@ -53,6 +59,9 @@ public class MeetingController : ControllerBase
         } else if (actionName == "yield")
         {
             action = new YieldTheFloor();
+        } else if (actionName == "electChair")
+        {
+            //action = new Move(new ElectChair(actionTaker));
         }
 
         if (action == null)

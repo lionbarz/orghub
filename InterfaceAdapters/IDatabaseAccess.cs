@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Core;
+using InterfaceAdapters.Models;
 
 namespace InterfaceAdapters
 {
@@ -10,6 +11,8 @@ namespace InterfaceAdapters
         Task AddGroupAsync(Group group);
         Task UpdateGroupAsync(Group group);
         Task<Group> GetGroupAsync(Guid groupId);
+        Task<IEnumerable<Group>> GetGroupsAsync();
+        
         Task AddPersonAsync(Person person);
         Task<Person> GetPersonAsync(Guid personId);
 

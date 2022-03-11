@@ -52,6 +52,16 @@ export class Meeting extends Component {
         await this.populateMeetingData();
     }
 
+    async takeActionElectChair() {
+        const requestOptions = {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ meetingIdString: this.state.meeting.id, actionName: "electChair" })
+        };
+        await fetch('meeting', requestOptions);
+        await this.populateMeetingData();
+    }
+
     render() {
         let contents = this.state.loading
             ? <p><em>Loading...</em></p>

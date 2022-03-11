@@ -44,6 +44,11 @@ namespace Core
         public int Quorum { get; set; }
 
         /// <summary>
+        /// Manages the meeting states.
+        /// </summary>
+        private StateManager _stateManager;
+
+        /// <summary>
         /// Whether there is a quorum among the attendees.
         /// </summary>
         public bool HasQuorum()
@@ -51,12 +56,6 @@ namespace Core
             var numCanVote = Attendees.Count(x => x.IsMember);
             return numCanVote >= Quorum;
         }
-        
-        /// <summary>
-        /// The stack of meeting states. The last is the latest.
-        /// It always starts with an adjourned state.
-        /// </summary>
-        private LinkedList<IMeetingState> MeetingStates { get; }
 
         private Meeting(Person chair, DateTimeOffset startTime, int quorum)
         {
@@ -65,8 +64,6 @@ namespace Core
             Attendees = new List<MeetingAttendee>();
             Chair = chair;
             Quorum = quorum;
-            MeetingStates = new LinkedList<IMeetingState>();
-            MeetingStates.AddLast(new AdjournedState());
         }
 
         /// <summary>
@@ -92,57 +89,14 @@ namespace Core
             Attendees.Remove(attendee);
         }
 
-        public void Act(Guid personId, IAction action)
+        public void Act(MeetingAttendee actor, IAction action)
         {
-            MeetingAttendee? actor = Attendees.FirstOrDefault(x => x.Person.Id == personId);
-
-            if (actor == null)
-            {
-                throw new ArgumentException($"No person with ID {personId} is in the meeting.");
-            }
-            
-            IMeetingState currentState = MeetingStates.Last();
-            
-            Console.WriteLine($"State: {currentState.GetDescription()}");
-            Console.WriteLine($"Action: {action.Describe(actor.Person)}");
-
-            if (action is MoveToAdjourn)
-            {
-                // Right now we immediately adjourn as soon as anyone suggests it.
-                while (MeetingStates.Last() is not AdjournedState)
-                {
-                    MeetingStates.RemoveLast();
-                }
-                return;
-            }
-            
-            if (currentState.TryHandleAction(actor, action, out IMeetingState? newState,
-                out IAction? resultingAction))
-            {
-                if (newState != null)
-                {
-                    MeetingStates.AddLast(newState);
-                    return;
-                }
-                
-                // The current state is done. Go back to last state on stack.
-                MeetingStates.RemoveLast();
-                
-                if (resultingAction != null)
-                {
-                    Act(actor.Person.Id, resultingAction);
-                }
-            }
-            else
-            {
-                throw new ArgumentException(
-                    $"{actor.Person.Name} can't take action {action} in meeting state {currentState}");
-            }
+            _stateManager.Act(actor, action);
         }
 
         public IMeetingState GetMeetingState()
         {
-            return MeetingStates.Last();
+            return _stateManager.GetMeetingState();
         }
     }
 }

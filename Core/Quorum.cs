@@ -44,7 +44,7 @@ namespace Core
         }
         
         /// <summary>
-        /// How many need to be present.
+        /// How many need to be present for quorum.
         /// </summary>
         /// <param name="membershipSize">How many in the membership.</param>
         /// <returns>Quorum</returns>

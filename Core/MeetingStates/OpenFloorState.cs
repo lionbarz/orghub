@@ -5,6 +5,13 @@ namespace Core.MeetingStates
 {
     public class OpenFloorState : IMeetingState
     {
+        private IGroupModifier GroupModifier { get; }
+        
+        public OpenFloorState(IGroupModifier groupModifier)
+        {
+            GroupModifier = groupModifier;
+        }
+        
         public bool TryHandleAction(MeetingAttendee actor, IAction action, out IMeetingState? newState,
             out IAction? resultingAction)
         {
@@ -26,7 +33,7 @@ namespace Core.MeetingStates
             if (action is Move moveAction)
             {
                 // Right now automatically moves to debate.
-                newState = new DebateState(moveAction.Motion);
+                newState = new DebateState(moveAction.Motion, GroupModifier);
                 return true;
             }
 
