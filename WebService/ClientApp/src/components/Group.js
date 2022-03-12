@@ -3,6 +3,7 @@ import { withRouter } from "react-router";
 
 export class Group extends Component {
     static displayName = Group.name;
+    userId = localStorage.getItem('userId');
 
     constructor(props) {
         super(props);
@@ -30,7 +31,7 @@ export class Group extends Component {
         const requestOptions = {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({})
+            body: JSON.stringify({ userId: this.userId })
         };
         await fetch(`group/${this.props.match.params.id}/action/${action}`, requestOptions);
         await this.populateGroupData();
@@ -40,7 +41,7 @@ export class Group extends Component {
         const requestOptions = {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ nomineeName: nomineeName})
+            body: JSON.stringify({ nomineeName: nomineeName, userId: this.userId })
         };
         await fetch(`group/${this.props.match.params.id}/action/electchair`, requestOptions);
         await this.populateGroupData();
@@ -50,7 +51,7 @@ export class Group extends Component {
         const requestOptions = {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ text: text})
+            body: JSON.stringify({ text: text, userId: this.userId })
         };
         await fetch(`group/${this.props.match.params.id}/action/moveresolution`, requestOptions);
         await this.populateGroupData();
@@ -68,7 +69,7 @@ export class Group extends Component {
         return (
             <div>
                 <h1 id="tabelLabel" >Group info</h1>
-                <p>You are: {localStorage.getItem('userId')}</p>
+                <p>You are: {this.userId}</p>
                 {contents}
                 <button className="btn btn-primary" onClick={() => this.takeAction("calltoorder")}>Call to order</button>
                 <button className="btn btn-primary" onClick={() => this.takeAction("adjourn")}>Adjourn</button>
