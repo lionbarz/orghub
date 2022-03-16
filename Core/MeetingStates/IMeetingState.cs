@@ -20,9 +20,11 @@ namespace Core.MeetingStates
         /// <param name="action"></param>
         /// <param name="newState">If not null, there's a new state
         /// the meeting goes to.</param>
+        /// <param name="replaceCurrentState">If true, replace the current state with newState.</param>
         /// <param name="resultingAction"></param>
         /// <returns>True if it's handled.</returns>
         bool TryHandleAction(MeetingAttendee actor, IAction action, out IMeetingState? newState,
+            out bool replaceCurrentState,
             out IAction? resultingAction);
 
         /// <summary>

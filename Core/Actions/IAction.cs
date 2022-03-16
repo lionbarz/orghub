@@ -29,8 +29,7 @@ namespace Core.Actions
         /// <summary>
         /// Describe the action as taken by this person.
         /// </summary>
-        /// <param name="person"></param>
-        /// <returns></returns>
+        /// <remarks>Example: Mo started speaking.</remarks>
         public string Describe(Person person);
     }
 }

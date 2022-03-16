@@ -6,17 +6,19 @@ namespace Core.MeetingStates
     public class OpenFloorState : IMeetingState
     {
         private IGroupModifier GroupModifier { get; }
-        
+
         public OpenFloorState(IGroupModifier groupModifier)
         {
             GroupModifier = groupModifier;
         }
-        
+
         public bool TryHandleAction(MeetingAttendee actor, IAction action, out IMeetingState? newState,
+            out bool replaceCurrentState,
             out IAction? resultingAction)
         {
             newState = null;
             resultingAction = null;
+            replaceCurrentState = false;
 
             if (action is MoveToAdjourn)
             {

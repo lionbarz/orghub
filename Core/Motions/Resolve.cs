@@ -5,7 +5,7 @@ namespace Core.Motions
     /// <summary>
     /// Resolve whatever the resolution text says.
     /// </summary>
-    public class Resolve : IActionableMotion
+    public class Resolve : IGroupModifyingMotion
     {
         private string Resolution { get; }
 

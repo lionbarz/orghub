@@ -77,7 +77,8 @@ namespace Core
             var group = new Group
             {
                 IsMassMeeting = true,
-                Chair = chair
+                Chair = chair,
+                Bylaws = Bylaws.MassMeeting()
             };
             return group;
         }
@@ -161,6 +162,11 @@ namespace Core
         public void AddResolution(string text)
         {
             Resolutions.Add(text);
+        }
+
+        public void SetName(string text)
+        {
+            Bylaws.Name = text;
         }
 
         public IMeetingState GetState()

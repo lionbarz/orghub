@@ -7,25 +7,27 @@ namespace Core.MeetingStates
     public class AdjournedState : IMeetingState
     {
         private IGroupModifier GroupModifier { get; }
-        
+
         public AdjournedState(IGroupModifier groupModifier)
         {
             GroupModifier = groupModifier;
         }
-        
+
         public bool TryHandleAction(MeetingAttendee actor, IAction action, out IMeetingState? newState,
+            out bool replaceCurrentState,
             out IAction? resultingAction)
         {
+            newState = null;
+            resultingAction = null;
+            replaceCurrentState = false;
+            
             if (actor.IsChair && action is CallMeetingToOrder)
             {
                 // TODO: Automatically put the agenda item?
                 newState = new OpenFloorState(GroupModifier);
-                resultingAction = null;
                 return true;
             }
 
-            newState = null;
-            resultingAction = null;
             return false;
         }
 

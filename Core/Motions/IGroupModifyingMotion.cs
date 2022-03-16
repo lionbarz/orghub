@@ -3,9 +3,9 @@
 namespace Core.Motions
 {
     /// <summary>
-    /// A motion, when passed, can do something.
+    /// A motion, when passed, changes group properties.
     /// </summary>
-    public interface IActionableMotion : IMotion
+    public interface IGroupModifyingMotion : IMotion
     {
         Task TakeActionAsync(IGroupModifier groupModifier);
     }

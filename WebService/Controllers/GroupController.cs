@@ -1,4 +1,5 @@
 ﻿using Core.Actions;
+using Core.Motions;
 using InterfaceAdapters;
 using InterfaceAdapters.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -74,5 +75,44 @@ public class GroupController : ControllerBase
     public async Task ActionMoveResolution(string id, [FromBody] MoveResolutionRequest request)
     {
         await _groupService.MoveResolution(Guid.Parse(request.UserId), Guid.Parse(id), request.Text);
+    }
+    
+    [HttpPost]
+    [Route("group/{id}/action/movechangegroupname")]
+    public async Task ActionMoveChangeGroupName(string id, [FromBody] MoveChangeGroupName request)
+    {
+        await _groupService.MoveChangeGroupName(Guid.Parse(request.UserId), Guid.Parse(id), request.Name);
+    }
+    
+    [HttpPost]
+    [Route("group/{id}/action/second")]
+    public async Task ActionSecond(string id, [FromBody] GenericUserRequest request)
+    {
+        IAction action = new SecondMotion();
+        await _groupService.ActAsync(Guid.Parse(request.UserId), Guid.Parse(id), action);
+    }
+    
+    [HttpPost]
+    [Route("group/{id}/action/moveenddebate")]
+    public async Task ActionMoveEndDebate(string id, [FromBody] GenericUserRequest request)
+    {
+        IAction action = new Move(new EndDebate());
+        await _groupService.ActAsync(Guid.Parse(request.UserId), Guid.Parse(id), action);
+    }
+    
+    [HttpPost]
+    [Route("group/{id}/action/speak")]
+    public async Task ActionSpeak(string id, [FromBody] GenericUserRequest request)
+    {
+        IAction action = new Speak();
+        await _groupService.ActAsync(Guid.Parse(request.UserId), Guid.Parse(id), action);
+    }
+    
+    [HttpPost]
+    [Route("group/{id}/action/yield")]
+    public async Task ActionYield(string id, [FromBody] GenericUserRequest request)
+    {
+        IAction action = new YieldTheFloor();
+        await _groupService.ActAsync(Guid.Parse(request.UserId), Guid.Parse(id), action);
     }
 }

@@ -54,7 +54,8 @@ namespace InterfaceAdapters
                     Name = m.Name
                 }),
                 State = x.GetState().GetDescription(),
-                Resolutions = x.Resolutions
+                Resolutions = x.Resolutions,
+                Name = x.Bylaws.Name
             };
         }
 
@@ -81,6 +82,16 @@ namespace InterfaceAdapters
         {
             var actor = await _database.GetPersonAsync(userId);
             var motion = new Resolve(resolution);
+            var group = await _database.GetGroupAsync(groupId);
+            var action = new Move(motion);
+            group.TakeAction(actor, action);
+            await _database.UpdateGroupAsync(group);
+        }
+        
+        public async Task MoveChangeGroupName(Guid userId, Guid groupId, string groupName)
+        {
+            var actor = await _database.GetPersonAsync(userId);
+            var motion = new ChangeOrgName(groupName);
             var group = await _database.GetGroupAsync(groupId);
             var action = new Move(motion);
             group.TakeAction(actor, action);

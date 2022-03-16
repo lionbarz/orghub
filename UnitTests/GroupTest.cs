@@ -54,5 +54,36 @@ namespace UnitTests
             group.TakeAction(mo, new MoveToAdjourn());
             Assert.IsInstanceOfType(group.GetState(), typeof(AdjournedState));
         }
+        
+        [TestMethod]
+        public void SecondAndVoteOnMotion()
+        {
+            var mo = new Person("Mo");
+            var roni = new Person("Roni");
+            var members = new Person[] { mo };
+            var group = Group.MassMeeting(mo);
+
+            group.TakeAction(mo, new CallMeetingToOrder());
+            Assert.IsInstanceOfType(group.GetState(), typeof(OpenFloorState));
+            
+            group.TakeAction(mo, new Move(new ElectChair(roni)));
+            Assert.IsInstanceOfType(group.GetState(), typeof(DebateState));
+            
+            group.TakeAction(roni, new Move(new EndDebate()));
+            Assert.IsInstanceOfType(group.GetState(), typeof(MotionProposed));
+
+            // Seconded, so a vote is taken on ending debate.
+            group.TakeAction(mo, new SecondMotion());
+            Assert.IsInstanceOfType(group.GetState(), typeof(VotingState));
+            
+            // Vote passes, so debate ends and now voting on original motion.
+            group.TakeAction(mo, new DeclareMotionPassed());
+            Assert.IsInstanceOfType(group.GetState(), typeof(VotingState));
+            
+            // Original motion passed, so back to open floor.
+            group.TakeAction(mo, new DeclareMotionPassed());
+            Assert.AreEqual(roni, group.Chair);
+            Assert.IsInstanceOfType(group.GetState(), typeof(OpenFloorState));
+        }
     }
 }

@@ -29,5 +29,10 @@ namespace InterfaceAdapters.Models
         /// All resolutions passed by the group.
         /// </summary>
         public IEnumerable<string> Resolutions { get; set; }
+        
+        /// <summary>
+        /// The group name.
+        /// </summary>
+        public string Name { get; set; }
     }
 }

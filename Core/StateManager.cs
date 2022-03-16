@@ -19,11 +19,11 @@ namespace Core
         /// It always starts with an adjourned state.
         /// </summary>
         private LinkedList<IMeetingState> States { get; }
-        
+
         public void Act(MeetingAttendee actor, IAction action)
         {
             IMeetingState currentState = States.Last();
-            
+
             Console.WriteLine($"State: {currentState.GetDescription()}");
             Console.WriteLine($"Action: {action.Describe(actor.Person)}");
 
@@ -34,21 +34,27 @@ namespace Core
                 {
                     States.RemoveLast();
                 }
+
                 return;
             }
-            
-            if (currentState.TryHandleAction(actor, action, out IMeetingState? newState,
+
+            if (currentState.TryHandleAction(actor, action, out IMeetingState? newState, out bool replaceCurrentState,
                     out IAction? resultingAction))
             {
                 if (newState != null)
                 {
+                    if (replaceCurrentState)
+                    {
+                        States.RemoveLast();
+                    }
+                    
                     States.AddLast(newState);
                     return;
                 }
-                
+
                 // The current state is done. Go back to last state on stack.
                 States.RemoveLast();
-                
+
                 if (resultingAction != null)
                 {
                     Act(actor, resultingAction);

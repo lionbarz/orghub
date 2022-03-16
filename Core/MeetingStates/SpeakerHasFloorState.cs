@@ -8,7 +8,7 @@ namespace Core.MeetingStates
     {
         // The speaker who has the floor.
         private MeetingAttendee Speaker { get; }
-        
+
         // The amount of time the speaker has.
         private TimeSpan AllotedTime { get; }
 
@@ -16,19 +16,21 @@ namespace Core.MeetingStates
         {
             Speaker = speaker;
         }
-        
+
         public bool TryHandleAction(MeetingAttendee actor, IAction action, out IMeetingState? newState,
+            out bool replaceCurrentState,
             out IAction? resultingAction)
         {
             newState = null;
             resultingAction = null;
-            
+            replaceCurrentState = false;
+
             if (actor.IsChair && action is ExpireSpeakerTime)
             {
                 return true;
             }
 
-            if (actor == Speaker && action is YieldTheFloor)
+            if (actor.Equals(Speaker) && action is YieldTheFloor)
             {
                 return true;
             }

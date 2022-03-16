@@ -7,7 +7,7 @@ export class Group extends Component {
 
     constructor(props) {
         super(props);
-        this.state = { group: null, loading: true, resolution: "" };
+        this.state = { group: null, loading: true, resolution: "", groupName: "" };
     }
 
     componentDidMount() {
@@ -57,8 +57,22 @@ export class Group extends Component {
         await this.populateGroupData();
     }
 
+    async moveGroupName(text) {
+        const requestOptions = {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name: text, userId: this.userId })
+        };
+        await fetch(`group/${this.props.match.params.id}/action/movechangegroupname`, requestOptions);
+        await this.populateGroupData();
+    }
+
     handleChangeResolution = (event) => {
         this.setState({resolution: event.target.value});
+    }
+
+    handleChangeGroupName = (event) => {
+        this.setState({groupName: event.target.value});
     }
     
     render() {
@@ -73,10 +87,16 @@ export class Group extends Component {
                 {contents}
                 <button className="btn btn-primary" onClick={() => this.takeAction("calltoorder")}>Call to order</button>
                 <button className="btn btn-primary" onClick={() => this.takeAction("adjourn")}>Adjourn</button>
+                <button className="btn btn-primary" onClick={() => this.takeAction("speak")}>speak</button>
+                <button className="btn btn-primary" onClick={() => this.takeAction("yield")}>Yield</button>
+                <button className="btn btn-primary" onClick={() => this.takeAction("second")}>Second</button>
+                <button className="btn btn-primary" onClick={() => this.takeAction("moveenddebate")}>I want to vote now</button>
                 <button className="btn btn-primary" onClick={() => this.takeAction("declaremotionpassed")}>Declare motion passed</button>
                 <button className="btn btn-primary" onClick={() => this.moveElectChair("Rawan Hammoud")}>Elect Roni chair</button>
-                <button className="btn btn-primary" onClick={() => this.moveResolution(this.state.resolution)}>Resolution</button>
+                <button className="btn btn-primary" onClick={() => this.moveResolution(this.state.resolution)}>Suggest resolution</button>
                 <input type="text" value={this.state.resolution} onChange={this.handleChangeResolution} />
+                <button className="btn btn-primary" onClick={() => this.moveGroupName(this.state.groupName)}>Suggest group name</button>
+                <input type="text" value={this.state.groupName} onChange={this.handleChangeGroupName} />
             </div>
         );
     }
