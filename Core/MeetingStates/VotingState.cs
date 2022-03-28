@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Core.Actions;
 using Core.Motions;
 
@@ -14,15 +15,16 @@ namespace Core.MeetingStates
             _motion = motion;
             _groupModifier = groupModifier;
         }
-        
-        public bool TryHandleAction(MeetingAttendee actor, IAction action, out IMeetingState? newState, out bool replaceCurrentState,
+
+        public bool TryHandleAction(MeetingAttendee actor, IAction action, out IMeetingState? newState,
+            out bool replaceCurrentState,
             out IAction? resultingAction)
         {
             newState = null;
             resultingAction = null;
             replaceCurrentState = false;
-            
-            if (action is DeclareMotionPassed && actor.IsChair)
+
+            if (action is DeclareMotionPassed)
             {
                 if (_motion is IGroupModifyingMotion actionableMotion)
                 {
@@ -40,9 +42,14 @@ namespace Core.MeetingStates
             return false;
         }
 
-        public IEnumerable<ActionType> GetSupportedActions(MeetingAttendee attendee)
+        public IEnumerable<Type> GetSupportedActions(MeetingAttendee actor)
         {
-            throw new System.NotImplementedException();
+            return new[] { typeof(DeclareMotionPassed) };
+        }
+        
+        public IEnumerable<Type> GetSupportedMotions()
+        {
+            return Array.Empty<Type>();
         }
 
         public string GetDescription()

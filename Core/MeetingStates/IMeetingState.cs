@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Core.Actions;
 
 namespace Core.MeetingStates
@@ -28,14 +29,17 @@ namespace Core.MeetingStates
             out IAction? resultingAction);
 
         /// <summary>
-        /// What actions this attendee can take, taking into account the roles.
-        /// This mirrors the action handling, such that if it can be handled,
-        /// it's returned here.
+        /// What actions can be taken during this state.
         /// </summary>
-        IEnumerable<ActionType> GetSupportedActions(MeetingAttendee attendee);
+        IEnumerable<Type> GetSupportedActions(MeetingAttendee actor);
 
         /// <summary>
-        /// What is going on at the meeting at this stage?
+        /// The motions that can be moved during this state.
+        /// </summary>
+        IEnumerable<Type> GetSupportedMotions();
+
+        /// <summary>
+        /// What is going on at the meeting at this stage.
         /// </summary>
         string GetDescription();
     }

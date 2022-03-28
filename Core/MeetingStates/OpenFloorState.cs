@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Core.Actions;
+using Core.Motions;
 
 namespace Core.MeetingStates
 {
@@ -42,9 +44,20 @@ namespace Core.MeetingStates
             return false;
         }
 
-        public IEnumerable<ActionType> GetSupportedActions(MeetingAttendee attendee)
+        public IEnumerable<Type> GetSupportedActions(MeetingAttendee actor)
         {
-            return new[] { ActionType.MoveToAdjourn, ActionType.Speak };
+            return new[]
+            {
+                typeof(MoveToAdjourn), typeof(Speak)
+            };
+        }
+        
+        public IEnumerable<Type> GetSupportedMotions()
+        {
+            return new[]
+            {
+                typeof(Resolve), typeof(ElectChair), typeof(ChangeOrgName)
+            };
         }
 
         public string GetDescription()

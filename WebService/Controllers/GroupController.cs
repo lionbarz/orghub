@@ -38,6 +38,35 @@ public class GroupController : ControllerBase
         IAction action = new CallMeetingToOrder();
         await _groupService.AddGroupAsync(Guid.Parse(request.UserId));
     }
+    
+    /// <summary>
+    /// Get all available actions.
+    /// </summary>
+    [HttpGet]
+    [Route("group/{id}/action")]
+    public async Task<IEnumerable<string>> GetAvailableActions(string id, string userId)
+    {
+        var actions = await _groupService.GetAvailableActions(Guid.Parse(userId), Guid.Parse(id));
+        return actions;
+    }
+    
+    /// <summary>
+    /// Get all available motions.
+    /// </summary>
+    [HttpGet]
+    [Route("group/{id}/motion")]
+    public async Task<IEnumerable<string>> GetAvailableMotions(string id)
+    {
+        var motions = await _groupService.GetAvailableMotions(Guid.Parse(id));
+        return motions;
+    }
+    
+    [HttpGet]
+    [Route("group/{id}/minutes")]
+    public async Task<IEnumerable<string>> GetMinutes(string id)
+    {
+        return await _groupService.GetMinutes(Guid.Parse(id));
+    }
 
     [HttpPost]
     [Route("group/{id}/action/calltoorder")]

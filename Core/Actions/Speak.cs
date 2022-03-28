@@ -5,11 +5,7 @@
     /// </summary>
     public class Speak : IAction
     {
-        public bool IsAvailableToChairs => true;
-        public bool IsAvailableToMembers => true;
-        public bool IsAvailableToGuests => true;
-        
-        public string Describe(Person person)
+        public string RecordEntry(Person person)
         {
             return $"{person.Name} started speaking.";
         }

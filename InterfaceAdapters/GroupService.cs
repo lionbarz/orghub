@@ -55,8 +55,24 @@ namespace InterfaceAdapters
                 }),
                 State = x.GetState().GetDescription(),
                 Resolutions = x.Resolutions,
-                Name = x.Bylaws.Name
+                Name = x.Bylaws.Name,
+                Minutes = x.Minutes
             };
+        }
+
+        public async Task<IEnumerable<string>> GetAvailableActions(Guid userId, Guid groupId)
+        {
+            var actor = await _database.GetPersonAsync(userId);
+            var group = await _database.GetGroupAsync(groupId);
+            var actions = group.GetAvailableActions(actor);
+            return actions.Select(x => x.ToString());
+        }
+        
+        public async Task<IEnumerable<string>> GetAvailableMotions(Guid groupId)
+        {
+            var group = await _database.GetGroupAsync(groupId);
+            var actions = group.GetAvailableMotions();
+            return actions.Select(x => x.ToString());
         }
 
         public async Task ActAsync(Guid userId, Guid groupId, IAction action)
@@ -96,6 +112,12 @@ namespace InterfaceAdapters
             var action = new Move(motion);
             group.TakeAction(actor, action);
             await _database.UpdateGroupAsync(group);
+        }
+
+        public async Task<IEnumerable<string>> GetMinutes(Guid groupId)
+        {
+            var group = await _database.GetGroupAsync(groupId);
+            return group.Minutes;
         }
     }
 }

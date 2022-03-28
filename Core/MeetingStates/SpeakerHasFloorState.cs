@@ -25,7 +25,7 @@ namespace Core.MeetingStates
             resultingAction = null;
             replaceCurrentState = false;
 
-            if (actor.IsChair && action is ExpireSpeakerTime)
+            if (action is ExpireSpeakerTime)
             {
                 return true;
             }
@@ -38,21 +38,22 @@ namespace Core.MeetingStates
             return false;
         }
 
-        public IEnumerable<ActionType> GetSupportedActions(MeetingAttendee attendee)
+        public IEnumerable<Type> GetSupportedActions(MeetingAttendee actor)
         {
-            var actions = new List<ActionType>();
+            var actions = new LinkedList<Type>();
+            actions.AddLast(typeof(ExpireSpeakerTime));
 
-            if (attendee.IsChair)
+            if (actor.Equals(Speaker))
             {
-                actions.Add(ActionType.ExpireSpeakerTime);
-            }
-
-            if (attendee == Speaker)
-            {
-                actions.Add(ActionType.YieldTheFloor);
+                actions.AddLast(typeof(YieldTheFloor));
             }
 
             return actions;
+        }
+        
+        public IEnumerable<Type> GetSupportedMotions()
+        {
+            return Array.Empty<Type>();
         }
 
         public string GetDescription()

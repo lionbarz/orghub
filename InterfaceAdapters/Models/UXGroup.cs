@@ -34,5 +34,10 @@ namespace InterfaceAdapters.Models
         /// The group name.
         /// </summary>
         public string Name { get; set; }
+        
+        /// <summary>
+        /// The minutes, ie activity log.
+        /// </summary>
+        public IEnumerable<string> Minutes { get; set; }
     }
 }

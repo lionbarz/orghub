@@ -20,12 +20,14 @@ namespace Core
         /// </summary>
         private LinkedList<IMeetingState> States { get; }
 
-        public void Act(MeetingAttendee actor, IAction action)
+        public IEnumerable<string> Act(MeetingAttendee actor, IAction action)
         {
+            var minutes = new LinkedList<string>();
             IMeetingState currentState = States.Last();
 
+            minutes.AddLast($"{action.RecordEntry(actor.Person)}");
             Console.WriteLine($"State: {currentState.GetDescription()}");
-            Console.WriteLine($"Action: {action.Describe(actor.Person)}");
+            Console.WriteLine($"Action: {action.RecordEntry(actor.Person)}");
 
             if (action is MoveToAdjourn)
             {
@@ -35,8 +37,10 @@ namespace Core
                     States.RemoveLast();
                 }
 
-                return;
+                return minutes;
             }
+
+            VerifyPermission(action, actor);
 
             if (currentState.TryHandleAction(actor, action, out IMeetingState? newState, out bool replaceCurrentState,
                     out IAction? resultingAction))
@@ -49,7 +53,7 @@ namespace Core
                     }
                     
                     States.AddLast(newState);
-                    return;
+                    return minutes;
                 }
 
                 // The current state is done. Go back to last state on stack.
@@ -65,11 +69,27 @@ namespace Core
                 throw new ArgumentException(
                     $"{actor.Person.Name} can't take action {action} in meeting state {currentState}");
             }
+
+            return minutes;
         }
 
         public IMeetingState GetMeetingState()
         {
             return States.Last();
+        }
+
+        private void VerifyPermission(IAction action, MeetingAttendee actor)
+        {
+            var avail = new ActionAvailability();
+            var hasPermission = avail.IsActionAvailableToPerson(actor.IsMember, actor.IsChair, action.GetType());
+
+            if (!hasPermission)
+            {
+                // TODO: Make a new exception type.
+                // TODO: Add to exception string what the person is (guest, chair)
+                throw new Exception(
+                    $"{actor.Person.Name} cannot take action {action.ToString()} because it is only available to TODO");
+            }
         }
     }
 }

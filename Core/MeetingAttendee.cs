@@ -15,11 +15,13 @@ namespace Core
         public bool IsMember { get; set; }
         
         /// <summary>
-        /// Whether this person chairing the meeting.
+        /// Whether this person is chairing the meeting.
         /// </summary>
         public bool IsChair { get; set; }
 
         public override bool Equals(object? obj) => this.Equals(obj as MeetingAttendee);
+
+        public bool IsGuest => !IsMember && !IsChair;
         
         public bool Equals(MeetingAttendee? obj)
         {

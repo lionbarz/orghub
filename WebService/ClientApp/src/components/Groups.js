@@ -1,7 +1,4 @@
 ﻿import React, {Component} from 'react';
-import {Link} from "react-router-dom";
-import {NavLink} from "reactstrap";
-import { withRouter } from 'react-router-dom';
 import { Card, CardBody, CardText } from 'reactstrap';
 
 export class Groups extends Component {
@@ -27,8 +24,7 @@ export class Groups extends Component {
                     <Card key={group.id}>
                         <CardBody>
                             <h5 className="card-title">{group.name || "New Group"}</h5>
-                            <CardText>Chair: <strong>{group.chair.name}</strong></CardText>
-                            <CardText>State: {group.state}</CardText>
+                            <CardText>{group.state}</CardText>
                             {group.members.map(member => <p>Member: member.name</p>)}
                             <button className="btn btn-primary" onClick={() => visitGroup('/group/' + group.id)}>View Group</button>
                         </CardBody>

@@ -21,7 +21,7 @@ namespace Core.MeetingStates
             resultingAction = null;
             replaceCurrentState = false;
             
-            if (actor.IsChair && action is CallMeetingToOrder)
+            if (action is CallMeetingToOrder)
             {
                 // TODO: Automatically put the agenda item?
                 newState = new OpenFloorState(GroupModifier);
@@ -31,14 +31,19 @@ namespace Core.MeetingStates
             return false;
         }
 
-        public IEnumerable<ActionType> GetSupportedActions(MeetingAttendee attendee)
+        public IEnumerable<Type> GetSupportedActions(MeetingAttendee actor)
         {
-            return attendee.IsChair ? new[] { ActionType.CallMeetingToOrder } : Array.Empty<ActionType>();
+            return new[] { typeof(CallMeetingToOrder) };
+        }
+        
+        public IEnumerable<Type> GetSupportedMotions()
+        {
+            return Array.Empty<Type>();
         }
 
         public string GetDescription()
         {
-            return "The group is adjourned.";
+            return "Adjourned until the next meeting.";
         }
     }
 }

@@ -57,6 +57,11 @@ namespace Core
         /// Tracks the state of this group.
         /// </summary>
         private readonly StateManager _stateManager;
+        
+        /// <summary>
+        /// What states and actions have happened so far.
+        /// </summary>
+        public IList<string> Minutes { get; private init;  }
 
         /// <summary>
         /// Constructor.
@@ -67,6 +72,7 @@ namespace Core
             Members = new List<Person>();
             Meetings = new List<Meeting>();
             Resolutions = new List<string>();
+            Minutes = new List<string>();
             
             // TODO: Is there a better way to do this than pass this?
             _stateManager = new StateManager(this);
@@ -138,14 +144,12 @@ namespace Core
         // TODO: Have a method that marks people as present and if Mass Meeting then they are members, and have this method take a person Id and look it up in members. But what about guests?
         public void TakeAction(Person actor, IAction action)
         {
-            var attendee = new MeetingAttendee()
+            var attendee = CreateAttendee(actor);
+            var minutes = _stateManager.Act(attendee, action);
+            foreach (var minute in minutes)
             {
-                Person = actor,
-                IsChair = actor == Chair,
-                IsMember = IsMember(actor.Id)
-            };
-
-            _stateManager.Act(attendee, action);
+                Minutes.Add(minute);
+            }
         }
 
         private static bool IsEnoughNoticeGiven(DateTimeOffset currentTime, DateTimeOffset meetingTime,
@@ -172,6 +176,37 @@ namespace Core
         public IMeetingState GetState()
         {
             return _stateManager.GetMeetingState();
+        }
+
+        /// <summary>
+        /// Get the actions available to a person.
+        /// </summary>
+        /// <param name="person">The person who wants to take actions.</param>
+        public IEnumerable<Type> GetAvailableActions(Person person)
+        {
+            var state = GetState();
+            var attendee = CreateAttendee(person);
+            var actions = state.GetSupportedActions(attendee);
+            var avail = new ActionAvailability();
+            var filteredActions =
+                actions.Where(x => avail.IsActionAvailableToPerson(attendee.IsMember, attendee.IsChair, x));
+            return filteredActions;
+        }
+        
+        public IEnumerable<Type> GetAvailableMotions()
+        {
+            var state = GetState();
+            return state.GetSupportedMotions();
+        }
+        
+        private MeetingAttendee CreateAttendee(Person actor)
+        {
+            return new MeetingAttendee()
+            {
+                Person = actor,
+                IsChair = actor == Chair,
+                IsMember = IsMember(actor.Id)
+            };
         }
     }
 }

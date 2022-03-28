@@ -9,27 +9,9 @@ namespace Core.Actions
     public interface IAction
     {
         /// <summary>
-        /// Whether the chair can invoke this action.
-        /// </summary>
-        /// <returns></returns>
-        public bool IsAvailableToChairs { get; }
-
-        /// <summary>
-        /// Whether a member can invoke this action.
-        /// </summary>
-        /// <returns></returns>
-        public bool IsAvailableToMembers { get; }
-
-        /// <summary>
-        /// Whether a meeting guest can invoke this action.
-        /// </summary>
-        /// <returns></returns>
-        public bool IsAvailableToGuests { get; }
-
-        /// <summary>
-        /// Describe the action as taken by this person.
+        /// What should go in the record/minutes, in past tense.
         /// </summary>
         /// <remarks>Example: Mo started speaking.</remarks>
-        public string Describe(Person person);
+        public string RecordEntry(Person person);
     }
 }

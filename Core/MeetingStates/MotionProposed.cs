@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Core.Actions;
 using Core.Motions;
 
@@ -28,7 +29,7 @@ namespace Core.MeetingStates
             resultingAction = null;
             replaceCurrentState = false;
 
-            if (actor.IsMember && action is SecondMotion)
+            if (action is SecondMotion)
             {
                 if (_motion is EndDebate)
                 {
@@ -48,9 +49,17 @@ namespace Core.MeetingStates
             return false;
         }
 
-        public IEnumerable<ActionType> GetSupportedActions(MeetingAttendee attendee)
+        public IEnumerable<Type> GetSupportedActions(MeetingAttendee actor)
         {
-            throw new System.NotImplementedException();
+            return new[]
+            {
+                typeof(SecondMotion)
+            };
+        }
+        
+        public IEnumerable<Type> GetSupportedMotions()
+        {
+            return Array.Empty<Type>();
         }
 
         public string GetDescription()

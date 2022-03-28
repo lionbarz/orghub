@@ -7,10 +7,6 @@ namespace Core.Actions
     /// </summary>
     public class Move : IAction
     {
-        public bool IsAvailableToChairs => true;
-        public bool IsAvailableToMembers => true;
-        public bool IsAvailableToGuests => false;
-        
         /// <summary>
         /// Description of what the person is proposing/moving.
         /// </summary>
@@ -21,7 +17,7 @@ namespace Core.Actions
             Motion = motion;
         }
 
-        public string Describe(Person person)
+        public string RecordEntry(Person person)
         {
             return $"{person.Name} moved that: {Motion.GetText()}";
         }

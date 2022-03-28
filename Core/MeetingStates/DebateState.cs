@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Core.Actions;
 using Core.Motions;
 
@@ -42,13 +43,13 @@ namespace Core.MeetingStates
                 return true;
             }
 
-            if (actor.IsMember && action is Move { Motion: EndDebate } move)
+            if (action is Move { Motion: EndDebate } move)
             {
                 newState = new MotionProposed(actor.Person, move.Motion, GroupModifier);
                 return true;
             }
 
-            if (action is DeclareMotionPassed && actor.IsChair)
+            if (action is DeclareMotionPassed)
             {
                 if (Motion is IGroupModifyingMotion actionableMotion)
                 {
@@ -68,9 +69,21 @@ namespace Core.MeetingStates
             return false;
         }
 
-        public IEnumerable<ActionType> GetSupportedActions(MeetingAttendee attendee)
+        public IEnumerable<Type> GetSupportedActions(MeetingAttendee actor)
         {
-            return new[] { ActionType.MoveToAdjourn, ActionType.Speak };
+            return new[]
+            {
+                typeof(MoveToAdjourn), typeof(Speak), typeof(EndDebate), typeof(DeclareMotionPassed),
+                typeof(DeclareEndDebate)
+            };
+        }
+        
+        public IEnumerable<Type> GetSupportedMotions()
+        {
+            return new[]
+            {
+                typeof(EndDebate)
+            };
         }
 
         public string GetDescription()
