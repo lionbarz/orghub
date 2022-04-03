@@ -36,6 +36,10 @@ export class Home extends Component {
     render() {
         return (
             <div>
+                <div className="jumbotron">
+                    <h1 className="display-4">Group. Raise money. Grow. Make a difference.</h1>
+                    <p className="lead">Free for groups under 10 members.</p>
+                </div>
                 <h2>Who are you?</h2>
                 <label>
                     Name: <input size="50" name="user" value={this.state.name} onChange={this.handleChange}/>
