@@ -10,7 +10,7 @@ export class Group extends Component {
     }
 
     componentDidMount() {
-        this.updateState();
+        this.refreshLoop();
     }
 
     static render(group, actions) {
@@ -198,5 +198,10 @@ export class Group extends Component {
         const response = await fetch(`group/${id}/minutes`);
         const data = await response.json();
         this.setState({ minutes: data });
+    }
+
+    refreshLoop = () => {
+        this.updateState();
+        setTimeout(this.refreshLoop, 3000);
     }
 }
