@@ -1,4 +1,4 @@
-﻿import React, { Component } from 'react';
+import React, { Component } from 'react';
 
 export class Group extends Component {
     static displayName = Group.name;
@@ -26,7 +26,7 @@ export class Group extends Component {
                     <div className="card-header">Happening Now</div>
                     <div className="card-body">
                         <p className="card-text">{group.state}</p>
-                        
+
                     </div>
                     {actions}
                 </div>
@@ -34,7 +34,7 @@ export class Group extends Component {
                     <div className="card-header">Decisions Agreed On</div>
                     <div className="card-body">
                         <ul>
-                        {group.resolutions.map(text => <li className="card-text">{text}</li>)}
+                            {group.resolutions.map(text => <li className="card-text">{text}</li>)}
                         </ul>
                     </div>
                 </div>
@@ -50,7 +50,7 @@ export class Group extends Component {
             </div>
         );
     }
-    
+
     renderActions = () => {
         return (
             <div>
@@ -82,7 +82,7 @@ export class Group extends Component {
                         chair</button>
                 }
                 {this.state.motions.includes('Core.Motions.Resolve') && <button className="btn btn-primary"
-                                                                                  onClick={() => this.moveResolution(this.state.resolution)}>Suggest
+                                                                                onClick={() => this.moveResolution(this.state.resolution)}>Suggest
                     resolution</button>
                 }
                 {this.state.motions.includes('Core.Motions.Resolve') &&
@@ -146,7 +146,7 @@ export class Group extends Component {
     handleChangeGroupName = (event) => {
         this.setState({groupName: event.target.value});
     }
-    
+
     render() {
         let contents = this.state.loading
             ? <p><em>Loading...</em></p>
@@ -171,7 +171,7 @@ export class Group extends Component {
         this.getAvailableMotions();
         this.getMinutes();
     }
-    
+
     async populateGroupData() {
         const id = this.props.match.params.id;
         const response = await fetch(`group/${id}`);

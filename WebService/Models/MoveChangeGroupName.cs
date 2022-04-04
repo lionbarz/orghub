@@ -2,5 +2,5 @@
 
 public class MoveChangeGroupName : GenericUserRequest
 {
-    public string Name { get; set; }
+    public string? Name { get; set; }
 }

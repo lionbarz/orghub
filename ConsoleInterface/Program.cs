@@ -10,10 +10,10 @@ namespace ConsoleInterface
     {
         static void Main(string[] args)
         {
-            Run().Wait();
+            Run();
         }
 
-        static async Task Run()
+        static void Run()
         {
             IDatabaseAccess db = new InMemoryDatabase();
             GroupService groupService = new(db);

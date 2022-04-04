@@ -1,4 +1,4 @@
-﻿import React, {Component} from 'react';
+import React, {Component} from 'react';
 import { Card, CardBody, CardText } from 'reactstrap';
 
 export class Groups extends Component {
@@ -12,7 +12,7 @@ export class Groups extends Component {
     componentDidMount() {
         this.populateGroupData();
     }
-    
+
     visitGroup = (path) => {
         this.props.history.push(path);
     }
@@ -40,7 +40,7 @@ export class Groups extends Component {
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({userId: localStorage.getItem('userId')})
         };
-        const response = await fetch('group', requestOptions);
+        await fetch('group', requestOptions);
         await this.populateGroupData();
     }
 
