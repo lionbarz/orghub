@@ -15,7 +15,7 @@ namespace UnitTests
             var mo = new Person("Mo");
             var zaki = new Person("Zaki");
             var members = new Person[] { mo };
-            var group = Group.MassMeeting(mo);
+            var group = Group.NewInstance(mo);
             
             Assert.IsTrue(group.IsMember(zaki.Id));
             Assert.IsTrue(group.IsMember(mo.Id));
@@ -38,8 +38,7 @@ namespace UnitTests
         {
             var mo = new Person("Mo");
             var omar = new Person("Omar");
-            var members = new Person[] { mo };
-            var group = Group.MassMeeting(mo);
+            var group = Group.NewInstance(mo);
 
             group.TakeAction(mo, new CallMeetingToOrder());
             Assert.IsInstanceOfType(group.GetState(), typeof(OpenFloorState));
@@ -61,7 +60,7 @@ namespace UnitTests
             var mo = new Person("Mo");
             var roni = new Person("Roni");
             var members = new Person[] { mo };
-            var group = Group.MassMeeting(mo);
+            var group = Group.NewInstance(mo);
 
             group.TakeAction(mo, new CallMeetingToOrder());
             Assert.IsInstanceOfType(group.GetState(), typeof(OpenFloorState));

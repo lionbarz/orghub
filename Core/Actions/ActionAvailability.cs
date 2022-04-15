@@ -43,6 +43,7 @@ namespace Core.Actions
             { typeof(ElectChair), new Availability(false, true, true) },
             { typeof(EndDebate), new Availability(false, true, true) },
             { typeof(Resolve), new Availability(false, true, true) },
+            { typeof(GrantMembership), new Availability(false, true, true)}
         };
     }
 }

@@ -1,16 +1,29 @@
 import React, { Component } from 'react';
+import { Button } from 'reactstrap';
+import { Modal, ModalBody, ModalHeader, ModalFooter, FormGroup, Input } from 'reactstrap';
 
 export class Group extends Component {
     static displayName = Group.name;
-    userId = localStorage.getItem('userId');
+    user = JSON.parse(localStorage.getItem('user'));
+    
+    // The ID of the interval that is refreshing the state.
+    intervalId = null;
 
     constructor(props) {
         super(props);
-        this.state = { group: null, loading: true, resolution: "", groupName: "", actions: [], motions: [], minutes: [] };
+        this.state = { group: null, loading: true, resolution: "", groupName: "", actions: [], motions: [], minutes: [],
+            showMembershipModal: false,
+            allPeople: [],
+            selectedPersonId: null};
     }
 
-    componentDidMount() {
-        this.refreshLoop();
+    componentDidMount = () => {
+        this.updateState();
+        this.intervalId = setInterval(this.updateState, 5000);
+    }
+
+    componentWillUnmount = () => {
+        clearInterval(this.intervalId);
     }
 
     static render(group, actions) {
@@ -26,7 +39,6 @@ export class Group extends Component {
                     <div className="card-header">Happening Now</div>
                     <div className="card-body">
                         <p className="card-text">{group.state}</p>
-
                     </div>
                     {actions}
                 </div>
@@ -34,7 +46,7 @@ export class Group extends Component {
                     <div className="card-header">Decisions Agreed On</div>
                     <div className="card-body">
                         <ul>
-                            {group.resolutions.map(text => <li className="card-text">{text}</li>)}
+                            {group.resolutions.map(text => <li key={text} className="card-text">{text}</li>)}
                         </ul>
                     </div>
                 </div>
@@ -42,11 +54,18 @@ export class Group extends Component {
                     <div className="card-header">History</div>
                     <div className="card-body">
                         <ul>
-                            {group.minutes.map(text => <li className="card-text">{text}</li>)}
+                            {group.minutes.map(text => <li key={text} className="card-text">{text}</li>)}
                         </ul>
                     </div>
                 </div>
-                {group.members.map(member => <p>Member: {member.name}</p>)}
+                <div className="card mb-3" style={{maxWidth: "36rem"}}>
+                    <div className="card-header">Members</div>
+                    <div className="card-body">
+                        <ul>
+                            {group.members.map(member => <li key={member.id} className="card-text">{member.name}</li>)}
+                        </ul>
+                    </div>
+                </div>
             </div>
         );
     }
@@ -55,11 +74,14 @@ export class Group extends Component {
         return (
             <div>
                 {this.state.actions.includes('Core.Actions.CallMeetingToOrder') &&
-                    <button className="btn btn-primary" onClick={() => this.takeAction("calltoorder")}>Call to
-                        order</button>
+                    <Button color="primary" onClick={() => this.takeAction("calltoorder")}>
+                        Call to order
+                    </Button>
                 }
                 {this.state.actions.includes('Core.Actions.MoveToAdjourn') &&
-                    <button className="btn btn-primary" onClick={() => this.takeAction("adjourn")}>Suggest ending the meeting</button>
+                    <Button color="primary" onClick={() => this.takeAction("adjourn")}>
+                        Suggest ending the meeting
+                    </Button>
                 }
                 {this.state.actions.includes('Core.Actions.Speak') &&
                     <button className="btn btn-primary" onClick={() => this.takeAction("speak")}>Speak</button>
@@ -95,6 +117,11 @@ export class Group extends Component {
                 {this.state.motions.includes('Core.Motions.ChangeOrgName') &&
                     <input type="text" value={this.state.groupName} onChange={this.handleChangeGroupName}/>
                 }
+                {this.state.motions.includes('Core.Motions.GrantMembership') &&
+                    <Button color="primary" onClick={() => this.moveGrantMembershipPrompt()}>
+                        Suggest adding a member
+                    </Button>
+                }
             </div>
         );
     }
@@ -103,7 +130,7 @@ export class Group extends Component {
         const requestOptions = {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ userId: this.userId })
+            body: JSON.stringify({ userId: this.user.id })
         };
         await fetch(`group/${this.props.match.params.id}/action/${action}`, requestOptions);
         await this.updateState();
@@ -113,7 +140,7 @@ export class Group extends Component {
         const requestOptions = {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ nomineeName: nomineeName, userId: this.userId })
+            body: JSON.stringify({ nomineeName: nomineeName, userId: this.user.id })
         };
         await fetch(`group/${this.props.match.params.id}/action/electchair`, requestOptions);
         await this.updateState();
@@ -123,7 +150,7 @@ export class Group extends Component {
         const requestOptions = {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ text: text, userId: this.userId })
+            body: JSON.stringify({ text: text, userId: this.user.id })
         };
         await fetch(`group/${this.props.match.params.id}/action/moveresolution`, requestOptions);
         await this.updateState();
@@ -133,10 +160,31 @@ export class Group extends Component {
         const requestOptions = {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ name: text, userId: this.userId })
+            body: JSON.stringify({ name: text, userId: this.user.id })
         };
         await fetch(`group/${this.props.match.params.id}/action/movechangegroupname`, requestOptions);
         await this.updateState();
+    }
+
+    async moveGrantMembership(personId) {
+        const requestOptions = {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ personId: personId, userId: this.user.id })
+        };
+        await fetch(`group/${this.props.match.params.id}/action/movegrantmembership`, requestOptions);
+        await this.updateState();
+    }
+
+    moveGrantMembershipPrompt = async () => {
+        console.log("Show modal.");
+        this.getAllPeople();
+        this.setState({showMembershipModal: true});
+    }
+    
+    closeGrantMembershipPrompt = () => {
+        console.log("Close modal.");
+        this.setState({showMembershipModal: false});
     }
 
     handleChangeResolution = (event) => {
@@ -146,8 +194,14 @@ export class Group extends Component {
     handleChangeGroupName = (event) => {
         this.setState({groupName: event.target.value});
     }
+    
+    handleChangePersonSelect = (event) => {
+        let personId = event.target.value;
+        console.log("Selected person " + personId);
+        this.setState({selectedPersonId: personId});
+    }
 
-    render() {
+    render = () => {
         let contents = this.state.loading
             ? <p><em>Loading...</em></p>
             : Group.render(this.state.group, this.renderActions());
@@ -155,53 +209,86 @@ export class Group extends Component {
         return (
             <div>
                 {!this.state.group &&
-                    <h1 id="tabelLabel">Group</h1>
+                    <h1 id="tabelLabel">Loading...</h1>
                 }
                 {this.state.group &&
                     <h1 id="tabelLabel">{this.state.group.name}</h1>
                 }
                 {contents}
+                <Modal isOpen={this.state.showMembershipModal} toggle={() => this.closeGrantMembershipPrompt()}>
+                    <ModalHeader
+                        close={<button className="close" onClick={this.closeGrantMembershipPrompt}>×</button>}
+                        toggle={this.closeGrantMembershipPrompt}>
+                        Who do you think should join {this.state.group && this.state.group.name}?
+                    </ModalHeader>
+                    <ModalBody>
+                        <FormGroup>
+                            <Input
+                                id="exampleSelect"
+                                name="select"
+                                type="select"
+                                onChange={this.handleChangePersonSelect}>
+                                <option key="default" value="default">-- Select --</option>
+                                {this.state.allPeople.map(person =>
+                                    <option key={person.id} value={person.id} className="card-text">{person.name}</option>)}
+                            </Input>
+                        </FormGroup>
+                    </ModalBody>
+                    <ModalFooter>
+                        <Button
+                            color="primary"
+                            onClick={() => this.moveGrantMembership(this.state.selectedPersonId)}>
+                            Suggest membership
+                        </Button>
+                        {' '}
+                        <Button onClick={this.closeGrantMembershipPrompt}>
+                            Cancel
+                        </Button>
+                    </ModalFooter>
+                </Modal>
             </div>
         );
     }
 
-    async updateState() {
+    updateState = async () => {
+        console.log("Updating state");
         this.populateGroupData();
         this.getAvailableActions();
         this.getAvailableMotions();
         this.getMinutes();
     }
 
-    async populateGroupData() {
+    populateGroupData = async () => {
         const id = this.props.match.params.id;
         const response = await fetch(`group/${id}`);
         const data = await response.json();
         this.setState({ group: data, loading: false });
     }
 
-    async getAvailableActions() {
+    getAvailableActions = async () => {
         const id = this.props.match.params.id;
-        const response = await fetch(`group/${id}/action?userId=${this.userId}`);
+        const response = await fetch(`group/${id}/action?userId=${this.user.id}`);
         const data = await response.json();
         this.setState({ actions: data });
     }
 
-    async getAvailableMotions() {
+    getAvailableMotions = async () => {
         const id = this.props.match.params.id;
-        const response = await fetch(`group/${id}/motion`);
+        const response = await fetch(`group/${id}/motion?userId=${this.user.id}`);
         const data = await response.json();
         this.setState({ motions: data });
     }
 
-    async getMinutes() {
+    getMinutes = async () => {
         const id = this.props.match.params.id;
         const response = await fetch(`group/${id}/minutes`);
         const data = await response.json();
         this.setState({ minutes: data });
     }
 
-    refreshLoop = () => {
-        this.updateState();
-        setTimeout(this.refreshLoop, 3000);
+    getAllPeople = async () => {
+        const response = await fetch(`person`);
+        const data = await response.json();
+        this.setState({ allPeople: data });
     }
 }

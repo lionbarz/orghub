@@ -21,7 +21,7 @@ namespace InterfaceAdapters
         public async Task<UXGroup> AddGroupAsync(Guid userId)
         {
             var chair = await _database.GetPersonAsync(userId);
-            var group = Group.MassMeeting(chair);
+            var group = Group.NewInstance(chair);
             await _database.AddGroupAsync(group);
             return ToUxGroup(group);
         }
@@ -68,10 +68,11 @@ namespace InterfaceAdapters
             return actions.Select(x => x.ToString());
         }
         
-        public async Task<IEnumerable<string>> GetAvailableMotions(Guid groupId)
+        public async Task<IEnumerable<string>> GetAvailableMotions(Guid userId, Guid groupId)
         {
+            var actor = await _database.GetPersonAsync(userId);
             var group = await _database.GetGroupAsync(groupId);
-            var actions = group.GetAvailableMotions();
+            var actions = group.GetAvailableMotions(actor);
             return actions.Select(x => x.ToString());
         }
 
@@ -87,9 +88,9 @@ namespace InterfaceAdapters
         {
             var actor = await _database.GetPersonAsync(userId);
             Person nominee = new Person(nomineeName);
-            IMotion motion = new ElectChair(nominee);
-            IAction action = new Move(motion);
             var group = await _database.GetGroupAsync(groupId);
+            IMotion motion = new ElectChair(nominee, group);
+            IAction action = new Move(motion);
             group.TakeAction(actor, action);
             await _database.UpdateGroupAsync(group);
         }
@@ -97,8 +98,8 @@ namespace InterfaceAdapters
         public async Task MoveResolution(Guid userId, Guid groupId, string resolution)
         {
             var actor = await _database.GetPersonAsync(userId);
-            var motion = new Resolve(resolution);
             var group = await _database.GetGroupAsync(groupId);
+            var motion = new Resolve(resolution, group);
             var action = new Move(motion);
             group.TakeAction(actor, action);
             await _database.UpdateGroupAsync(group);
@@ -107,8 +108,19 @@ namespace InterfaceAdapters
         public async Task MoveChangeGroupName(Guid userId, Guid groupId, string groupName)
         {
             var actor = await _database.GetPersonAsync(userId);
-            var motion = new ChangeOrgName(groupName);
             var group = await _database.GetGroupAsync(groupId);
+            var motion = new ChangeOrgName(groupName, group);
+            var action = new Move(motion);
+            group.TakeAction(actor, action);
+            await _database.UpdateGroupAsync(group);
+        }
+        
+        public async Task MoveGrantMembership(Guid userId, Guid groupId, Guid nomineeId)
+        {
+            var actor = await _database.GetPersonAsync(userId);
+            var nominee = await _database.GetPersonAsync(nomineeId);
+            var group = await _database.GetGroupAsync(groupId);
+            var motion = new GrantMembership(nominee, group);
             var action = new Move(motion);
             group.TakeAction(actor, action);
             await _database.UpdateGroupAsync(group);

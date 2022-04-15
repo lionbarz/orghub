@@ -15,6 +15,7 @@ namespace InterfaceAdapters
         
         Task AddPersonAsync(Person person);
         Task<Person> GetPersonAsync(Guid personId);
+        Task<IEnumerable<Person>> GetPersonsAsync();
 
         Task AddMeetingAsync(Meeting meeting);
         Task<IEnumerable<Meeting>> ListMeetingsAsync();

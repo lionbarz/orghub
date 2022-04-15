@@ -25,7 +25,6 @@ export class Groups extends Component {
                         <CardBody>
                             <h5 className="card-title">{group.name || "New Group"}</h5>
                             <CardText>{group.state}</CardText>
-                            {group.members.map(member => <p>Member: member.name</p>)}
                             <button className="btn btn-primary" onClick={() => visitGroup('/group/' + group.id)}>View Group</button>
                         </CardBody>
                     </Card>
@@ -35,10 +34,11 @@ export class Groups extends Component {
     }
 
     addGroup = async () => {
+        let user = JSON.parse(localStorage.getItem('user'));
         const requestOptions = {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({userId: localStorage.getItem('userId')})
+            body: JSON.stringify({userId: user.id})
         };
         await fetch('group', requestOptions);
         await this.populateGroupData();
@@ -52,8 +52,8 @@ export class Groups extends Component {
         return (
             <div>
                 <h1 id="tabelLabel">Groups</h1>
-                <button className="btn btn-primary" onClick={() => this.addGroup()}>Create Group</button>
                 {contents}
+                <button className="btn btn-primary mt-3" onClick={() => this.addGroup()}>Add Group</button>
             </div>
         );
     }

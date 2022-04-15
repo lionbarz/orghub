@@ -26,9 +26,9 @@ namespace Core.MeetingStates
 
             if (action is DeclareMotionPassed)
             {
-                if (_motion is IGroupModifyingMotion actionableMotion)
+                if (_motion is GroupModifyingMotion groupModifyingMotion)
                 {
-                    actionableMotion.TakeActionAsync(_groupModifier);
+                    groupModifyingMotion.TakeActionAsync();
                 }
 
                 if (_motion is IActionTakingMotion actionTakingMotion)

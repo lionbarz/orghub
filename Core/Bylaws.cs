@@ -35,9 +35,9 @@ namespace Core
             Mission = mission;
         }
 
-        public static Bylaws MassMeeting()
+        public static Bylaws Default()
         {
-            return new Bylaws("Mass Meeting", "Conduct new business")
+            return new Bylaws("New Group", "Make a difference.")
             {
                 MinimumMeetingNotice = TimeSpan.FromDays(3)
             };

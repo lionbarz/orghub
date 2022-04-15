@@ -56,7 +56,7 @@ namespace Core.MeetingStates
         {
             return new[]
             {
-                typeof(Resolve), typeof(ElectChair), typeof(ChangeOrgName)
+                typeof(Resolve), typeof(ElectChair), typeof(ChangeOrgName), typeof(GrantMembership)
             };
         }
 

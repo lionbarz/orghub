@@ -55,9 +55,9 @@ public class GroupController : ControllerBase
     /// </summary>
     [HttpGet]
     [Route("group/{id}/motion")]
-    public async Task<IEnumerable<string>> GetAvailableMotions(string id)
+    public async Task<IEnumerable<string>> GetAvailableMotions(string id, string userId)
     {
-        var motions = await _groupService.GetAvailableMotions(Guid.Parse(id));
+        var motions = await _groupService.GetAvailableMotions(Guid.Parse(userId), Guid.Parse(id));
         return motions;
     }
     
@@ -94,9 +94,17 @@ public class GroupController : ControllerBase
 
     [HttpPost]
     [Route("group/{id}/action/electchair")]
-    public async Task ActionElectChair(string id, [FromBody] ElectChairRequest request)
+    public async Task ActionElectChair(string id, [FromBody] GenericPersonRequest request)
     {
-        await _groupService.ElectChair(Guid.Parse(request.UserId), Guid.Parse(id), request.NomineeName);
+        await _groupService.ElectChair(Guid.Parse(request.UserId), Guid.Parse(id), request.PersonId);
+    }
+    
+    [HttpPost]
+    [Route("group/{id}/action/movegrantmembership")]
+    public async Task ActionMoveGrantMembership(string id, [FromBody] GenericPersonRequest request)
+    {
+        await _groupService.MoveGrantMembership(Guid.Parse(request.UserId), Guid.Parse(id),
+            Guid.Parse(request.PersonId));
     }
 
     [HttpPost]

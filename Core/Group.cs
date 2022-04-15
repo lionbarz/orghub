@@ -33,12 +33,6 @@ namespace Core
         public ICollection<Person> Members { get; private init; }
 
         /// <summary>
-        /// If true, then there isn't a strict membership.
-        /// Everyone is a member.
-        /// </summary>
-        public bool IsMassMeeting { get; private set; }
-
-        /// <summary>
         /// The person chairing the organization.
         /// </summary>
         public Person? Chair { get; private set; }
@@ -78,14 +72,15 @@ namespace Core
             _stateManager = new StateManager(this);
         }
 
-        public static Group MassMeeting(Person chair)
+        public static Group NewInstance(Person creator)
         {
             var group = new Group
             {
-                IsMassMeeting = true,
-                Chair = chair,
-                Bylaws = Bylaws.MassMeeting()
+                Chair = creator,
+                Bylaws = Bylaws.Default(),
+                Members = new List<Person>() { creator }
             };
+
             return group;
         }
 
@@ -105,7 +100,7 @@ namespace Core
                 group.Members.Add(member);
             }
 
-            group.Bylaws = Bylaws.MassMeeting();
+            group.Bylaws = Bylaws.Default();
 
             return group;
         }
@@ -120,24 +115,9 @@ namespace Core
             Chair = person;
         }
 
-        public Meeting CreateMeeting(DateTimeOffset startTime)
-        {
-            if (!IsEnoughNoticeGiven(DateTimeOffset.Now, startTime, Bylaws.MinimumMeetingNotice))
-            {
-                throw new ArgumentException($"{Bylaws.MinimumMeetingNotice} notice required.");
-            }
-
-            // TODO: This fixes the number in time. Need to pull in real time.
-            int quorum = Bylaws.MeetingQuorum.GetQuorumNumber(Members.Count);
-
-            var meeting = Meeting.NewInstance(Chair, startTime, quorum);
-            Meetings.Add(meeting);
-            return meeting;
-        }
-
         public bool IsMember(Guid personId)
         {
-            return IsMassMeeting || Members.Any(x => x.Id == personId);
+            return Members.Any(x => x.Id == personId);
         }
 
         // TODO: Return result.
@@ -158,6 +138,11 @@ namespace Core
             return meetingTime - currentTime >= requiredNotice;
         }
 
+        public string GetName()
+        {
+            return Bylaws.Name;
+        }
+
         public void SetChair(Person person)
         {
             Chair = person;
@@ -171,6 +156,11 @@ namespace Core
         public void SetName(string text)
         {
             Bylaws.Name = text;
+        }
+
+        public void AddMember(Person member)
+        {
+            Members.Add(member);
         }
 
         public IMeetingState GetState()
@@ -193,10 +183,15 @@ namespace Core
             return filteredActions;
         }
         
-        public IEnumerable<Type> GetAvailableMotions()
+        public IEnumerable<Type> GetAvailableMotions(Person person)
         {
             var state = GetState();
-            return state.GetSupportedMotions();
+            var attendee = CreateAttendee(person);
+            var motions = state.GetSupportedMotions();
+            var avail = new ActionAvailability();
+            var filteredMotions =
+                motions.Where(x => avail.IsActionAvailableToPerson(attendee.IsMember, attendee.IsChair, x));
+            return filteredMotions;
         }
         
         private MeetingAttendee CreateAttendee(Person actor)

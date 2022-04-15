@@ -49,6 +49,11 @@ namespace Databases
             return Task.FromResult(_personDict[personId]);
         }
 
+        public async Task<IEnumerable<Person>> GetPersonsAsync()
+        {
+            return _personDict.Values;
+        }
+
         public Task AddMeetingAsync(Meeting meeting)
         {
             _meetingDict[meeting.Id] = meeting;

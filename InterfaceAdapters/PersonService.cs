@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Core;
 using InterfaceAdapters.Models;
@@ -25,6 +27,12 @@ namespace InterfaceAdapters
         {
             var person = await _database.GetPersonAsync(id);
             return ToUXPerson(person);
+        }
+
+        public async Task<IEnumerable<UXPerson>> GetPersons()
+        {
+            var people = await _database.GetPersonsAsync();
+            return people.Select(x => ToUXPerson(x));
         }
 
         private UXPerson ToUXPerson(Person person)

@@ -6,7 +6,8 @@ export class Home extends Component {
     constructor(props) {
         super(props);
 
-        this.state = {name: ""};
+        let user = localStorage.getItem('user');
+        this.state = {name: "", user: JSON.parse(user)};
     }
 
     componentDidMount() {
@@ -14,7 +15,6 @@ export class Home extends Component {
     }
     
     populateUserName() {
-        
     }
 
     async saveUser() {
@@ -25,7 +25,8 @@ export class Home extends Component {
         };
         const response = await fetch('person/addPerson', requestOptions);
         const data = await response.json();
-        localStorage.setItem('userId', data.id);
+        localStorage.setItem('user', JSON.stringify(data));
+        this.setState({user: data})
     }
 
     handleChange = (event) => {
@@ -41,10 +42,15 @@ export class Home extends Component {
                     <p className="lead">Free for groups under 10 members.</p>
                 </div>
                 <h2>Who are you?</h2>
-                <label>
-                    Name: <input size="50" name="user" value={this.state.name} onChange={this.handleChange}/>
-                </label>
-                <button className="btn btn-primary" onClick={() => this.saveUser()}>Save</button>
+                {this.state.user && <p>Hello, {this.state.user.name}</p>}
+                
+                    <div>
+                        <label>
+                            Name: <input size="50" name="user" value={this.state.name} onChange={this.handleChange}/>
+                        </label>
+                        <button className="btn btn-primary" onClick={() => this.saveUser()}>Save</button>
+                    </div>
+                
             </div>
         );
     }
