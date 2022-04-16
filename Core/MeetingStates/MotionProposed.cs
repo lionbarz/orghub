@@ -10,43 +10,34 @@ namespace Core.MeetingStates
     /// </summary>
     public class MotionProposed : IMeetingState
     {
-        private IMotion _motion;
+        private MotionChain MotionChain { get; }
         private Person _mover;
-        private IGroupModifier _groupModifier;
+        private IGroupModifier GroupModifier { get; }
         
-        public MotionProposed(Person mover, IMotion motion, IGroupModifier groupModifier)
+        public MotionProposed(IGroupModifier groupModifier, Person mover, MotionChain motionChain)
         {
-            _motion = motion;
             _mover = mover;
-            _groupModifier = groupModifier;
+            GroupModifier = groupModifier;
+            MotionChain = motionChain;
         }
 
-        public bool TryHandleAction(MeetingAttendee actor, IAction action, out IMeetingState? newState,
-            out bool replaceCurrentState,
-            out IAction? resultingAction)
+        public IMeetingState TryHandleAction(MeetingAttendee actor, IAction action)
         {
-            newState = null;
-            resultingAction = null;
-            replaceCurrentState = false;
-
             if (action is SecondMotion)
             {
-                if (_motion is EndDebate)
+                if (MotionChain.Current is EndDebate)
                 {
                     // Motion to end debate is not debated.
                     // TODO: Make "isDebatable" a property of a motion.
-                    newState = new VotingState(_motion, _groupModifier);
+                    return new VotingState(GroupModifier, MotionChain);
                 }
-                else
-                {
-                    newState = new DebateState(_motion, _groupModifier);
-                }
-
-                replaceCurrentState = true;
-                return true;
+                
+                return new DebateState(GroupModifier, MotionChain);
             }
+            
+            // TODO: If there is no second, go back to main motion or open floor.
 
-            return false;
+            throw new InvalidActionException();
         }
 
         public IEnumerable<Type> GetSupportedActions(MeetingAttendee actor)
@@ -64,7 +55,7 @@ namespace Core.MeetingStates
 
         public string GetDescription()
         {
-            return $"{_mover.Name} proposed \"{_motion.GetText()}\".";
+            return $"{_mover.Name} proposed \"{MotionChain.Current.GetText()}\".";
         }
     }
 }

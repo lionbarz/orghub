@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Core.Actions;
@@ -80,6 +81,23 @@ namespace Core
                 Bylaws = Bylaws.Default(),
                 Members = new List<Person>() { creator }
             };
+
+            return group;
+        }
+        
+        public static Group NewInstance(Person creator, IEnumerable<Person> members)
+        {
+            var group = new Group
+            {
+                Chair = creator,
+                Bylaws = Bylaws.Default(),
+                Members = new List<Person>() { creator }
+            };
+            
+            foreach (var member in members)
+            {
+                group.AddMember(member);
+            }
 
             return group;
         }
@@ -165,7 +183,7 @@ namespace Core
 
         public IMeetingState GetState()
         {
-            return _stateManager.GetMeetingState();
+            return _stateManager.State;
         }
 
         /// <summary>

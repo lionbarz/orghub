@@ -14,34 +14,26 @@ namespace Core.MeetingStates
             GroupModifier = groupModifier;
         }
 
-        public bool TryHandleAction(MeetingAttendee actor, IAction action, out IMeetingState? newState,
-            out bool replaceCurrentState,
-            out IAction? resultingAction)
+        public IMeetingState TryHandleAction(MeetingAttendee actor, IAction action)
         {
-            newState = null;
-            resultingAction = null;
-            replaceCurrentState = false;
-
             if (action is MoveToAdjourn)
             {
                 // Right now moves to adjourn are automatically approved unanimously.
-                return true;
+                // TODO: Require a second and vote.
+                return new AdjournedState(GroupModifier);
             }
 
             if (action is Speak)
             {
-                newState = new SpeakerHasFloorState(actor);
-                return true;
+                return new SpeakerHasFloorState(GroupModifier, actor);
             }
 
             if (action is Move moveAction)
             {
-                // Right now automatically moves to debate.
-                newState = new DebateState(moveAction.Motion, GroupModifier);
-                return true;
+                return new MotionProposed(GroupModifier, actor.Person, MotionChain.FromMotion(moveAction.Motion));
             }
 
-            return false;
+            throw new InvalidActionException();
         }
 
         public IEnumerable<Type> GetSupportedActions(MeetingAttendee actor)
@@ -62,7 +54,7 @@ namespace Core.MeetingStates
 
         public string GetDescription()
         {
-            return "The floor is open for suggestions and speakers.";
+            return "The floor is open to suggestions and speakers.";
         }
     }
 }

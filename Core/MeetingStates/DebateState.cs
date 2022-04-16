@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Core.Actions;
 using Core.Motions;
 
@@ -7,66 +8,43 @@ namespace Core.MeetingStates
 {
     public class DebateState : IMeetingState
     {
-        /// <summary>
-        /// The motion being debated.
-        /// </summary>
-        private IMotion Motion { get; }
+        private MotionChain MotionChain { get; init; }
 
         /// <summary>
         /// Can be used to set group properties.
         /// </summary>
         private IGroupModifier GroupModifier { get; }
 
-        public DebateState(IMotion motion, IGroupModifier groupModifier)
+        public DebateState(IGroupModifier groupModifier, MotionChain motionChain)
         {
-            Motion = motion;
+            MotionChain = motionChain;
             GroupModifier = groupModifier;
         }
 
-        public bool TryHandleAction(MeetingAttendee actor, IAction action, out IMeetingState? newState,
-            out bool replaceCurrentState, out IAction? resultingAction)
+        public IMeetingState TryHandleAction(MeetingAttendee actor, IAction action)
         {
-            newState = null;
-            resultingAction = null;
-            replaceCurrentState = false;
-
             if (action is MoveToAdjourn)
             {
                 // Right now moves to adjourn are automatically approved unanimously.
-                resultingAction = new MoveToAdjourn();
-                return true;
+                return new AdjournedState(GroupModifier);
             }
 
             if (action is Speak)
             {
-                newState = new SpeakerHasFloorState(actor);
-                return true;
+                return new SpeakerHasFloorState(GroupModifier, actor, MotionChain);
             }
 
             if (action is Move { Motion: EndDebate } move)
             {
-                newState = new MotionProposed(actor.Person, move.Motion, GroupModifier);
-                return true;
-            }
-
-            if (action is DeclareMotionPassed)
-            {
-                if (Motion is GroupModifyingMotion groupModifyingMotion)
-                {
-                    groupModifyingMotion.TakeActionAsync();
-                }
-
-                return true;
+                return new MotionProposed(GroupModifier, actor.Person, MotionChain.Push(move.Motion));
             }
 
             if (action is DeclareEndDebate)
             {
-                newState = new VotingState(Motion, GroupModifier);
-                replaceCurrentState = true;
-                return true;
+                return new VotingState(GroupModifier, MotionChain);
             }
 
-            return false;
+            throw new InvalidActionException();
         }
 
         public IEnumerable<Type> GetSupportedActions(MeetingAttendee actor)
@@ -88,7 +66,7 @@ namespace Core.MeetingStates
 
         public string GetDescription()
         {
-            return $"Debating \"{Motion.GetText()}\"";
+            return $"Floor is open to speakers to debate {MotionChain.Current.GetText()}.";
         }
     }
 }

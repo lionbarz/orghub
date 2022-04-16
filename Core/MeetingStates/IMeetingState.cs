@@ -7,26 +7,15 @@ namespace Core.MeetingStates
     public interface IMeetingState
     {
         /// <summary>
-        /// Tries to handle the action. If the action is handled,
-        /// we either provide a new state that needs to be stacked
-        /// on top of this one, or the result of this state which
-        /// is passed to the previous state, or neither, which
-        /// means that this state is done but has no return value.
+        /// Handle the action and return the next state, which
+        /// could also be the current state if it's a loop.
         /// 
-        /// If the action is not handled, it just means it's an
-        /// invalid action that doesn't apply in this state and
-        /// we're staying in this state.
+        /// If the action can't be handled, an exception is thrown.
         /// </summary>
         /// <param name="actor"></param>
         /// <param name="action"></param>
-        /// <param name="newState">If not null, there's a new state
-        /// the meeting goes to.</param>
-        /// <param name="replaceCurrentState">If true, replace the current state with newState.</param>
-        /// <param name="resultingAction"></param>
-        /// <returns>True if it's handled.</returns>
-        bool TryHandleAction(MeetingAttendee actor, IAction action, out IMeetingState? newState,
-            out bool replaceCurrentState,
-            out IAction? resultingAction);
+        /// <returns>The new state to go to.</returns>
+        IMeetingState TryHandleAction(MeetingAttendee actor, IAction action);
 
         /// <summary>
         /// What actions can be taken during this state.

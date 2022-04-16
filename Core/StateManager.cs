@@ -10,72 +10,29 @@ namespace Core
     {
         public StateManager(IGroupModifier groupModifier)
         {
-            States = new LinkedList<IMeetingState>();
-            States.AddLast(new AdjournedState(groupModifier));
+            State = new AdjournedState(groupModifier);
         }
 
-        /// <summary>
-        /// The stack of meeting states. The last is the latest.
-        /// It always starts with an adjourned state.
-        /// </summary>
-        private LinkedList<IMeetingState> States { get; }
+        public IMeetingState State { get; private set; }
 
         public IEnumerable<string> Act(MeetingAttendee actor, IAction action)
         {
             var minutes = new LinkedList<string>();
-            IMeetingState currentState = States.Last();
-
             minutes.AddLast($"{action.RecordEntry(actor.Person)}");
-            Console.WriteLine($"State: {currentState.GetDescription()}");
-            Console.WriteLine($"Action: {action.RecordEntry(actor.Person)}");
-
-            if (action is MoveToAdjourn)
-            {
-                // Right now we immediately adjourn as soon as anyone suggests it.
-                while (States.Last() is not AdjournedState)
-                {
-                    States.RemoveLast();
-                }
-
-                return minutes;
-            }
 
             VerifyPermission(action, actor);
 
-            if (currentState.TryHandleAction(actor, action, out IMeetingState? newState, out bool replaceCurrentState,
-                    out IAction? resultingAction))
+            try
             {
-                if (newState != null)
-                {
-                    if (replaceCurrentState)
-                    {
-                        States.RemoveLast();
-                    }
-                    
-                    States.AddLast(newState);
-                    return minutes;
-                }
-
-                // The current state is done. Go back to last state on stack.
-                States.RemoveLast();
-
-                if (resultingAction != null)
-                {
-                    Act(actor, resultingAction);
-                }
+                State = State.TryHandleAction(actor, action);
             }
-            else
+            catch (InvalidActionException ex)
             {
                 throw new ArgumentException(
-                    $"{actor.Person.Name} can't take action {action} in meeting state {currentState}");
+                    $"{actor.Person.Name} can't take action {action} in meeting state {State}");
             }
 
             return minutes;
-        }
-
-        public IMeetingState GetMeetingState()
-        {
-            return States.Last();
         }
 
         private void VerifyPermission(IAction action, MeetingAttendee actor)

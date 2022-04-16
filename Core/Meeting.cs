@@ -96,7 +96,7 @@ namespace Core
 
         public IMeetingState GetMeetingState()
         {
-            return _stateManager.GetMeetingState();
+            return _stateManager.State;
         }
     }
 }

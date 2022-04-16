@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Core.Actions;
 using Core.Motions;
 
@@ -7,39 +8,48 @@ namespace Core.MeetingStates
 {
     public class VotingState : IMeetingState
     {
-        private readonly IMotion _motion;
-        private readonly IGroupModifier _groupModifier;
+        private readonly YesNoBallotBox _ballotBox;
         
-        public VotingState(IMotion motion, IGroupModifier groupModifier)
+        private MotionChain MotionChain { get; init; }
+        
+        /// <summary>
+        /// Can be used to set group properties.
+        /// </summary>
+        private IGroupModifier GroupModifier { get; }
+        
+        public VotingState(IGroupModifier groupModifier, MotionChain motionChain)
         {
-            _motion = motion;
-            _groupModifier = groupModifier;
+            _ballotBox = new YesNoBallotBox();
+            GroupModifier = groupModifier;
+            MotionChain = motionChain;
         }
 
-        public bool TryHandleAction(MeetingAttendee actor, IAction action, out IMeetingState? newState,
-            out bool replaceCurrentState,
-            out IAction? resultingAction)
+        public IMeetingState TryHandleAction(MeetingAttendee actor, IAction action)
         {
-            newState = null;
-            resultingAction = null;
-            replaceCurrentState = false;
-
             if (action is DeclareMotionPassed)
             {
-                if (_motion is GroupModifyingMotion groupModifyingMotion)
+                if (MotionChain.Current is GroupModifyingMotion groupModifyingMotion)
                 {
                     groupModifyingMotion.TakeActionAsync();
                 }
 
-                if (_motion is IActionTakingMotion actionTakingMotion)
+                if (MotionChain.Current is EndDebate)
                 {
-                    resultingAction = actionTakingMotion.GetAction();
+                    return new VotingState(GroupModifier, MotionChain.Pop());
                 }
-
-                return true;
+                
+                return MotionChain.Previous.Any()
+                    ? new DebateState(GroupModifier, MotionChain.Pop())
+                    : new OpenFloorState(GroupModifier);
             }
 
-            return false;
+            if (action is Vote vote)
+            {
+                _ballotBox.CastBallot(new YesNoBallot(actor.Person, vote.Type));
+                return this;
+            }
+
+            throw new InvalidActionException();
         }
 
         public IEnumerable<Type> GetSupportedActions(MeetingAttendee actor)
@@ -54,7 +64,8 @@ namespace Core.MeetingStates
 
         public string GetDescription()
         {
-            return $"Voting on \"{_motion.GetText()}\"";
+            return
+                $"Voting on \"{MotionChain.Current.GetText()}\". {_ballotBox.NumAye} in favor. {_ballotBox.NumNay} opposed. {_ballotBox.NumAbstain} abstaining.";
         }
     }
 }

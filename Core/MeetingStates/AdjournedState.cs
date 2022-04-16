@@ -13,22 +13,14 @@ namespace Core.MeetingStates
             GroupModifier = groupModifier;
         }
 
-        public bool TryHandleAction(MeetingAttendee actor, IAction action, out IMeetingState? newState,
-            out bool replaceCurrentState,
-            out IAction? resultingAction)
+        public IMeetingState TryHandleAction(MeetingAttendee actor, IAction action)
         {
-            newState = null;
-            resultingAction = null;
-            replaceCurrentState = false;
-            
             if (action is CallMeetingToOrder)
             {
-                // TODO: Automatically put the agenda item?
-                newState = new OpenFloorState(GroupModifier);
-                return true;
+                return new OpenFloorState(GroupModifier);
             }
 
-            return false;
+            throw new InvalidActionException();
         }
 
         public IEnumerable<Type> GetSupportedActions(MeetingAttendee actor)

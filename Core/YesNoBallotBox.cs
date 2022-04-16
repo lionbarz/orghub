@@ -4,9 +4,8 @@ using System.Collections.Generic;
 namespace Core
 {
     /// <summary>
-    /// Takes ballots, voter eligibility, and vote closure,
-    /// and provides whether a vote is adopted or dropped
-    /// using 50% + 1.
+    /// Takes ballots and vote closure and provides
+    /// whether a vote is adopted or dropped using 50% + 1.
     /// </summary>
     public class YesNoBallotBox
     {
@@ -22,21 +21,17 @@ namespace Core
         // How many ballots count towards Abstain.
         public int NumAbstain => CountEligibleBallotsOfType(VoteType.Abstain);
 
-        // Who is eligible to vote.
-        private readonly IVoterEligibilityVerifier EligibilityVerifier;
-        
         // True if voting is now closed.
         private bool IsClosed { get; set; }
 
         // How each voter voted.
         private ICollection<YesNoBallot> Ballots { get; }
 
-        public YesNoBallotBox(IVoterEligibilityVerifier eligibilityVerifier)
+        public YesNoBallotBox()
         {
             Id = Guid.NewGuid();
             IsClosed = false;
             Ballots = new LinkedList<YesNoBallot>();
-            EligibilityVerifier = eligibilityVerifier;
         }
 
         /// <summary>
@@ -86,8 +81,7 @@ namespace Core
             foreach (var ballot in Ballots)
             {
                 // One person, one vote.
-                if (ballot.VoteType == type && EligibilityVerifier.IsEligible(ballot.Voter) &&
-                    !alreadyVoted.Contains(ballot.Voter))
+                if (ballot.VoteType == type && !alreadyVoted.Contains(ballot.Voter))
                 {
                     alreadyVoted.Add(ballot.Voter);
                     count++;

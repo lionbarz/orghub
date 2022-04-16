@@ -1,4 +1,5 @@
-﻿using Core;
+﻿using System.Collections.Generic;
+using Core;
 using Core.Actions;
 using Core.MeetingStates;
 using Core.Motions;
@@ -10,11 +11,10 @@ namespace UnitTests
     public class GroupTest
     {
         [TestMethod]
-        public void MassMeetingAttendance()
+        public void GroupAttendance()
         {
             var mo = new Person("Mo");
             var zaki = new Person("Zaki");
-            var members = new Person[] { mo };
             var group = Group.NewInstance(mo);
             
             Assert.IsTrue(group.IsMember(zaki.Id));
@@ -34,16 +34,16 @@ namespace UnitTests
         }
         
         [TestMethod]
-        public void MassMeetingSetChair()
+        public void GroupSetChair()
         {
             var mo = new Person("Mo");
             var omar = new Person("Omar");
-            var group = Group.NewInstance(mo);
+            var group = Group.NewInstance(mo, new List<Person>() { omar });
 
             group.TakeAction(mo, new CallMeetingToOrder());
             Assert.IsInstanceOfType(group.GetState(), typeof(OpenFloorState));
             
-            group.TakeAction(mo, new Move(new ElectChair(omar)));
+            group.TakeAction(mo, new Move(new ElectChair(omar, group)));
             Assert.IsInstanceOfType(group.GetState(), typeof(DebateState));
             
             group.TakeAction(mo, new DeclareMotionPassed());
@@ -59,13 +59,15 @@ namespace UnitTests
         {
             var mo = new Person("Mo");
             var roni = new Person("Roni");
-            var members = new Person[] { mo };
-            var group = Group.NewInstance(mo);
+            var group = Group.NewInstance(mo, new List<Person>() { roni });
 
             group.TakeAction(mo, new CallMeetingToOrder());
             Assert.IsInstanceOfType(group.GetState(), typeof(OpenFloorState));
             
-            group.TakeAction(mo, new Move(new ElectChair(roni)));
+            group.TakeAction(mo, new Move(new ElectChair(roni, group)));
+            Assert.IsInstanceOfType(group.GetState(), typeof(MotionProposed));
+            
+            group.TakeAction(mo, new SecondMotion());
             Assert.IsInstanceOfType(group.GetState(), typeof(DebateState));
             
             group.TakeAction(roni, new Move(new EndDebate()));
