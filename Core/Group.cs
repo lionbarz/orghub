@@ -1,10 +1,8 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Core.Actions;
 using Core.MeetingStates;
-using Core.Motions;
 
 namespace Core
 {
@@ -179,6 +177,7 @@ namespace Core
         public void AddMember(Person member)
         {
             Members.Add(member);
+            Minutes.Add($"{member.Name} was added as a member.");
         }
 
         public IMeetingState GetState()

@@ -1,10 +1,11 @@
 import React, { Component } from 'react';
 import { Button } from 'reactstrap';
 import { Modal, ModalBody, ModalHeader, ModalFooter, FormGroup, Input } from 'reactstrap';
+import {AddMemberButton} from "./AddMemberButton";
 
 export class Group extends Component {
     static displayName = Group.name;
-    user = JSON.parse(localStorage.getItem('user'));
+    userId = localStorage.getItem('userId');
     
     // The ID of the interval that is refreshing the state.
     intervalId = null;
@@ -26,9 +27,18 @@ export class Group extends Component {
         clearInterval(this.intervalId);
     }
 
-    static render(group, actions) {
+    renderGroup = (group, actions) => {
         return (
             <div>
+                <div className="card mb-3" style={{maxWidth: "36rem"}}>
+                    <div className="card-header">Members</div>
+                    <div className="card-body">
+                        <ul>
+                            {group.members.map(member => <li key={member.id} className="card-text">{member.name}</li>)}
+                        </ul>
+                        <AddMemberButton groupId={group.id} onAdd={() => this.updateState()}/>
+                    </div>
+                </div>
                 <div className="card mb-3" style={{maxWidth: "36rem"}}>
                     <div className="card-header">Chair</div>
                     <div className="card-body">
@@ -40,7 +50,12 @@ export class Group extends Component {
                     <div className="card-body">
                         <p className="card-text">{group.state}</p>
                     </div>
-                    {actions}
+                </div>
+                <div className="card mb-3" style={{maxWidth: "36rem"}}>
+                    <div className="card-header">What you can do</div>
+                    <div className="card-body">
+                        {actions}
+                    </div>
                 </div>
                 <div className="card mb-3" style={{maxWidth: "36rem"}}>
                     <div className="card-header">Decisions Agreed On</div>
@@ -55,14 +70,6 @@ export class Group extends Component {
                     <div className="card-body">
                         <ul>
                             {group.minutes.map(text => <li key={text} className="card-text">{text}</li>)}
-                        </ul>
-                    </div>
-                </div>
-                <div className="card mb-3" style={{maxWidth: "36rem"}}>
-                    <div className="card-header">Members</div>
-                    <div className="card-body">
-                        <ul>
-                            {group.members.map(member => <li key={member.id} className="card-text">{member.name}</li>)}
                         </ul>
                     </div>
                 </div>
@@ -130,7 +137,7 @@ export class Group extends Component {
         const requestOptions = {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ userId: this.user.id })
+            body: JSON.stringify({ userId: this.userId })
         };
         await fetch(`group/${this.props.match.params.id}/action/${action}`, requestOptions);
         await this.updateState();
@@ -140,7 +147,7 @@ export class Group extends Component {
         const requestOptions = {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ nomineeName: nomineeName, userId: this.user.id })
+            body: JSON.stringify({ nomineeName: nomineeName, userId: this.userId })
         };
         await fetch(`group/${this.props.match.params.id}/action/electchair`, requestOptions);
         await this.updateState();
@@ -150,7 +157,7 @@ export class Group extends Component {
         const requestOptions = {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ text: text, userId: this.user.id })
+            body: JSON.stringify({ text: text, userId: this.userId })
         };
         await fetch(`group/${this.props.match.params.id}/action/moveresolution`, requestOptions);
         await this.updateState();
@@ -160,7 +167,7 @@ export class Group extends Component {
         const requestOptions = {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ name: text, userId: this.user.id })
+            body: JSON.stringify({ name: text, userId: this.userId })
         };
         await fetch(`group/${this.props.match.params.id}/action/movechangegroupname`, requestOptions);
         await this.updateState();
@@ -170,14 +177,13 @@ export class Group extends Component {
         const requestOptions = {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ personId: personId, userId: this.user.id })
+            body: JSON.stringify({ personId: personId, userId: this.userId })
         };
         await fetch(`group/${this.props.match.params.id}/action/movegrantmembership`, requestOptions);
         await this.updateState();
     }
 
     moveGrantMembershipPrompt = async () => {
-        console.log("Show modal.");
         this.getAllPeople();
         this.setState({showMembershipModal: true});
     }
@@ -204,7 +210,7 @@ export class Group extends Component {
     render = () => {
         let contents = this.state.loading
             ? <p><em>Loading...</em></p>
-            : Group.render(this.state.group, this.renderActions());
+            : this.renderGroup(this.state.group, this.renderActions());
 
         return (
             <div>
@@ -267,14 +273,14 @@ export class Group extends Component {
 
     getAvailableActions = async () => {
         const id = this.props.match.params.id;
-        const response = await fetch(`group/${id}/action?userId=${this.user.id}`);
+        const response = await fetch(`group/${id}/action?userId=${this.userId}`);
         const data = await response.json();
         this.setState({ actions: data });
     }
 
     getAvailableMotions = async () => {
         const id = this.props.match.params.id;
-        const response = await fetch(`group/${id}/motion?userId=${this.user.id}`);
+        const response = await fetch(`group/${id}/motion?userId=${this.userId}`);
         const data = await response.json();
         this.setState({ motions: data });
     }

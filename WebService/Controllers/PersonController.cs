@@ -29,4 +29,11 @@ public class PersonController : ControllerBase
     {
         return await _personService.GetPersons();
     }
+    
+    [HttpGet]
+    [Route("person/{id}")]
+    public async Task<UXPerson> GetPersons(string id)
+    {
+        return await _personService.GetPersonAsync(Guid.Parse(id));
+    }
 }

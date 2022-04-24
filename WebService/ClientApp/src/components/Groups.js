@@ -34,11 +34,11 @@ export class Groups extends Component {
     }
 
     addGroup = async () => {
-        let user = JSON.parse(localStorage.getItem('user'));
+        let userId = localStorage.getItem('userId');
         const requestOptions = {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({userId: user.id})
+            body: JSON.stringify({userId: userId})
         };
         await fetch('group', requestOptions);
         await this.populateGroupData();

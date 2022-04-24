@@ -32,7 +32,7 @@ namespace InterfaceAdapters
         public async Task<IEnumerable<UXPerson>> GetPersons()
         {
             var people = await _database.GetPersonsAsync();
-            return people.Select(x => ToUXPerson(x));
+            return people.Select(ToUXPerson);
         }
 
         private UXPerson ToUXPerson(Person person)

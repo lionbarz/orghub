@@ -152,4 +152,12 @@ public class GroupController : ControllerBase
         IAction action = new YieldTheFloor();
         await _groupService.ActAsync(Guid.Parse(request.UserId), Guid.Parse(id), action);
     }
+    
+    [HttpPost]
+    [Route("group/{id}/addmember")]
+    public async Task AddMember(string id, [FromBody] GenericUserRequest request)
+    {
+        IAction action = new YieldTheFloor();
+        await _groupService.AddMemberAsync(Guid.Parse(id), Guid.Parse(request.UserId));
+    }
 }

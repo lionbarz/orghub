@@ -5,16 +5,26 @@ export class Home extends Component {
 
     constructor(props) {
         super(props);
-
-        let user = localStorage.getItem('user');
-        this.state = {name: "", user: JSON.parse(user)};
+        this.state = {user: null, name: ""};
     }
 
     componentDidMount() {
-        this.populateUserName();
+        let userId = localStorage.getItem('userId');
+        
+        if (userId) {
+            this.populateUserName(userId);
+        }
     }
     
-    populateUserName() {
+    populateUserName = async (personId) => {
+        const requestOptions = {
+            method: 'GET',
+            headers: { 'Content-Type': 'application/json' }
+        };
+        const response = await fetch('person/' + personId, requestOptions);
+        const user = await response.json();
+        localStorage.setItem('userId', user.id);
+        this.setState({user: user})
     }
 
     async saveUser() {
@@ -24,9 +34,9 @@ export class Home extends Component {
             body: JSON.stringify({ userName: this.state.name })
         };
         const response = await fetch('person/addPerson', requestOptions);
-        const data = await response.json();
-        localStorage.setItem('user', JSON.stringify(data));
-        this.setState({user: data})
+        const user = await response.json();
+        localStorage.setItem('userId', user.id);
+        this.setState({user: user})
     }
 
     handleChange = (event) => {
@@ -38,19 +48,19 @@ export class Home extends Component {
         return (
             <div>
                 <div className="jumbotron">
-                    <h1 className="display-4">Group. Raise money. Grow. Make a difference.</h1>
+                    <h1 className="display-4">Organize. Raise money. Grow. Make a difference.</h1>
                     <p className="lead">Free for groups under 10 members.</p>
                 </div>
                 <h2>Who are you?</h2>
                 {this.state.user && <p>Hello, {this.state.user.name}</p>}
-                
+                {!this.state.user &&
                     <div>
                         <label>
                             Name: <input size="50" name="user" value={this.state.name} onChange={this.handleChange}/>
                         </label>
                         <button className="btn btn-primary" onClick={() => this.saveUser()}>Save</button>
                     </div>
-                
+                }
             </div>
         );
     }

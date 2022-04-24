@@ -131,5 +131,13 @@ namespace InterfaceAdapters
             var group = await _database.GetGroupAsync(groupId);
             return group.Minutes;
         }
+        
+        public async Task AddMemberAsync(Guid groupId, Guid personId)
+        {
+            var person = await _database.GetPersonAsync(personId);
+            var group = await _database.GetGroupAsync(groupId);
+            group.AddMember(person);
+            await _database.UpdateGroupAsync(group);
+        }
     }
 }
