@@ -19,12 +19,7 @@ namespace InterfaceAdapters.Models
         /// The person chairing the group.
         /// </summary>
         public UXPerson Chair { get; set; }
-        
-        /// <summary>
-        /// Is this group adjourned, debating, etc.
-        /// </summary>
-        public string State { get; set; }
-        
+
         /// <summary>
         /// All resolutions passed by the group.
         /// </summary>
@@ -39,5 +34,11 @@ namespace InterfaceAdapters.Models
         /// The minutes, ie activity log.
         /// </summary>
         public IEnumerable<string> Minutes { get; set; }
+
+        /// <summary>
+        /// A string description in plain English about the
+        /// state of this group. Ex: Mohamed is speaking.
+        /// </summary>
+        public string State { get; set; }
     }
 }

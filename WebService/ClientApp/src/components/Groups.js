@@ -52,8 +52,8 @@ export class Groups extends Component {
         return (
             <div>
                 <h1 id="tabelLabel">Groups</h1>
+                <button className="btn btn-primary mb-3" onClick={() => this.addGroup()}>Create Group</button>
                 {contents}
-                <button className="btn btn-primary mt-3" onClick={() => this.addGroup()}>Add Group</button>
             </div>
         );
     }

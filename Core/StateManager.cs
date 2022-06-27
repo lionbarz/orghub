@@ -1,52 +1,101 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using Core.Actions;
 using Core.MeetingStates;
+using Core.Motions;
 
 namespace Core
 {
-    public class StateManager
+    /// <summary>
+    /// Shuffles underlying state by passing the actions to an underlying state,
+    /// and this behaves as a state itself. See the State pattern.
+    /// </summary>
+    public class StateManager : IMeetingState
     {
+        /// <summary>
+        /// The current state.
+        /// </summary>
+        private IMeetingState State { get; set; }
+        
+        /// <summary>
+        /// Creates a StateManager with an initial Adjourned state.
+        /// </summary>
         public StateManager(IGroupModifier groupModifier)
         {
             State = new AdjournedState(groupModifier);
         }
 
-        public IMeetingState State { get; private set; }
-
-        public IEnumerable<string> Act(MeetingAttendee actor, IAction action)
+        private StateManager(IMeetingState state)
         {
-            var minutes = new LinkedList<string>();
-            minutes.AddLast($"{action.RecordEntry(actor.Person)}");
-
-            VerifyPermission(action, actor);
-
-            try
-            {
-                State = State.TryHandleAction(actor, action);
-            }
-            catch (InvalidActionException ex)
-            {
-                throw new ArgumentException(
-                    $"{actor.Person.Name} can't take action {action} in meeting state {State}");
-            }
-
-            return minutes;
+            State = state;
         }
 
-        private void VerifyPermission(IAction action, MeetingAttendee actor)
+        public static StateManager StartingWithState(IMeetingState initialState)
         {
-            var avail = new ActionAvailability();
-            var hasPermission = avail.IsActionAvailableToPerson(actor.IsMember, actor.IsChair, action.GetType());
+            return new StateManager(initialState);
+        }
 
-            if (!hasPermission)
-            {
-                // TODO: Make a new exception type.
-                // TODO: Add to exception string what the person is (guest, chair)
-                throw new Exception(
-                    $"{actor.Person.Name} cannot take action {action.ToString()} because it is only available to TODO");
-            }
+        public IMeetingState CallMeetingToOrder(PersonRole actor)
+        {
+            State = State.CallMeetingToOrder(actor);
+            return State;
+        }
+
+        public IMeetingState DeclareTimeExpired(PersonRole actor)
+        {
+            State = State.DeclareTimeExpired(actor);
+            return State;
+        }
+
+        public IMeetingState MoveMainMotion(PersonRole actor, IMainMotion motion)
+        {
+            State = State.MoveMainMotion(actor, motion);
+            return State;
+        }
+
+        public IMeetingState MoveSubsidiaryMotion(PersonRole actor, ISubsidiaryMotion motion)
+        {
+            State = State.MoveSubsidiaryMotion(actor, motion);
+            return State;
+        }
+
+        public IMeetingState MoveToAdjournUntil(PersonRole actor, DateTimeOffset untilTime)
+        {
+            State = State.MoveToAdjournUntil(actor, untilTime);
+            return State;
+        }
+
+        public IMeetingState Second(PersonRole actor)
+        {
+            State = State.Second(actor);
+            return State;
+        }
+
+        public IMeetingState Speak(PersonRole actor)
+        {
+            State = State.Speak(actor);
+            return State;
+        }
+
+        public IMeetingState Vote(PersonRole actor, VoteType type)
+        {
+            State = State.Vote(actor, type);
+            return State;
+        }
+
+        public IMeetingState Yield(PersonRole actor)
+        {
+            State = State.Yield(actor);
+            return State;
+        }
+
+        public ICollection<ActionSupport> GetActionSupportForPerson(PersonRole actor)
+        {
+            return State.GetActionSupportForPerson(actor);
+        }
+
+        public string GetDescription()
+        {
+            return State.GetDescription();
         }
     }
 }

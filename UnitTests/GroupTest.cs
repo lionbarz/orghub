@@ -1,7 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Core;
-using Core.Actions;
-using Core.MeetingStates;
 using Core.Motions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -39,10 +38,14 @@ namespace UnitTests
             var mo = new Person("Mo");
             var omar = new Person("Omar");
             var group = Group.NewInstance(mo, new List<Person>() { omar });
+            group.AddMember(omar);
+            var moRole = group.CreatePersonRole(mo);
+            var omarRole = group.CreatePersonRole(omar);
+            var meeting = Meeting.NewInstance(group.Id, group, mo, DateTimeOffset.Now, 0);
 
-            group.TakeAction(mo, new CallMeetingToOrder());
-            Assert.IsInstanceOfType(group.GetState(), typeof(OpenFloorState));
+            meeting.State.CallMeetingToOrder(moRole);
             
+            /*
             group.TakeAction(mo, new Move(new ElectChair(omar, group)));
             Assert.IsInstanceOfType(group.GetState(), typeof(DebateState));
             
@@ -52,39 +55,32 @@ namespace UnitTests
 
             group.TakeAction(mo, new MoveToAdjourn());
             Assert.IsInstanceOfType(group.GetState(), typeof(AdjournedState));
+            */
         }
         
         [TestMethod]
         public void SecondAndVoteOnMotion()
         {
             var mo = new Person("Mo");
-            var roni = new Person("Roni");
-            var group = Group.NewInstance(mo, new List<Person>() { roni });
+            var omar = new Person("Omar");
+            var group = Group.NewInstance(mo, new List<Person>() { omar });
+            group.AddMember(omar);
+            var moRole = group.CreatePersonRole(mo);
+            var omarRole = group.CreatePersonRole(omar);
+            var meeting = Meeting.NewInstance(group.Id, group, mo, DateTimeOffset.Now, 0);
 
-            group.TakeAction(mo, new CallMeetingToOrder());
-            Assert.IsInstanceOfType(group.GetState(), typeof(OpenFloorState));
+            meeting.State.CallMeetingToOrder(moRole);
+            meeting.State.MoveMainMotion(omarRole, new ElectChair(omar, group));
+            meeting.State.Second(moRole);
             
-            group.TakeAction(mo, new Move(new ElectChair(roni, group)));
-            Assert.IsInstanceOfType(group.GetState(), typeof(MotionProposed));
-            
-            group.TakeAction(mo, new SecondMotion());
-            Assert.IsInstanceOfType(group.GetState(), typeof(DebateState));
-            
-            group.TakeAction(roni, new Move(new EndDebate()));
-            Assert.IsInstanceOfType(group.GetState(), typeof(MotionProposed));
+            // Moves to a vote.
+            meeting.State.DeclareTimeExpired(moRole);
 
-            // Seconded, so a vote is taken on ending debate.
-            group.TakeAction(mo, new SecondMotion());
-            Assert.IsInstanceOfType(group.GetState(), typeof(VotingState));
+            meeting.State.Vote(moRole, VoteType.Aye);
+            meeting.State.Vote(omarRole, VoteType.Aye);
+            meeting.State.DeclareTimeExpired(moRole);
             
-            // Vote passes, so debate ends and now voting on original motion.
-            group.TakeAction(mo, new DeclareMotionPassed());
-            Assert.IsInstanceOfType(group.GetState(), typeof(VotingState));
-            
-            // Original motion passed, so back to open floor.
-            group.TakeAction(mo, new DeclareMotionPassed());
-            Assert.AreEqual(roni, group.Chair);
-            Assert.IsInstanceOfType(group.GetState(), typeof(OpenFloorState));
+            Assert.AreEqual(omar, group.Chair);
         }
     }
 }

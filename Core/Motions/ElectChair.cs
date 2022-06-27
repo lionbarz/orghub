@@ -6,7 +6,7 @@ namespace Core.Motions
     /// <summary>
     /// Set the chair of a group to a specific person.
     /// </summary>
-    public class ElectChair : GroupModifyingMotion
+    public class ElectChair : GroupModifyingMotion, IMainMotion
     {
         private readonly Person _nominee;
 

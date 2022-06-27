@@ -1,14 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using Core.Actions;
 using Core.Motions;
 
 namespace Core.MeetingStates
 {
-    public class VotingState : IMeetingState
+    public class VotingState : MeetingStateBase
     {
-        private readonly YesNoBallotBox _ballotBox;
+        private YesNoBallotBox BallotBox { get; }
         
         private MotionChain MotionChain { get; init; }
         
@@ -19,53 +17,163 @@ namespace Core.MeetingStates
         
         public VotingState(IGroupModifier groupModifier, MotionChain motionChain)
         {
-            _ballotBox = new YesNoBallotBox();
+            BallotBox = new YesNoBallotBox();
             GroupModifier = groupModifier;
             MotionChain = motionChain;
         }
 
-        public IMeetingState TryHandleAction(MeetingAttendee actor, IAction action)
+        public override IMeetingState CallMeetingToOrder(PersonRole actor)
         {
-            if (action is DeclareMotionPassed)
+            throw new PersonOutOfOrderException("Meeting is already in order.");
+        }
+
+        /// <summary>
+        /// When the time expires, whoever has more votes wins.
+        /// </summary>
+        public override IMeetingState DeclareTimeExpired(PersonRole actor)
+        {
+            // TODO: Do something about a quorum, so not just declaring a result
+            // TODO: when a small fraction has voted.
+            
+            BallotBox.CloseVoting();
+            var motionCarried = BallotBox.GetStatus() == VoteResult.AyesHaveIt;
+
+            if (motionCarried)
             {
                 if (MotionChain.Current is GroupModifyingMotion groupModifyingMotion)
                 {
                     groupModifyingMotion.TakeActionAsync();
                 }
-
-                if (MotionChain.Current is EndDebate)
+                
+                if (MotionChain.Current is PreviousQuestion)
                 {
+                    // The vote was on ending debate, so the next thing is to vote on the main motion.
                     return new VotingState(GroupModifier, MotionChain.Pop());
                 }
-                
-                return MotionChain.Previous.Any()
-                    ? new DebateState(GroupModifier, MotionChain.Pop())
-                    : new OpenFloorState(GroupModifier);
             }
-
-            if (action is Vote vote)
+            else
             {
-                _ballotBox.CastBallot(new YesNoBallot(actor.Person, vote.Type));
-                return this;
+                // TODO: Record that the motion didn't carry.
             }
-
-            throw new InvalidActionException();
+            
+            return MotionChain.Previous.Any()
+                ? new DebateState(GroupModifier, MotionChain.Pop())
+                : OpenFloorState.InstanceOf(GroupModifier);
         }
 
-        public IEnumerable<Type> GetSupportedActions(MeetingAttendee actor)
+        public override IMeetingState MoveMainMotion(PersonRole actor, IMainMotion motion)
         {
-            return new[] { typeof(DeclareMotionPassed) };
-        }
-        
-        public IEnumerable<Type> GetSupportedMotions()
-        {
-            return Array.Empty<Type>();
+            throw new PersonOutOfOrderException("Cannot move a motion during voting.");
         }
 
-        public string GetDescription()
+        public override IMeetingState MoveSubsidiaryMotion(PersonRole actor, ISubsidiaryMotion motion)
+        {
+            throw new PersonOutOfOrderException("Cannot move a motion during voting.");
+        }
+
+        public override IMeetingState Second(PersonRole actor)
+        {
+            throw new PersonOutOfOrderException("There isn't a motion to second.");
+        }
+
+        public override IMeetingState Speak(PersonRole actor)
+        {
+            throw new PersonOutOfOrderException("Nobody can speak during voting.");
+        }
+
+        public override IMeetingState Vote(PersonRole actor, VoteType type)
+        {
+            if (!CanVote(actor, out string explanation))
+            {
+                throw new PersonOutOfOrderException(explanation);
+            }
+            
+            BallotBox.CastBallot(new YesNoBallot(actor.Person, type));
+            return this;
+        }
+
+        public override IMeetingState Yield(PersonRole actor)
+        {
+            throw new PersonOutOfOrderException("Nobody has the floor during voting.");
+        }
+
+        public override IMeetingState MoveToAdjournUntil(PersonRole actor, DateTimeOffset untilTime)
+        {
+            throw new PersonOutOfOrderException("The meeting cannot be adjourned during voting.");
+        }
+
+        public override string GetDescription()
         {
             return
-                $"Voting on \"{MotionChain.Current.GetText()}\". {_ballotBox.NumAye} in favor. {_ballotBox.NumNay} opposed. {_ballotBox.NumAbstain} abstaining.";
+                $"Voting on \"{MotionChain.Current.GetText()}\". {BallotBox.NumAye} in favor. {BallotBox.NumNay} opposed. {BallotBox.NumAbstain} abstaining.";
+        }
+
+        protected override bool CanMoveToAdjournUntil(PersonRole actor, out string explanation)
+        {
+            explanation = "The meeting cannot be adjourned during voting.";
+            return false;
+        }
+
+        protected override bool CanCallToOrder(PersonRole actor, out string explanation)
+        {
+            explanation = "The meeting is already in order.";
+            return false;
+        }
+
+        protected override bool CanDeclareTimeExpired(PersonRole actor, out string explanation)
+        {
+            // TODO: Have a timer dictate this.
+            
+            if (actor.IsChair)
+            {
+                explanation = "The chair can declare the time for voting as expired.";
+                return true;
+            }
+
+            explanation = "Only the chair can declare the time for voting as expired.";
+            return false;
+        }
+
+        protected override bool CanSecond(PersonRole actor, out string explanation)
+        {
+            explanation = "There is no motion to second.";
+            return false;
+        }
+
+        protected override bool CanSpeak(PersonRole actor, out string explanation)
+        {
+            explanation = "No speeches are allowed during voting.";
+            return false;
+        }
+
+        protected override bool CanMoveMainMotion(PersonRole actor, out string explanation)
+        {
+            explanation = "No motions can be moved during voting.";
+            return false;
+        }
+
+        protected override bool CanMoveSubsidiaryMotion(PersonRole actor, out string explanation)
+        {
+            explanation = "No motions can be moved during voting.";
+            return false;
+        }
+
+        protected override bool CanVote(PersonRole actor, out string explanation)
+        {
+            if (actor.IsGuest)
+            {
+                explanation = "Voting is only open to members.";
+                return false;
+            }
+
+            explanation = "Voting is open to all members.";
+            return true;
+        }
+
+        protected override bool CanYield(PersonRole actor, out string explanation)
+        {
+            explanation = "Nobody has the floor during voting.";
+            return false;
         }
     }
 }

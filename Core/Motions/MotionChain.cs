@@ -4,6 +4,9 @@ using System.Linq;
 
 namespace Core.Motions
 {
+    /// <summary>
+    /// Represents one motion and all motions that came before it.
+    /// </summary>
     public class MotionChain
     {
         public IMotion Current { get; }

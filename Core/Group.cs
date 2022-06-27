@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Core.Actions;
-using Core.MeetingStates;
 
 namespace Core
 {
@@ -39,22 +37,29 @@ namespace Core
         /// <summary>
         /// Past and future meetings of this group.
         /// </summary>
-        public ICollection<Meeting> Meetings { get; private init; }
+        public ICollection<Meeting> Meetings { get; }
         
         /// <summary>
         /// All resolutions passed by this group.
         /// </summary>
-        public ICollection<string> Resolutions { get; private init; }
+        public ICollection<string> Resolutions { get; }
 
         /// <summary>
-        /// Tracks the state of this group.
+        /// The state of this group (adjourned, voting, etc).
+        /// This handles actions.
         /// </summary>
-        private readonly StateManager _stateManager;
+        public StateManager State { get; private init; }
         
         /// <summary>
         /// What states and actions have happened so far.
         /// </summary>
         public IList<string> Minutes { get; private init;  }
+        
+        /// <summary>
+        /// Whether this is an established group.
+        /// TODO: Create another class that implements the interface for mass meetings.
+        /// </summary>
+        public bool IsMassMeeting { get; }
 
         /// <summary>
         /// Constructor.
@@ -67,8 +72,11 @@ namespace Core
             Resolutions = new List<string>();
             Minutes = new List<string>();
             
+            // TODO: This is always true for now.
+            IsMassMeeting = true;
+            
             // TODO: Is there a better way to do this than pass this?
-            _stateManager = new StateManager(this);
+            State = new StateManager(this);
         }
 
         public static Group NewInstance(Person creator)
@@ -76,7 +84,7 @@ namespace Core
             var group = new Group
             {
                 Chair = creator,
-                Bylaws = Bylaws.Default(),
+                Bylaws = Bylaws.Default("New group"),
                 Members = new List<Person>() { creator }
             };
 
@@ -88,7 +96,7 @@ namespace Core
             var group = new Group
             {
                 Chair = creator,
-                Bylaws = Bylaws.Default(),
+                Bylaws = Bylaws.Default($"{creator.Name}'s new group"),
                 Members = new List<Person>() { creator }
             };
             
@@ -116,7 +124,7 @@ namespace Core
                 group.Members.Add(member);
             }
 
-            group.Bylaws = Bylaws.Default();
+            group.Bylaws = Bylaws.Default("New group");
 
             return group;
         }
@@ -134,24 +142,6 @@ namespace Core
         public bool IsMember(Guid personId)
         {
             return Members.Any(x => x.Id == personId);
-        }
-
-        // TODO: Return result.
-        // TODO: Have a method that marks people as present and if Mass Meeting then they are members, and have this method take a person Id and look it up in members. But what about guests?
-        public void TakeAction(Person actor, IAction action)
-        {
-            var attendee = CreateAttendee(actor);
-            var minutes = _stateManager.Act(attendee, action);
-            foreach (var minute in minutes)
-            {
-                Minutes.Add(minute);
-            }
-        }
-
-        private static bool IsEnoughNoticeGiven(DateTimeOffset currentTime, DateTimeOffset meetingTime,
-            TimeSpan requiredNotice)
-        {
-            return meetingTime - currentTime >= requiredNotice;
         }
 
         public string GetName()
@@ -176,49 +166,33 @@ namespace Core
 
         public void AddMember(Person member)
         {
+            if (Members.Contains(member)) return;
+            
             Members.Add(member);
             Minutes.Add($"{member.Name} was added as a member.");
         }
-
-        public IMeetingState GetState()
-        {
-            return _stateManager.State;
-        }
-
-        /// <summary>
-        /// Get the actions available to a person.
-        /// </summary>
-        /// <param name="person">The person who wants to take actions.</param>
-        public IEnumerable<Type> GetAvailableActions(Person person)
-        {
-            var state = GetState();
-            var attendee = CreateAttendee(person);
-            var actions = state.GetSupportedActions(attendee);
-            var avail = new ActionAvailability();
-            var filteredActions =
-                actions.Where(x => avail.IsActionAvailableToPerson(attendee.IsMember, attendee.IsChair, x));
-            return filteredActions;
-        }
         
-        public IEnumerable<Type> GetAvailableMotions(Person person)
+        public PersonRole CreatePersonRole(Person person)
         {
-            var state = GetState();
-            var attendee = CreateAttendee(person);
-            var motions = state.GetSupportedMotions();
-            var avail = new ActionAvailability();
-            var filteredMotions =
-                motions.Where(x => avail.IsActionAvailableToPerson(attendee.IsMember, attendee.IsChair, x));
-            return filteredMotions;
-        }
-        
-        private MeetingAttendee CreateAttendee(Person actor)
-        {
-            return new MeetingAttendee()
+            if (person == Chair)
             {
-                Person = actor,
-                IsChair = actor == Chair,
-                IsMember = IsMember(actor.Id)
-            };
+                return PersonRole.AsChair(person);
+            }
+
+            if (IsMember(person.Id))
+            {
+                return PersonRole.AsMember(person);
+            }
+
+            return PersonRole.AsGuest(person);
+        }
+
+        public void MarkAttendance(Person person)
+        {
+            if (IsMassMeeting)
+            {
+                AddMember(person);
+            }
         }
     }
 }

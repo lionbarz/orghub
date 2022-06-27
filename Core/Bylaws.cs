@@ -35,9 +35,9 @@ namespace Core
             Mission = mission;
         }
 
-        public static Bylaws Default()
+        public static Bylaws Default(string groupName)
         {
-            return new Bylaws("New Group", "Make a difference.")
+            return new Bylaws(groupName, "Make a difference.")
             {
                 MinimumMeetingNotice = TimeSpan.FromDays(3)
             };

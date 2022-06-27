@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Core.Actions;
-using Core.MeetingStates;
 
 namespace Core
 {
@@ -19,6 +17,11 @@ namespace Core
         /// Uniquely identifies this meeting.
         /// </summary>
         public Guid Id { get; }
+        
+        /// <summary>
+        /// The ID of the group that is meeting.
+        /// </summary>
+        public Guid GroupId { get; private init; }
 
         /// <summary>
         /// When the meeting will start.
@@ -28,7 +31,7 @@ namespace Core
         /// <summary>
         /// The attendees at any point of the meeting.
         /// </summary>
-        public ICollection<MeetingAttendee> Attendees { get; private set; }
+        public ICollection<PersonRole> Attendees { get; private set; }
         
         /// <summary>
         /// The chair of the meeting. Usually the person who called the meeting.
@@ -44,9 +47,9 @@ namespace Core
         public int Quorum { get; set; }
 
         /// <summary>
-        /// Manages the meeting states.
+        /// The state of the meeting. This handles actions.
         /// </summary>
-        private StateManager _stateManager;
+        public StateManager State { get; private init; }
 
         /// <summary>
         /// Whether there is a quorum among the attendees.
@@ -57,13 +60,15 @@ namespace Core
             return numCanVote >= Quorum;
         }
 
-        private Meeting(Person chair, DateTimeOffset startTime, int quorum)
+        private Meeting(Guid groupId, IGroupModifier groupModifier, Person chair, DateTimeOffset startTime, int quorum)
         {
             Id = Guid.NewGuid();
             StartTime = startTime;
-            Attendees = new List<MeetingAttendee>();
+            Attendees = new List<PersonRole>();
             Chair = chair;
             Quorum = quorum;
+            State = new StateManager(groupModifier);
+            GroupId = groupId;
         }
 
         /// <summary>
@@ -74,29 +79,20 @@ namespace Core
         /// <param name="startTime"></param>
         /// <returns></returns>
         /// <exception cref="ArgumentException"></exception>
-        public static Meeting NewInstance(Person chair, DateTimeOffset startTime, int quorum)
+        public static Meeting NewInstance(Guid groupId, IGroupModifier groupModifier, Person chair,
+            DateTimeOffset startTime, int quorum)
         {
-            return new Meeting(chair, startTime, quorum);
+            return new Meeting(groupId, groupModifier, chair, startTime, quorum);
         }
 
-        public void AddAttendee(MeetingAttendee attendee)
+        public void AddAttendee(PersonRole attendee)
         {
             Attendees.Add(attendee);
         }
 
-        public void RemoveAttendee(MeetingAttendee attendee)
+        public void RemoveAttendee(PersonRole attendee)
         {
             Attendees.Remove(attendee);
-        }
-
-        public void Act(MeetingAttendee actor, IAction action)
-        {
-            _stateManager.Act(actor, action);
-        }
-
-        public IMeetingState GetMeetingState()
-        {
-            return _stateManager.State;
         }
     }
 }

@@ -2,7 +2,7 @@ using System.Threading.Tasks;
 
 namespace Core.Motions
 {
-    public class GrantMembership : GroupModifyingMotion
+    public class GrantMembership : GroupModifyingMotion, IMainMotion
     {
         private readonly Person _applicant;
         

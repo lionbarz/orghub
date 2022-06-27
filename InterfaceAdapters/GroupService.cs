@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Core;
-using Core.Actions;
 using Core.Motions;
 using InterfaceAdapters.Models;
 
@@ -11,30 +10,30 @@ namespace InterfaceAdapters
 {
     public class GroupService
     {
-        private readonly IDatabaseAccess _database;
+        private readonly IDatabaseAccess _db;
 
         public GroupService(IDatabaseAccess database)
         {
-            _database = database;
+            _db = database;
         }
 
-        public async Task<UXGroup> AddGroupAsync(Guid userId)
+        public async Task<UXGroup> AddGroupAsync(Guid chairUserId)
         {
-            var chair = await _database.GetPersonAsync(userId);
+            var chair = await _db.GetPersonAsync(chairUserId);
             var group = Group.NewInstance(chair);
-            await _database.AddGroupAsync(group);
+            await _db.AddGroupAsync(group);
             return ToUxGroup(group);
         }
 
         public async Task<IEnumerable<UXGroup>> GetGroupsAsync()
         {
-            var groups = await _database.GetGroupsAsync();
+            var groups = await _db.GetGroupsAsync();
             return groups.Select(ToUxGroup);
         }
 
         public async Task<UXGroup> GetGroupAsync(Guid id)
         {
-            var group = await _database.GetGroupAsync(id);
+            var group = await _db.GetGroupAsync(id);
             return ToUxGroup(group);
         }
 
@@ -53,91 +52,60 @@ namespace InterfaceAdapters
                     Id = m.Id,
                     Name = m.Name
                 }),
-                State = x.GetState().GetDescription(),
                 Resolutions = x.Resolutions,
                 Name = x.Bylaws.Name,
-                Minutes = x.Minutes
+                Minutes = x.Minutes,
+                State = x.State.GetDescription()
             };
-        }
-
-        public async Task<IEnumerable<string>> GetAvailableActions(Guid userId, Guid groupId)
-        {
-            var actor = await _database.GetPersonAsync(userId);
-            var group = await _database.GetGroupAsync(groupId);
-            var actions = group.GetAvailableActions(actor);
-            return actions.Select(x => x.ToString());
-        }
-        
-        public async Task<IEnumerable<string>> GetAvailableMotions(Guid userId, Guid groupId)
-        {
-            var actor = await _database.GetPersonAsync(userId);
-            var group = await _database.GetGroupAsync(groupId);
-            var actions = group.GetAvailableMotions(actor);
-            return actions.Select(x => x.ToString());
-        }
-
-        public async Task ActAsync(Guid userId, Guid groupId, IAction action)
-        {
-            var actor = await _database.GetPersonAsync(userId);
-            var group = await _database.GetGroupAsync(groupId);
-            group.TakeAction(actor, action);
-            await _database.UpdateGroupAsync(group);
-        }
-
-        public async Task ElectChair(Guid userId, Guid groupId, string nomineeName)
-        {
-            var actor = await _database.GetPersonAsync(userId);
-            Person nominee = new Person(nomineeName);
-            var group = await _database.GetGroupAsync(groupId);
-            IMotion motion = new ElectChair(nominee, group);
-            IAction action = new Move(motion);
-            group.TakeAction(actor, action);
-            await _database.UpdateGroupAsync(group);
-        }
-
-        public async Task MoveResolution(Guid userId, Guid groupId, string resolution)
-        {
-            var actor = await _database.GetPersonAsync(userId);
-            var group = await _database.GetGroupAsync(groupId);
-            var motion = new Resolve(resolution, group);
-            var action = new Move(motion);
-            group.TakeAction(actor, action);
-            await _database.UpdateGroupAsync(group);
-        }
-        
-        public async Task MoveChangeGroupName(Guid userId, Guid groupId, string groupName)
-        {
-            var actor = await _database.GetPersonAsync(userId);
-            var group = await _database.GetGroupAsync(groupId);
-            var motion = new ChangeOrgName(groupName, group);
-            var action = new Move(motion);
-            group.TakeAction(actor, action);
-            await _database.UpdateGroupAsync(group);
-        }
-        
-        public async Task MoveGrantMembership(Guid userId, Guid groupId, Guid nomineeId)
-        {
-            var actor = await _database.GetPersonAsync(userId);
-            var nominee = await _database.GetPersonAsync(nomineeId);
-            var group = await _database.GetGroupAsync(groupId);
-            var motion = new GrantMembership(nominee, group);
-            var action = new Move(motion);
-            group.TakeAction(actor, action);
-            await _database.UpdateGroupAsync(group);
         }
 
         public async Task<IEnumerable<string>> GetMinutes(Guid groupId)
         {
-            var group = await _database.GetGroupAsync(groupId);
+            var group = await _db.GetGroupAsync(groupId);
             return group.Minutes;
         }
         
         public async Task AddMemberAsync(Guid groupId, Guid personId)
         {
-            var person = await _database.GetPersonAsync(personId);
-            var group = await _database.GetGroupAsync(groupId);
+            var person = await _db.GetPersonAsync(personId);
+            var group = await _db.GetGroupAsync(groupId);
             group.AddMember(person);
-            await _database.UpdateGroupAsync(group);
+            await _db.UpdateGroupAsync(group);
+        }
+        
+        public async Task CallToOrder(Guid groupId, Guid personId)
+        {
+            var group = await _db.GetGroupAsync(groupId);
+            var person = await _db.GetPersonAsync(personId);
+            var personRole = group.CreatePersonRole(person);
+            group.State.CallMeetingToOrder(personRole);
+            await _db.UpdateGroupAsync(group);
+        }
+
+        public async Task<IEnumerable<string>> GetAvailableActions(Guid groupId, Guid personId)
+        {
+            var group = await _db.GetGroupAsync(groupId);
+            var person = await _db.GetPersonAsync(personId);
+            var personRole = group.CreatePersonRole(person);
+            var actionSupports = group.State.GetActionSupportForPerson(personRole);
+            return actionSupports.Where(x => x.IsSupported).Select(x => x.Action.ToString());
+        }
+
+        public async Task MarkAttendance(Guid groupId, Guid personId)
+        {
+            var group = await _db.GetGroupAsync(groupId);
+            var person = await _db.GetPersonAsync(personId);
+            group.MarkAttendance(person);
+            await _db.UpdateGroupAsync(group);
+        }
+
+        public async Task MoveResolution(Guid groupId, Guid personId, string text)
+        {
+            var group = await _db.GetGroupAsync(groupId);
+            var person = await _db.GetPersonAsync(personId);
+            var personRole = group.CreatePersonRole(person);
+            group.State.MoveMainMotion(personRole, new Resolve(text, group));
+            await _db.UpdateGroupAsync(group);
         }
     }
 }

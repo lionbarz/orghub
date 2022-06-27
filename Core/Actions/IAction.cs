@@ -2,7 +2,7 @@
 namespace Core.Actions
 {
     /// <summary>
-    /// Actions that can be taken during a meeting, such
+    /// Action that can be taken during a meeting, such
     /// making a motion, rising to speak, calling the
     /// meeting to order, etc.
     /// </summary>

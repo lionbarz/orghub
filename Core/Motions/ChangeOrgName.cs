@@ -2,7 +2,7 @@
 
 namespace Core.Motions
 {
-    public class ChangeOrgName : GroupModifyingMotion
+    public class ChangeOrgName : GroupModifyingMotion, IMainMotion
     {
         private readonly string _suggestedName;
 

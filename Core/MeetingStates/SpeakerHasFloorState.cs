@@ -1,15 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Text;
-using Core.Actions;
 using Core.Motions;
 
 namespace Core.MeetingStates
 {
-    public class SpeakerHasFloorState : IMeetingState
+    public class SpeakerHasFloorState : MeetingStateBase
     {
         // The speaker who has the floor.
-        private MeetingAttendee Speaker { get; }
+        private Person Speaker { get; }
         
         // An optional motion. The speaker could be debating
         // a motion or just speaking.
@@ -21,53 +19,77 @@ namespace Core.MeetingStates
         // Need it to pass to other states.
         private IGroupModifier GroupModifier { get; }
 
-        public SpeakerHasFloorState(IGroupModifier groupModifier, MeetingAttendee speaker)
+        public SpeakerHasFloorState(IGroupModifier groupModifier, Person speaker)
         {
             Speaker = speaker;
             GroupModifier = groupModifier;
         }
         
-        public SpeakerHasFloorState(IGroupModifier groupModifier, MeetingAttendee speaker, MotionChain motionChain)
+        public SpeakerHasFloorState(IGroupModifier groupModifier, Person speaker, MotionChain motionChain)
         {
             Speaker = speaker;
             MotionChain = motionChain;
             GroupModifier = groupModifier;
         }
 
-        public IMeetingState TryHandleAction(MeetingAttendee actor, IAction action)
+        public override IMeetingState CallMeetingToOrder(PersonRole actor)
         {
-            if (action is ExpireSpeakerTime || (actor.Equals(Speaker) && action is YieldTheFloor))
+            throw new PersonOutOfOrderException("Meeting already in order.");
+        }
+
+        public override IMeetingState DeclareTimeExpired(PersonRole actor)
+        {
+            if (!CanDeclareTimeExpired(actor, out string explanation))
             {
-                return (MotionChain == null)
-                    ? new OpenFloorState(GroupModifier)
-                    : new DebateState(GroupModifier, MotionChain);
+                throw new PersonOutOfOrderException(explanation);
             }
-
-            throw new InvalidActionException();
+            
+            return MotionChain == null
+                ? OpenFloorState.InstanceOf(GroupModifier)
+                : new DebateState(GroupModifier, MotionChain);
         }
 
-        public IEnumerable<Type> GetSupportedActions(MeetingAttendee actor)
+        public override IMeetingState MoveMainMotion(PersonRole actor, IMainMotion motion)
         {
-            var actions = new LinkedList<Type>();
-            actions.AddLast(typeof(ExpireSpeakerTime));
-
-            if (actor.Equals(Speaker))
-            {
-                actions.AddLast(typeof(YieldTheFloor));
-            }
-
-            return actions;
+            throw new PersonOutOfOrderException("Can't move a motion while someone is speaking.");
         }
-        
-        public IEnumerable<Type> GetSupportedMotions()
+
+        public override IMeetingState MoveSubsidiaryMotion(PersonRole actor, ISubsidiaryMotion motion)
         {
-            return Array.Empty<Type>();
+            throw new PersonOutOfOrderException("Can't move a motion while someone is speaking.");
         }
 
-        public string GetDescription()
+        public override IMeetingState Second(PersonRole actor)
+        {
+            throw new PersonOutOfOrderException("There is no motion to second.");
+        }
+
+        public override IMeetingState Speak(PersonRole actor)
+        {
+            throw new PersonOutOfOrderException("Can't speak while someone is speaking.");
+        }
+
+        public override IMeetingState Vote(PersonRole actor, VoteType type)
+        {
+            throw new PersonOutOfOrderException("There is no vote in progress.");
+        }
+
+        public override IMeetingState Yield(PersonRole actor)
+        {
+            return MotionChain == null
+                ? OpenFloorState.InstanceOf(GroupModifier)
+                : new DebateState(GroupModifier, MotionChain);
+        }
+
+        public override IMeetingState MoveToAdjournUntil(PersonRole actor, DateTimeOffset untilTime)
+        {
+            throw new PersonOutOfOrderException("Can't move to adjourn while someone is speaking.");
+        }
+
+        public override string GetDescription()
         {
             var sb = new StringBuilder();
-            sb.Append($"{Speaker.Person.Name} is speaking");
+            sb.Append($"{Speaker.Name} is speaking");
 
             if (MotionChain != null)
             {
@@ -75,6 +97,74 @@ namespace Core.MeetingStates
             }
             
             return sb.ToString();
+        }
+
+        protected override bool CanMoveToAdjournUntil(PersonRole actor, out string explanation)
+        {
+            explanation = "Can't move to adjourn while someone is speaking.";
+            return false;
+        }
+
+        protected override bool CanCallToOrder(PersonRole actor, out string explanation)
+        {
+            explanation = "The meeting is already in order.";
+            return false;
+        }
+
+        protected override bool CanDeclareTimeExpired(PersonRole actor, out string explanation)
+        {
+            // TODO: Use a timer and only allow if it's really expired.
+            
+            if (!actor.IsChair)
+            {
+                explanation = "Only the chair can declare the time as expired.";
+                return false;
+            }
+
+            explanation = "The chair can declare the time as expired.";
+            return true;
+        }
+
+        protected override bool CanSecond(PersonRole actor, out string explanation)
+        {
+            explanation = "There is no motion to second.";
+            return false;
+        }
+
+        protected override bool CanSpeak(PersonRole actor, out string explanation)
+        {
+            explanation = "Can't speak while someone is speaking.";
+            return false;
+        }
+
+        protected override bool CanMoveMainMotion(PersonRole actor, out string explanation)
+        {
+            explanation = "Can't move a motion while someone is speaking.";
+            return false;
+        }
+
+        protected override bool CanMoveSubsidiaryMotion(PersonRole actor, out string explanation)
+        {
+            explanation = "Can't move a motion while someone is speaking.";
+            return false;
+        }
+
+        protected override bool CanVote(PersonRole actor, out string explanation)
+        {
+            explanation = "There is no vote in progress.";
+            return false;
+        }
+
+        protected override bool CanYield(PersonRole actor, out string explanation)
+        {
+            if (!actor.Person.Equals(Speaker))
+            {
+                explanation = $"Only {actor.Person.Name} can yield because they are the ones speaking.";
+                return false;
+            }
+
+            explanation = $"{actor.Person.Name} has the floor and can yield it.";
+            return true;
         }
     }
 }

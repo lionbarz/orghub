@@ -1,14 +1,15 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using Core.Actions;
 using Core.Motions;
 
 namespace Core.MeetingStates
 {
-    public class DebateState : IMeetingState
+    /// <summary>
+    /// A motion has been moved and seconded. The floor is open to
+    /// speakers (debaters) and subsidiary motions.
+    /// </summary>
+    public class DebateState : MeetingStateBase
     {
-        private MotionChain MotionChain { get; init; }
+        private MotionChain MotionChain { get; }
 
         /// <summary>
         /// Can be used to set group properties.
@@ -21,52 +22,150 @@ namespace Core.MeetingStates
             GroupModifier = groupModifier;
         }
 
-        public IMeetingState TryHandleAction(MeetingAttendee actor, IAction action)
+        public override IMeetingState CallMeetingToOrder(PersonRole actor)
         {
-            if (action is MoveToAdjourn)
-            {
-                // Right now moves to adjourn are automatically approved unanimously.
-                return new AdjournedState(GroupModifier);
-            }
-
-            if (action is Speak)
-            {
-                return new SpeakerHasFloorState(GroupModifier, actor, MotionChain);
-            }
-
-            if (action is Move { Motion: EndDebate } move)
-            {
-                return new MotionProposed(GroupModifier, actor.Person, MotionChain.Push(move.Motion));
-            }
-
-            if (action is DeclareEndDebate)
-            {
-                return new VotingState(GroupModifier, MotionChain);
-            }
-
-            throw new InvalidActionException();
+            throw new PersonOutOfOrderException("Cannot call the meeting to order during debate.");
         }
 
-        public IEnumerable<Type> GetSupportedActions(MeetingAttendee actor)
+        public override IMeetingState DeclareTimeExpired(PersonRole actor)
         {
-            return new[]
+            if (!CanDeclareTimeExpired(actor, out string explanation))
             {
-                typeof(MoveToAdjourn), typeof(Speak), typeof(EndDebate), typeof(DeclareMotionPassed),
-                typeof(DeclareEndDebate)
-            };
-        }
-        
-        public IEnumerable<Type> GetSupportedMotions()
-        {
-            return new[]
-            {
-                typeof(EndDebate)
-            };
+                throw new PersonOutOfOrderException(explanation);
+            }
+
+            return new VotingState(GroupModifier, MotionChain);
         }
 
-        public string GetDescription()
+        public override IMeetingState MoveSubsidiaryMotion(PersonRole actor, ISubsidiaryMotion motion)
+        {
+            if (!CanMoveSubsidiaryMotion(actor, out string explanation))
+            {
+                throw new PersonOutOfOrderException(explanation);
+            }
+            
+            return new MotionProposed(GroupModifier, actor.Person, MotionChain.Push(motion));
+        }
+
+        public override IMeetingState Second(PersonRole actor)
+        {
+            throw new PersonOutOfOrderException("There is nothing to second.");
+        }
+
+        public override IMeetingState MoveToAdjournUntil(PersonRole actor, DateTimeOffset untilTime)
+        {
+            if (!CanMoveToAdjournUntil(actor, out string explanation))
+            {
+                throw new PersonOutOfOrderException(explanation);
+            }
+            
+            // TODO: Vote on it.
+            return new AdjournedState(GroupModifier);
+        }
+
+        public override IMeetingState MoveMainMotion(PersonRole actor, IMainMotion motion)
+        {
+            throw new PersonOutOfOrderException("Cannot move a main motion while another is debated.");
+        }
+
+        public override IMeetingState Speak(PersonRole actor)
+        {
+            if (!CanSpeak(actor, out string explanation))
+            {
+                throw new PersonOutOfOrderException(explanation);
+            }
+
+            return new SpeakerHasFloorState(GroupModifier, actor.Person, MotionChain);
+        }
+
+        public override IMeetingState Vote(PersonRole actor, VoteType type)
+        {
+            throw new PersonOutOfOrderException("There is no vote in progress.");
+        }
+
+        public override IMeetingState Yield(PersonRole actor)
+        {
+            throw new PersonOutOfOrderException("Cannot yield because nobody has the floor.");
+        }
+
+        public override string GetDescription()
         {
             return $"Floor is open to speakers to debate {MotionChain.Current.GetText()}.";
+        }
+
+        protected override bool CanMoveToAdjournUntil(PersonRole actor, out string explanation)
+        {
+            if (actor.IsGuest)
+            {
+                explanation = $"{actor.Person.Name} is a guest and cannot move to adjourn.";
+                return false;
+            }
+
+            explanation = "Moving to adjourn can be made during debate.";
+            return true;
+        }
+
+        protected override bool CanCallToOrder(PersonRole actor, out string explanation)
+        {
+            explanation = "Cannot call the meeting to order during debate.";
+            return false;
+        }
+
+        protected override bool CanDeclareTimeExpired(PersonRole actor, out string explanation)
+        {
+            // TODO: This action should be "DeclareNoMoreDebate" instead of recycling this.
+            
+            if (!actor.IsChair)
+            {
+                explanation = "Only the chair can declare that there is no more debate.";
+                return false;
+            }
+            
+            explanation = "When there is no more debate the proceedings can move to a vote.";
+            return true;
+        }
+
+        protected override bool CanSecond(PersonRole actor, out string explanation)
+        {
+            explanation = "There is no motion to second.";
+            return false;
+        }
+
+        protected override bool CanSpeak(PersonRole actor, out string explanation)
+        {
+            // TODO: Limit the number of times guests and members can speak.
+            explanation = "Anyone can speak during the debate stage.";
+            return true;
+        }
+
+        protected override bool CanMoveMainMotion(PersonRole actor, out string explanation)
+        {
+            explanation = "Primary motions cannot be moved while debating another motion.";
+            return false;
+        }
+
+        protected override bool CanMoveSubsidiaryMotion(PersonRole actor, out string explanation)
+        {
+            if (actor.IsGuest)
+            {
+                explanation = "Guests cannot move motions.";
+                return false;
+            }
+
+            explanation = "There is a main motion and subsidiary motions can be made.";
+            return true;
+        }
+
+        protected override bool CanVote(PersonRole actor, out string explanation)
+        {
+            explanation = "There is no vote in progress.";
+            return false;
+        }
+
+        protected override bool CanYield(PersonRole actor, out string explanation)
+        {
+            explanation = "There's nothing to yield.";
+            return false;
         }
     }
 }
