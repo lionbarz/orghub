@@ -195,7 +195,7 @@ export class Group extends Component {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ userId: this.userId })
         };
-        await fetch(`group/${this.props.match.params.id}/action/${action}`, requestOptions);
+        await fetch(`api/group/${this.props.match.params.id}/action/${action}`, requestOptions);
         await this.updateState();
     }
 
@@ -205,7 +205,7 @@ export class Group extends Component {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ nomineeName: nomineeName, userId: this.userId })
         };
-        await fetch(`group/${this.props.match.params.id}/action/electchair`, requestOptions);
+        await fetch(`api/group/${this.props.match.params.id}/action/electchair`, requestOptions);
         await this.updateState();
     }
 
@@ -215,7 +215,7 @@ export class Group extends Component {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ name: text, userId: this.userId })
         };
-        await fetch(`group/${this.props.match.params.id}/action/movechangegroupname`, requestOptions);
+        await fetch(`api/group/${this.props.match.params.id}/action/movechangegroupname`, requestOptions);
         await this.updateState();
     }
 
@@ -225,7 +225,7 @@ export class Group extends Component {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ personId: personId, userId: this.userId })
         };
-        await fetch(`group/${this.props.match.params.id}/action/movegrantmembership`, requestOptions);
+        await fetch(`api/group/${this.props.match.params.id}/action/movegrantmembership`, requestOptions);
         await this.updateState();
     }
 
@@ -302,7 +302,7 @@ export class Group extends Component {
 
     populateGroupData = async () => {
         const id = this.props.match.params.id;
-        const response = await fetch(`group/${id}`);
+        const response = await fetch(`api/group/${id}`);
         const data = await response.json();
         this.setState({ group: data, loading: false });
     }
@@ -313,13 +313,13 @@ export class Group extends Component {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ userId: this.userId })
         };
-        await fetch(`group/${this.props.match.params.id}/markattendance`, requestOptions);
+        await fetch(`api/group/${this.props.match.params.id}/markattendance`, requestOptions);
         await this.updateState();
     }
 
     getAvailableActions = async () => {
         const id = this.props.match.params.id;
-        const response = await fetch(`group/${id}/action?userId=${this.userId}`);
+        const response = await fetch(`api/group/${id}/action?userId=${this.userId}`);
         const data = await response.json();
         this.setState({ actions: data });
     }

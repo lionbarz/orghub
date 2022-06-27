@@ -21,7 +21,7 @@ export class Home extends Component {
             method: 'GET',
             headers: { 'Content-Type': 'application/json' }
         };
-        const response = await fetch('person/' + personId, requestOptions);
+        const response = await fetch('api/person/' + personId, requestOptions);
         const user = await response.json();
         localStorage.setItem('userId', user.id);
         this.setState({user: user})
@@ -33,7 +33,7 @@ export class Home extends Component {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ userName: this.state.name })
         };
-        const response = await fetch('person/addPerson', requestOptions);
+        const response = await fetch('api/person/addPerson', requestOptions);
         const user = await response.json();
         localStorage.setItem('userId', user.id);
         this.setState({user: user})

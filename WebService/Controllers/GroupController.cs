@@ -16,21 +16,21 @@ public class GroupController : ControllerBase
     }
 
     [HttpGet]
-    [Route("group")]
+    [Route("api/group")]
     public async Task<IEnumerable<UXGroup>> List()
     {
         return await _groupService.GetGroupsAsync();
     }
 
     [HttpGet]
-    [Route("group/{id}")]
+    [Route("api/group/{id}")]
     public async Task<UXGroup> Get(string id)
     {
         return await _groupService.GetGroupAsync(Guid.Parse(id));
     }
     
     [HttpPost]
-    [Route("group")]
+    [Route("api/group")]
     public async Task AddGroup([FromBody] GenericUserRequest request)
     {
         await _groupService.AddGroupAsync(Guid.Parse(request.UserId));
@@ -40,7 +40,7 @@ public class GroupController : ControllerBase
     /// Get all available actions.
     /// </summary>
     [HttpGet]
-    [Route("group/{id}/action")]
+    [Route("api/group/{id}/action")]
     public async Task<IEnumerable<string>> GetAvailableActions(string id, string userId)
     {
         var actions = await _groupService.GetAvailableActions(Guid.Parse(id), Guid.Parse(userId));
@@ -48,21 +48,21 @@ public class GroupController : ControllerBase
     }
 
     [HttpPost]
-    [Route("group/{id}/markattendance")]
+    [Route("api/group/{id}/markattendance")]
     public async Task MarkAttendance(string id, [FromBody] GenericUserRequest request)
     {
         await _groupService.MarkAttendance(Guid.Parse(id), Guid.Parse(request.UserId));
     }
 
     [HttpPost]
-    [Route("group/{id}/moveresolution")]
+    [Route("api/group/{id}/moveresolution")]
     public async Task ActionMoveResolution(string id, [FromBody] MoveResolutionRequest request)
     {
         await _groupService.MoveResolution(Guid.Parse(id), Guid.Parse(request.UserId), request.Text);
     }
     
     [HttpPost]
-    [Route("group/{id}/action/calltoorder")]
+    [Route("api/group/{id}/action/calltoorder")]
     public async Task ActionCallToOrder(string id, [FromBody] GenericUserRequest request)
     {
         await _groupService.CallToOrder(Guid.Parse(id), Guid.Parse(request.UserId));

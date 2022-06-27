@@ -40,7 +40,7 @@ export class MoveResolutionButton extends Component {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ text: text, userId: this.props.personId })
         };
-        let response = await fetch(`group/${this.props.groupId}/moveresolution`, requestOptions);
+        let response = await fetch(`api/group/${this.props.groupId}/moveresolution`, requestOptions);
         return response.ok;
     }
 

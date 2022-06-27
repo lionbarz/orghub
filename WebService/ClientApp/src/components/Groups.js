@@ -40,7 +40,7 @@ export class Groups extends Component {
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({userId: userId})
         };
-        await fetch('group', requestOptions);
+        await fetch('api/group', requestOptions);
         await this.populateGroupData();
     }
 
@@ -59,7 +59,7 @@ export class Groups extends Component {
     }
 
     async populateGroupData() {
-        const response = await fetch('group');
+        const response = await fetch('api/group');
         const data = await response.json();
         this.setState({groups: data, loading: false});
     }
