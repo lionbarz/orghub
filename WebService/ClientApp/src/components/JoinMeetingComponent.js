@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import {Button, CardBody, CardTitle} from 'reactstrap';
+import {Button, CardBody} from 'reactstrap';
 import { Card, CardHeader, FormGroup, Input, Label } from 'reactstrap';
 
 // Has a dialog for specifying resolution text.
