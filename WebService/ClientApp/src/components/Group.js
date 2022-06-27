@@ -3,10 +3,10 @@ import { Button } from 'reactstrap';
 import { Modal, ModalBody, ModalHeader, ModalFooter, FormGroup, Input } from 'reactstrap';
 import ZoomMtgEmbedded from '@zoomus/websdk/embedded';
 import {MoveResolutionButton} from "./MoveResolutionButton";
+import {JoinMeetingComponent} from "./JoinMeetingComponent";
 
 export class Group extends Component {
     static displayName = Group.name;
-    userId = localStorage.getItem('userId');
     
     // The ID of the interval that is refreshing the state.
     intervalId = null;
@@ -14,6 +14,7 @@ export class Group extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            userId: localStorage.getItem('userId'),
             group: null,
             loading: true,
             groupName: "",
@@ -171,7 +172,7 @@ export class Group extends Component {
                         chair</button>
                 }
                 {this.state.actions.includes('MoveMainMotion') &&
-                    <MoveResolutionButton groupId={this.props.match.params.id} personId={this.userId} onSuccess={() => this.updateState()} />
+                    <MoveResolutionButton groupId={this.props.match.params.id} personId={this.state.userId} onSuccess={() => this.updateState()} />
                 }
                 {this.state.actions.includes('Core.Motions.ChangeOrgName') &&
                     <button className="btn btn-primary" onClick={() => this.moveGroupName(this.state.groupName)}>Suggest
@@ -193,7 +194,7 @@ export class Group extends Component {
         const requestOptions = {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ userId: this.userId })
+            body: JSON.stringify({ userId: this.state.userId })
         };
         await fetch(`api/group/${this.props.match.params.id}/action/${action}`, requestOptions);
         await this.updateState();
@@ -203,7 +204,7 @@ export class Group extends Component {
         const requestOptions = {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ nomineeName: nomineeName, userId: this.userId })
+            body: JSON.stringify({ nomineeName: nomineeName, userId: this.state.userId })
         };
         await fetch(`api/group/${this.props.match.params.id}/action/electchair`, requestOptions);
         await this.updateState();
@@ -213,7 +214,7 @@ export class Group extends Component {
         const requestOptions = {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ name: text, userId: this.userId })
+            body: JSON.stringify({ name: text, userId: this.state.userId })
         };
         await fetch(`api/group/${this.props.match.params.id}/action/movechangegroupname`, requestOptions);
         await this.updateState();
@@ -223,7 +224,7 @@ export class Group extends Component {
         const requestOptions = {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ personId: personId, userId: this.userId })
+            body: JSON.stringify({ personId: personId, userId: this.state.userId })
         };
         await fetch(`api/group/${this.props.match.params.id}/action/movegrantmembership`, requestOptions);
         await this.updateState();
@@ -258,6 +259,15 @@ export class Group extends Component {
             <div>
                 <div id="meetingSDKElement">
                 </div>
+                {!this.state.userId &&
+                    <div className="mb-3">
+                        <JoinMeetingComponent onPersonCreate={(userId) => {
+                            localStorage.setItem('userId', userId);
+                            this.setState({userId: userId});
+                            this.markAttendance();
+                        }} />
+                    </div>
+                }
                 {contents}
                 <Modal isOpen={this.state.showMembershipModal} toggle={() => this.closeGrantMembershipPrompt()}>
                     <ModalHeader
@@ -308,18 +318,26 @@ export class Group extends Component {
     }
 
     markAttendance = async () => {
+        if (!this.state.userId) {
+            return;
+        }
+        
         const requestOptions = {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ userId: this.userId })
+            body: JSON.stringify({ userId: this.state.userId })
         };
         await fetch(`api/group/${this.props.match.params.id}/markattendance`, requestOptions);
         await this.updateState();
     }
 
     getAvailableActions = async () => {
+        if (!this.state.userId) {
+            return;
+        }
+        
         const id = this.props.match.params.id;
-        const response = await fetch(`api/group/${id}/action?userId=${this.userId}`);
+        const response = await fetch(`api/group/${id}/action?userId=${this.state.userId}`);
         const data = await response.json();
         this.setState({ actions: data });
     }
