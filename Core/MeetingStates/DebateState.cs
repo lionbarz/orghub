@@ -90,7 +90,7 @@ namespace Core.MeetingStates
 
         public override string GetDescription()
         {
-            return $"Floor is open to speakers to debate {MotionChain.Current.GetText()}.";
+            return $"The suggestion is \"{MotionChain.Current.GetText()}\". Any debate?";
         }
 
         protected override bool CanMoveToAdjournUntil(PersonRole actor, out string explanation)

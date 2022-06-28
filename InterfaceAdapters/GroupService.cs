@@ -107,5 +107,50 @@ namespace InterfaceAdapters
             group.State.MoveMainMotion(personRole, new Resolve(text, group));
             await _db.UpdateGroupAsync(group);
         }
+
+        public async Task DeclareTimeExpired(Guid groupId, Guid personId)
+        {
+            var group = await _db.GetGroupAsync(groupId);
+            var person = await _db.GetPersonAsync(personId);
+            var personRole = group.CreatePersonRole(person);
+            group.State.DeclareTimeExpired(personRole);
+            await _db.UpdateGroupAsync(group);
+        }
+        
+        public async Task Second(Guid groupId, Guid personId)
+        {
+            var group = await _db.GetGroupAsync(groupId);
+            var person = await _db.GetPersonAsync(personId);
+            var personRole = group.CreatePersonRole(person);
+            group.State.Second(personRole);
+            await _db.UpdateGroupAsync(group);
+        }
+
+        public async Task Speak(Guid groupId, Guid personId)
+        {
+            var group = await _db.GetGroupAsync(groupId);
+            var person = await _db.GetPersonAsync(personId);
+            var personRole = group.CreatePersonRole(person);
+            group.State.Speak(personRole);
+            await _db.UpdateGroupAsync(group);
+        }
+        
+        public async Task Vote(Guid groupId, Guid personId, VoteType voteType)
+        {
+            var group = await _db.GetGroupAsync(groupId);
+            var person = await _db.GetPersonAsync(personId);
+            var personRole = group.CreatePersonRole(person);
+            group.State.Vote(personRole, voteType);
+            await _db.UpdateGroupAsync(group);
+        }
+        
+        public async Task Yield(Guid groupId, Guid personId)
+        {
+            var group = await _db.GetGroupAsync(groupId);
+            var person = await _db.GetPersonAsync(personId);
+            var personRole = group.CreatePersonRole(person);
+            group.State.Yield(personRole);
+            await _db.UpdateGroupAsync(group);
+        }
     }
 }

@@ -133,6 +133,19 @@ export class Group extends Component {
     renderActions = () => {
         return (
             <div>
+                {this.state.actions.includes('Vote') &&
+                    <div className="mt-3 mb-3">
+                        <Button color="primary" onClick={() => this.takeActionVote("Aye")}>
+                            Vote Aye
+                        </Button>
+                        <Button color="primary" onClick={() => this.takeActionVote("Nay")}>
+                            Vote Nay
+                        </Button>
+                        <Button color="primary" onClick={() => this.takeActionVote("Abstain")}>
+                            Abstain
+                        </Button>
+                    </div>
+                }
                 {this.state.actions.includes('CallToOrder') &&
                     <div className="mt-3 mb-3">
                         <Button color="primary" onClick={() => this.takeAction("calltoorder")}>
@@ -140,10 +153,10 @@ export class Group extends Component {
                         </Button>
                     </div>
                 }
-                {this.state.actions.includes('MoveToAdjourn') &&
+                {this.state.actions.includes('DeclareTimeExpired') &&
                     <div className="mt-3 mb-3">
-                        <Button color="primary" onClick={() => this.takeAction("adjourn")}>
-                            Suggest ending the meeting
+                        <Button color="primary" onClick={() => this.takeAction("DeclareTimeExpired")}>
+                            Declare time has expired
                         </Button>
                     </div>
                 }
@@ -152,8 +165,10 @@ export class Group extends Component {
                         <button className="btn btn-primary" onClick={() => this.takeAction("speak")}>Speak</button>
                     </div>
                 }
-                {this.state.actions.includes('Core.Actions.YieldTheFloor') &&
-                    <button className="btn btn-primary" onClick={() => this.takeAction("yield")}>Yield</button>
+                {this.state.actions.includes('Yield') &&
+                    <div className="mt-3 mb-3">
+                        <button className="btn btn-primary" onClick={() => this.takeAction("yield")}>Yield</button>
+                    </div>
                 }
                 {this.state.actions.includes('Second') &&
                     <div className="mt-3 mb-3">
@@ -186,6 +201,13 @@ export class Group extends Component {
                         Suggest adding a member
                     </Button>
                 }
+                {this.state.actions.includes('MoveToAdjourn') &&
+                    <div className="mt-3 mb-3">
+                        <Button color="primary" onClick={() => this.takeAction("movetoadjourn")}>
+                            Move to adjourn
+                        </Button>
+                    </div>
+                }
             </div>
         );
     }
@@ -196,7 +218,17 @@ export class Group extends Component {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ userId: this.state.userId })
         };
-        await fetch(`api/group/${this.props.match.params.id}/action/${action}`, requestOptions);
+        await fetch(`api/group/${this.props.match.params.id}/${action}`, requestOptions);
+        await this.updateState();
+    }
+
+    async takeActionVote (voteType) {
+        const requestOptions = {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ userId: this.state.userId, voteType: voteType })
+        };
+        await fetch(`api/group/${this.props.match.params.id}/vote`, requestOptions);
         await this.updateState();
     }
 

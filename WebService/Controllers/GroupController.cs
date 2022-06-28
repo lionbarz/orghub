@@ -1,4 +1,5 @@
-﻿using InterfaceAdapters;
+﻿using Core;
+using InterfaceAdapters;
 using InterfaceAdapters.Models;
 using Microsoft.AspNetCore.Mvc;
 using WebService.Models;
@@ -62,9 +63,49 @@ public class GroupController : ControllerBase
     }
     
     [HttpPost]
-    [Route("api/group/{id}/action/calltoorder")]
+    [Route("api/group/{id}/calltoorder")]
     public async Task ActionCallToOrder(string id, [FromBody] GenericUserRequest request)
     {
         await _groupService.CallToOrder(Guid.Parse(id), Guid.Parse(request.UserId));
+    }
+    
+    [HttpPost]
+    [Route("api/group/{id}/DeclareTimeExpired")]
+    public async Task ActionDeclareTimeExpired(string id, [FromBody] GenericUserRequest request)
+    {
+        await _groupService.DeclareTimeExpired(Guid.Parse(id), Guid.Parse(request.UserId));
+    }
+    
+    [HttpPost]
+    [Route("api/group/{id}/second")]
+    public async Task ActionSecond(string id, [FromBody] GenericUserRequest request)
+    {
+        await _groupService.Second(Guid.Parse(id), Guid.Parse(request.UserId));
+    }
+    
+    [HttpPost]
+    [Route("api/group/{id}/speak")]
+    public async Task ActionSpeak(string id, [FromBody] GenericUserRequest request)
+    {
+        await _groupService.Speak(Guid.Parse(id), Guid.Parse(request.UserId));
+    }
+    
+    [HttpPost]
+    [Route("api/group/{id}/vote")]
+    public async Task ActionVote(string id, [FromBody] VoteRequest request)
+    {
+        if (!Enum.TryParse(request.VoteType, true, out VoteType voteType))
+        {
+            throw new ArgumentException($"{request.VoteType} is not a valid type of vote.");
+        }
+        
+        await _groupService.Vote(Guid.Parse(id), Guid.Parse(request.UserId), voteType);
+    }
+    
+    [HttpPost]
+    [Route("api/group/{id}/yield")]
+    public async Task ActionYield(string id, [FromBody] GenericUserRequest request)
+    {
+        await _groupService.Yield(Guid.Parse(id), Guid.Parse(request.UserId));
     }
 }

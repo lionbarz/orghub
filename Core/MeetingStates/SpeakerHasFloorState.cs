@@ -88,15 +88,12 @@ namespace Core.MeetingStates
 
         public override string GetDescription()
         {
-            var sb = new StringBuilder();
-            sb.Append($"{Speaker.Name} is speaking");
-
             if (MotionChain != null)
             {
-                sb.Append($" about the motion: {MotionChain.Current.GetText()}");
+                return $"{Speaker.Name} is debating \"{MotionChain.Current.GetText()}\".";
             }
-            
-            return sb.ToString();
+
+            return $"{Speaker.Name} is speaking freely.";
         }
 
         protected override bool CanMoveToAdjournUntil(PersonRole actor, out string explanation)
