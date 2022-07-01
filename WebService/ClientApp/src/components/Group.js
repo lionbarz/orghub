@@ -1,5 +1,14 @@
 import React, { Component } from 'react';
-import { Button } from 'reactstrap';
+import Button from '@mui/material/Button';
+import GavelIcon from '@mui/icons-material/Gavel';
+import MicIcon from '@mui/icons-material/Mic';
+import AdjournIcon from '@mui/icons-material/DirectionsRun';
+import YieldIcon from '@mui/icons-material/MicOff';
+import VoteAyeIcon from '@mui/icons-material/ThumbUp';
+import VoteNayIcon from '@mui/icons-material/ThumbDown';
+import TimeExpiredIcon from '@mui/icons-material/Timer';
+import SecondIcon from '@mui/icons-material/EmojiPeople';
+import AbstainIcon from '@mui/icons-material/NotInterested';
 import { Modal, ModalBody, ModalHeader, ModalFooter, FormGroup, Input } from 'reactstrap';
 import ZoomMtgEmbedded from '@zoomus/websdk/embedded';
 import {MoveResolutionButton} from "./MoveResolutionButton";
@@ -105,9 +114,7 @@ export class Group extends Component {
                 <div className="card mb-3" style={{maxWidth: "36rem"}}>
                     <div className="card-header">Members</div>
                     <div className="card-body">
-                        
-                            {group.members.map(member => <p key={member.id} className="card-text">{member.name}</p>)}
-                        
+                        {group.members.map(member => <p key={member.id} className="card-text">{member.name}</p>)}
                     </div>
                 </div>
                 <div className="card mb-3" style={{maxWidth: "36rem"}}>
@@ -136,17 +143,17 @@ export class Group extends Component {
                 {this.state.actions.includes('Vote') &&
                     <div>
                         <div className="mt-3 mb-3">
-                            <Button color="primary" onClick={() => this.takeActionVote("Aye")}>
+                            <Button variant="outlined" startIcon={<VoteAyeIcon />} onClick={() => this.takeActionVote("Aye")}>
                                 Vote Aye
                             </Button>
                         </div>
                         <div className="mt-3 mb-3">
-                            <Button color="primary" onClick={() => this.takeActionVote("Nay")}>
+                            <Button variant="outlined" startIcon={<VoteNayIcon />} onClick={() => this.takeActionVote("Nay")}>
                                 Vote Nay
                             </Button>
                         </div>
                         <div className="mt-3 mb-3">
-                            <Button color="primary" onClick={() => this.takeActionVote("Abstain")}>
+                            <Button variant="outlined" startIcon={<AbstainIcon />} onClick={() => this.takeActionVote("Abstain")}>
                                 Abstain from voting
                             </Button>
                         </div>
@@ -154,31 +161,37 @@ export class Group extends Component {
                 }
                 {this.state.actions.includes('CallToOrder') &&
                     <div className="mt-3 mb-3">
-                        <Button color="primary" onClick={() => this.takeAction("calltoorder")}>
+                        <Button variant="outlined" startIcon={<GavelIcon />} onClick={() => this.takeAction("calltoorder")}>
                             Call to order
                         </Button>
                     </div>
                 }
                 {this.state.actions.includes('DeclareTimeExpired') &&
                     <div className="mt-3 mb-3">
-                        <Button color="primary" onClick={() => this.takeAction("DeclareTimeExpired")}>
+                        <Button variant="outlined" startIcon={<TimeExpiredIcon />} onClick={() => this.takeAction("DeclareTimeExpired")}>
                             Declare time has expired
                         </Button>
                     </div>
                 }
                 {this.state.actions.includes('Speak') &&
                     <div className="mt-3 mb-3">
-                        <button className="btn btn-primary" onClick={() => this.takeAction("speak")}>Speak</button>
+                        <Button variant="outlined" startIcon={<MicIcon />} onClick={() => this.takeAction("speak")}>
+                            Speak
+                        </Button>
                     </div>
                 }
                 {this.state.actions.includes('Yield') &&
                     <div className="mt-3 mb-3">
-                        <button className="btn btn-primary" onClick={() => this.takeAction("yield")}>Yield</button>
+                        <Button variant="outlined" startIcon={<YieldIcon />} onClick={() => this.takeAction("yield")}>
+                            Yield
+                        </Button>
                     </div>
                 }
                 {this.state.actions.includes('Second') &&
                     <div className="mt-3 mb-3">
-                        <button className="btn btn-primary" onClick={() => this.takeAction("second")}>Second</button>
+                        <Button variant="outlined" startIcon={<SecondIcon />} onClick={() => this.takeAction("second")}>
+                            Second
+                        </Button>
                     </div>
                 }
                 {this.state.actions.includes('Core.Motions.EndDebate') &&
@@ -209,7 +222,7 @@ export class Group extends Component {
                 }
                 {this.state.actions.includes('MoveToAdjourn') &&
                     <div className="mt-3 mb-3">
-                        <Button color="primary" onClick={() => this.takeAction("movetoadjourn")}>
+                        <Button variant="outlined" startIcon={<AdjournIcon />} onClick={() => this.takeAction("movetoadjourn")}>
                             Move to adjourn
                         </Button>
                     </div>

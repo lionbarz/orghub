@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
-import { Button } from 'reactstrap';
+import Button from '@mui/material/Button';
+import Icon from '@mui/icons-material/EmojiPeople';
 import { Modal, ModalBody, ModalHeader, ModalFooter, FormGroup, Input, Label } from 'reactstrap';
 
 // Has a dialog for specifying resolution text.
@@ -47,7 +48,9 @@ export class MoveResolutionButton extends Component {
     render = () => {
         return (
             <div>
-                <button className="btn btn-primary" onClick={this.showModal}>Suggest something...</button>
+                <Button variant="outlined" startIcon={<Icon />} onClick={this.showModal}>
+                    Suggest...
+                </Button>
                 <Modal isOpen={this.state.showModal} toggle={this.hideModal}>
                     <ModalHeader
                         close={<button className="close" onClick={this.hideModal}>×</button>}
