@@ -56,7 +56,7 @@ export class Home extends Component {
                 {!this.state.user &&
                     <div>
                         <label>
-                            Name: <input size="50" name="user" value={this.state.name} onChange={this.handleChange}/>
+                            Name: <input size="10" name="user" value={this.state.name} onChange={this.handleChange}/>
                         </label>
                         <button className="btn btn-primary" onClick={() => this.saveUser()}>Save</button>
                     </div>
