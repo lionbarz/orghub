@@ -50,6 +50,11 @@ namespace Core.MeetingStates
                     // The vote was on ending debate, so the next thing is to vote on the main motion.
                     return new VotingState(GroupModifier, MotionChain.Pop());
                 }
+
+                if (MotionChain.Current is Adjourn)
+                {
+                    return new AdjournedState(GroupModifier);
+                }
             }
             else
             {
@@ -97,7 +102,7 @@ namespace Core.MeetingStates
             throw new PersonOutOfOrderException("Nobody has the floor during voting.");
         }
 
-        public override IMeetingState MoveToAdjournUntil(PersonRole actor, DateTimeOffset untilTime)
+        public override IMeetingState MoveToAdjourn(PersonRole actor)
         {
             throw new PersonOutOfOrderException("The meeting cannot be adjourned during voting.");
         }
@@ -105,10 +110,10 @@ namespace Core.MeetingStates
         public override string GetDescription()
         {
             return
-                $"Voting on \"{MotionChain.Current.GetText()}\". {BallotBox.NumAye} in favor. {BallotBox.NumNay} opposed. {BallotBox.NumAbstain} abstaining.";
+                $"Voting on motion to {MotionChain.Current.GetText()}. {BallotBox.NumAye} in favor. {BallotBox.NumNay} opposed. {BallotBox.NumAbstain} abstaining.";
         }
 
-        protected override bool CanMoveToAdjournUntil(PersonRole actor, out string explanation)
+        protected override bool CanMoveToAdjourn(PersonRole actor, out string explanation)
         {
             explanation = "The meeting cannot be adjourned during voting.";
             return false;

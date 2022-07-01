@@ -46,14 +46,14 @@ namespace Core.MeetingStates
             throw new PersonOutOfOrderException("There is no motion to second.");
         }
 
-        public override IMeetingState MoveToAdjournUntil(PersonRole actorRole, DateTimeOffset untilTime)
+        public override IMeetingState MoveToAdjourn(PersonRole actorRole)
         {
-            if (!CanMoveToAdjournUntil(actorRole, out string? error))
+            if (!CanMoveToAdjourn(actorRole, out string? error))
             {
                 throw new PersonOutOfOrderException(error);
             }
             
-            var motion = new Adjourn(actorRole.Person, untilTime);
+            var motion = new Adjourn(actorRole.Person);
             var motionChain = MotionChain.FromMotion(motion);
             return new MotionProposed(GroupModifier, actorRole.Person, motionChain);
         }
@@ -88,7 +88,7 @@ namespace Core.MeetingStates
             return "The floor is open.";
         }
         
-        protected override bool CanMoveToAdjournUntil(PersonRole actor, out string explanation)
+        protected override bool CanMoveToAdjourn(PersonRole actor, out string explanation)
         {
             if (actor.IsGuest)
             {

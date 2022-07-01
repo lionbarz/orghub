@@ -54,6 +54,13 @@ public class GroupController : ControllerBase
     {
         await _groupService.MarkAttendance(Guid.Parse(id), Guid.Parse(request.UserId));
     }
+    
+    [HttpPost]
+    [Route("api/group/{id}/MoveToAdjourn")]
+    public async Task ActionMoveToAdjourn(string id, [FromBody] GenericUserRequest request)
+    {
+        await _groupService.MoveToAdjourn(Guid.Parse(id), Guid.Parse(request.UserId));
+    }
 
     [HttpPost]
     [Route("api/group/{id}/moveresolution")]

@@ -1,5 +1,4 @@
-﻿using System;
-using Core.Motions;
+﻿using Core.Motions;
 
 namespace Core.MeetingStates
 {
@@ -52,15 +51,15 @@ namespace Core.MeetingStates
             throw new PersonOutOfOrderException("There is nothing to second.");
         }
 
-        public override IMeetingState MoveToAdjournUntil(PersonRole actor, DateTimeOffset untilTime)
+        public override IMeetingState MoveToAdjourn(PersonRole actor)
         {
-            if (!CanMoveToAdjournUntil(actor, out string explanation))
+            if (!CanMoveToAdjourn(actor, out string explanation))
             {
                 throw new PersonOutOfOrderException(explanation);
             }
-            
-            // TODO: Vote on it.
-            return new AdjournedState(GroupModifier);
+
+            var newChain = MotionChain.Push(new Adjourn(actor.Person));
+            return new MotionProposed(GroupModifier, actor.Person, newChain);
         }
 
         public override IMeetingState MoveMainMotion(PersonRole actor, IMainMotion motion)
@@ -90,10 +89,10 @@ namespace Core.MeetingStates
 
         public override string GetDescription()
         {
-            return $"The suggestion is \"{MotionChain.Current.GetText()}\". Any debate?";
+            return $"The suggestion is to {MotionChain.Current.GetText()}. Any debate?";
         }
 
-        protected override bool CanMoveToAdjournUntil(PersonRole actor, out string explanation)
+        protected override bool CanMoveToAdjourn(PersonRole actor, out string explanation)
         {
             if (actor.IsGuest)
             {

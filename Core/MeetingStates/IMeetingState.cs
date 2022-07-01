@@ -29,7 +29,7 @@ namespace Core.MeetingStates
         /// <summary>
         /// Action to move that the meeting adjourns until a certain date.
         /// </summary>
-        IMeetingState MoveToAdjournUntil(PersonRole actor, DateTimeOffset untilTime);
+        IMeetingState MoveToAdjourn(PersonRole actor);
         
         /// <summary>
         /// Action to second.

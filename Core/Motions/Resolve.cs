@@ -16,7 +16,7 @@ namespace Core.Motions
 
         public override string GetText()
         {
-            return Resolution;
+            return $"adopt \"{Resolution}\"";
         }   
 
         public override Task TakeActionAsync()

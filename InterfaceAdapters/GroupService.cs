@@ -152,5 +152,14 @@ namespace InterfaceAdapters
             group.State.Yield(personRole);
             await _db.UpdateGroupAsync(group);
         }
+
+        public async Task MoveToAdjourn(Guid groupId, Guid personId)
+        {
+            var group = await _db.GetGroupAsync(groupId);
+            var person = await _db.GetPersonAsync(personId);
+            var personRole = group.CreatePersonRole(person);
+            group.State.MoveToAdjourn(personRole);
+            await _db.UpdateGroupAsync(group);
+        }
     }
 }

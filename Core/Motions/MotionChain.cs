@@ -41,6 +41,9 @@ namespace Core.Motions
             return new MotionChain(Previous.Last(), Previous.Take(Previous.Count - 1).ToList());
         }
 
+        /// <summary>
+        /// Pushes a new motion onto the chain and returns the new chain.
+        /// </summary>
         public MotionChain Push(IMotion motion)
         {
             var newPrevious = new List<IMotion>();

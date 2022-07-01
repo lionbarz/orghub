@@ -37,7 +37,7 @@ namespace Core.MeetingStates
             throw new PersonOutOfOrderException("Meeting is not in order");
         }
 
-        public override IMeetingState MoveToAdjournUntil(PersonRole actor, DateTimeOffset untilTime)
+        public override IMeetingState MoveToAdjourn(PersonRole actor)
         {
             throw new PersonOutOfOrderException(
                 $"{actor.Person.Name} cannot move to adjourn while the meeting is adjourned.");
@@ -72,7 +72,7 @@ namespace Core.MeetingStates
         /// <summary>
         /// Whether or not a person can move to adjourn.
         /// </summary>
-        protected override bool CanMoveToAdjournUntil(PersonRole actor, out string explanation)
+        protected override bool CanMoveToAdjourn(PersonRole actor, out string explanation)
         {
             explanation = $"Cannot move to adjourn while the meeting is adjourned.";
             return false;

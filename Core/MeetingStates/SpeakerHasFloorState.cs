@@ -81,7 +81,7 @@ namespace Core.MeetingStates
                 : new DebateState(GroupModifier, MotionChain);
         }
 
-        public override IMeetingState MoveToAdjournUntil(PersonRole actor, DateTimeOffset untilTime)
+        public override IMeetingState MoveToAdjourn(PersonRole actor)
         {
             throw new PersonOutOfOrderException("Can't move to adjourn while someone is speaking.");
         }
@@ -96,7 +96,7 @@ namespace Core.MeetingStates
             return $"{Speaker.Name} is speaking freely.";
         }
 
-        protected override bool CanMoveToAdjournUntil(PersonRole actor, out string explanation)
+        protected override bool CanMoveToAdjourn(PersonRole actor, out string explanation)
         {
             explanation = "Can't move to adjourn while someone is speaking.";
             return false;

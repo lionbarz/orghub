@@ -58,9 +58,9 @@ namespace Core
             return State;
         }
 
-        public IMeetingState MoveToAdjournUntil(PersonRole actor, DateTimeOffset untilTime)
+        public IMeetingState MoveToAdjourn(PersonRole actor)
         {
-            State = State.MoveToAdjournUntil(actor, untilTime);
+            State = State.MoveToAdjourn(actor);
             return State;
         }
 

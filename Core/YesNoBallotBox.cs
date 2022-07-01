@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Core
 {
@@ -25,13 +26,16 @@ namespace Core
         private bool IsClosed { get; set; }
 
         // How each voter voted.
-        private ICollection<YesNoBallot> Ballots { get; }
+        private IDictionary<Person, YesNoBallot> Ballots { get; }
 
         public YesNoBallotBox()
         {
             Id = Guid.NewGuid();
             IsClosed = false;
-            Ballots = new LinkedList<YesNoBallot>();
+            // TODO: VOTES COULD BE LOST!
+            // TODO: The request loads the entire state and modifies this and then saves.
+            // TODO: Two people could clobber each other.
+            Ballots = new Dictionary<Person, YesNoBallot>();
         }
 
         /// <summary>
@@ -44,7 +48,7 @@ namespace Core
         /// </remarks>
         public void CastBallot(YesNoBallot ballot)
         {
-            Ballots.Add(ballot);
+            Ballots[ballot.Voter] = ballot;
         }
 
         /// <summary>
@@ -75,20 +79,7 @@ namespace Core
         /// </summary>
         private int CountEligibleBallotsOfType(VoteType type)
         {
-            var count = 0;
-            HashSet<Person> alreadyVoted = new();
-            
-            foreach (var ballot in Ballots)
-            {
-                // One person, one vote.
-                if (ballot.VoteType == type && !alreadyVoted.Contains(ballot.Voter))
-                {
-                    alreadyVoted.Add(ballot.Voter);
-                    count++;
-                }    
-            }
-
-            return count;
+            return Ballots.Values.Count(x => x.VoteType == type);
         }
     }
 }

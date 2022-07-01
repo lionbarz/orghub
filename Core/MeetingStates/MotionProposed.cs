@@ -50,7 +50,7 @@ namespace Core.MeetingStates
                 throw new PersonOutOfOrderException(explanation);
             }
             
-            if (MotionChain.Current is PreviousQuestion)
+            if (MotionChain.Current is PreviousQuestion or Adjourn)
             {
                 // Motion to end debate is not debated.
                 // TODO: Make "isDebatable" a property of a motion.
@@ -75,17 +75,17 @@ namespace Core.MeetingStates
             throw new PersonOutOfOrderException("Only seconding is allowed.");
         }
 
-        public override IMeetingState MoveToAdjournUntil(PersonRole actor, DateTimeOffset untilTime)
+        public override IMeetingState MoveToAdjourn(PersonRole actor)
         {
             throw new PersonOutOfOrderException("Only seconding is allowed.");
         }
 
         public override string GetDescription()
         {
-            return $"{Mover.Name} proposed \"{MotionChain.Current.GetText()}\". Does anyone second?";
+            return $"{Mover.Name} moved to {MotionChain.Current.GetText()}. Does anyone second?";
         }
 
-        protected override bool CanMoveToAdjournUntil(PersonRole actor, out string explanation)
+        protected override bool CanMoveToAdjourn(PersonRole actor, out string explanation)
         {
             explanation = "Only seconding is allowed.";
             return false;

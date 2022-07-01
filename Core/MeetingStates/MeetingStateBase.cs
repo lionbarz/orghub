@@ -9,7 +9,7 @@ namespace Core.MeetingStates
     {
         public abstract IMeetingState CallMeetingToOrder(PersonRole actor);
         public abstract IMeetingState DeclareTimeExpired(PersonRole actor);
-        public abstract IMeetingState MoveToAdjournUntil(PersonRole actor, DateTimeOffset untilTime);
+        public abstract IMeetingState MoveToAdjourn(PersonRole actor);
         public abstract IMeetingState MoveMainMotion(PersonRole actor, IMainMotion motion);
         public abstract IMeetingState MoveSubsidiaryMotion(PersonRole actor, ISubsidiaryMotion motion);
         public abstract IMeetingState Second(PersonRole actor);
@@ -28,7 +28,7 @@ namespace Core.MeetingStates
             isSupported = CanDeclareTimeExpired(actor, out explanation);
             actionSupports.AddLast(ActionSupport.InstanceOf(Action.DeclareTimeExpired, isSupported, explanation));
             
-            isSupported = CanMoveToAdjournUntil(actor, out explanation);
+            isSupported = CanMoveToAdjourn(actor, out explanation);
             actionSupports.AddLast(ActionSupport.InstanceOf(Action.MoveToAdjourn, isSupported, explanation));
             
             isSupported = CanMoveMainMotion(actor, out explanation);
@@ -55,7 +55,7 @@ namespace Core.MeetingStates
         /// <summary>
         /// Whether or not a person can move to adjourn.
         /// </summary>
-        protected abstract bool CanMoveToAdjournUntil(PersonRole actor, out string explanation);
+        protected abstract bool CanMoveToAdjourn(PersonRole actor, out string explanation);
 
         /// <summary>
         /// Whether or not a person can call to order.
