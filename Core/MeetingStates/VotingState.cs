@@ -110,7 +110,7 @@ namespace Core.MeetingStates
         public override string GetDescription()
         {
             return
-                $"Voting on motion to {MotionChain.Current.GetText()}. {BallotBox.NumAye} in favor. {BallotBox.NumNay} opposed. {BallotBox.NumAbstain} abstaining.";
+                $"Voting on motion to {MotionChain.Current.GetText()}. {BallotBox.NumAye} in favor. {BallotBox.NumNay} opposed. {BallotBox.NumAbstain} abstaining. How do you vote?";
         }
 
         protected override bool CanMoveToAdjourn(PersonRole actor, out string explanation)
