@@ -134,16 +134,22 @@ export class Group extends Component {
         return (
             <div>
                 {this.state.actions.includes('Vote') &&
-                    <div className="mt-3 mb-3">
-                        <Button color="primary" onClick={() => this.takeActionVote("Aye")}>
-                            Vote Aye
-                        </Button>
-                        <Button color="primary" onClick={() => this.takeActionVote("Nay")}>
-                            Vote Nay
-                        </Button>
-                        <Button color="primary" onClick={() => this.takeActionVote("Abstain")}>
-                            Abstain
-                        </Button>
+                    <div>
+                        <div className="mt-3 mb-3">
+                            <Button color="primary" onClick={() => this.takeActionVote("Aye")}>
+                                Vote Aye
+                            </Button>
+                        </div>
+                        <div className="mt-3 mb-3">
+                            <Button color="primary" onClick={() => this.takeActionVote("Nay")}>
+                                Vote Nay
+                            </Button>
+                        </div>
+                        <div className="mt-3 mb-3">
+                            <Button color="primary" onClick={() => this.takeActionVote("Abstain")}>
+                                Abstain from voting
+                            </Button>
+                        </div>
                     </div>
                 }
                 {this.state.actions.includes('CallToOrder') &&
