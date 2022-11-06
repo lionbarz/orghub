@@ -19,6 +19,7 @@ namespace Core.MeetingStates
                 throw new PersonOutOfOrderException(explanation);
             }
             
+            GroupModifier.RecordMinute($"{actor.Person.Name} calls the meeting to order.");
             return OpenFloorState.InstanceOf(GroupModifier);
         }
 
@@ -51,12 +52,7 @@ namespace Core.MeetingStates
 
         public override IMeetingState Speak(PersonRole actorRole)
         {
-            if (!CanSpeak(actorRole, out string? error))
-            {
-                throw new PersonOutOfOrderException(error);
-            }
-            
-            return new SpeakerHasFloorState(GroupModifier, actorRole.Person);
+            throw new PersonOutOfOrderException("Nobody can speak when the meeting is adjourned.");
         }
 
         public override IMeetingState Vote(PersonRole actor, VoteType type)

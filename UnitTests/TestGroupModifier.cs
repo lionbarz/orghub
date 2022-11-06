@@ -28,5 +28,10 @@ namespace UnitTests
         {
           
         }
+
+        public void RecordMinute(string text)
+        {
+            
+        }
     }
 }

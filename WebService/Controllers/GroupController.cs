@@ -115,4 +115,11 @@ public class GroupController : ControllerBase
     {
         await _groupService.Yield(Guid.Parse(id), Guid.Parse(request.UserId));
     }
+    
+    [HttpPost]
+    [Route("api/group/{id}/nominateChair")]
+    public async Task NominateChair(string id, [FromBody] GenericPersonRequest request)
+    {
+        await _groupService.NominateChair(Guid.Parse(id), Guid.Parse(request.UserId), Guid.Parse(request.PersonId));
+    }
 }

@@ -8,7 +8,11 @@
     {
         /// <summary>
         /// The official text of this action which is exactly what a group is bound by.
-        /// The format is such that it completes the sentence "there is a motion to..."
+        /// The format is such that it completes the sentence "there is a motion..."
+        /// Examples:
+        /// - "that Rami chairs the group"
+        /// - "to adjourn the meeting"
+        /// - "to adopt the following: 'blah'"
         /// </summary>
         public string GetText();
     }

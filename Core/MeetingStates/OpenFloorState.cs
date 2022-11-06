@@ -46,31 +46,39 @@ namespace Core.MeetingStates
             throw new PersonOutOfOrderException("There is no motion to second.");
         }
 
-        public override IMeetingState MoveToAdjourn(PersonRole actorRole)
+        public override IMeetingState MoveToAdjourn(PersonRole actor)
         {
-            if (!CanMoveToAdjourn(actorRole, out string? error))
+            if (!CanMoveToAdjourn(actor, out string? error))
             {
                 throw new PersonOutOfOrderException(error);
             }
             
-            var motion = new Adjourn(actorRole.Person);
+            GroupModifier.RecordMinute($"{actor.Person.Name} moves to adjourn the meeting.");
+            var motion = new Adjourn(actor.Person);
             var motionChain = MotionChain.FromMotion(motion);
-            return new MotionProposed(GroupModifier, actorRole.Person, motionChain);
+            return new MotionProposed(GroupModifier, actor.Person, motionChain);
         }
 
         public override IMeetingState MoveMainMotion(PersonRole actor, IMainMotion motion)
         {
+            if (!CanMoveMainMotion(actor, out string explanation))
+            {
+                throw new PersonOutOfOrderException(explanation);
+            }
+            
+            GroupModifier.RecordMinute($"{actor.Person.Name} moves {motion.GetText()}.");
             return new MotionProposed(GroupModifier, actor.Person, MotionChain.FromMotion(motion));
         }
 
-        public override IMeetingState Speak(PersonRole actorRole)
+        public override IMeetingState Speak(PersonRole actor)
         {
-            if (!CanSpeak(actorRole, out string? error))
+            if (!CanSpeak(actor, out string? error))
             {
                 throw new PersonOutOfOrderException(error);
             }
             
-            return new SpeakerHasFloorState(GroupModifier, actorRole.Person);
+            GroupModifier.RecordMinute($"{actor.Person.Name} takes the floor.");
+            return new SpeakerHasFloorState(GroupModifier, actor.Person);
         }
 
         public override IMeetingState Vote(PersonRole actor, VoteType type)

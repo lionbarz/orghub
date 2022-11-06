@@ -27,6 +27,7 @@ namespace Core.MeetingStates
 
         public override IMeetingState DeclareTimeExpired(PersonRole actor)
         {
+            GroupModifier.RecordMinute($"Nobody seconded the motion to {MotionChain.Current.GetText()}.");
             // Drop this motion and go to previous motions, or the open floor if this is the only motion.
             return MotionChain.Previous.Any()
                 ? new DebateState(GroupModifier, MotionChain.Pop())
@@ -82,7 +83,7 @@ namespace Core.MeetingStates
 
         public override string GetDescription()
         {
-            return $"{Mover.Name} moved to {MotionChain.Current.GetText()}. Does anyone second?";
+            return $"{Mover.Name} moves {MotionChain.Current.GetText()}. Does anyone second?";
         }
 
         protected override bool CanMoveToAdjourn(PersonRole actor, out string explanation)

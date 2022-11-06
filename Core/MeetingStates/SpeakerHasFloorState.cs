@@ -44,6 +44,7 @@ namespace Core.MeetingStates
                 throw new PersonOutOfOrderException(explanation);
             }
             
+            GroupModifier.RecordMinute($"{actor.Person.Name}'s time on the floor is expired.");
             return MotionChain == null
                 ? OpenFloorState.InstanceOf(GroupModifier)
                 : new DebateState(GroupModifier, MotionChain);
@@ -76,6 +77,8 @@ namespace Core.MeetingStates
 
         public override IMeetingState Yield(PersonRole actor)
         {
+            GroupModifier.RecordMinute($"{actor.Person.Name} yields the floor.");
+            
             return MotionChain == null
                 ? OpenFloorState.InstanceOf(GroupModifier)
                 : new DebateState(GroupModifier, MotionChain);
@@ -90,7 +93,7 @@ namespace Core.MeetingStates
         {
             if (MotionChain != null)
             {
-                return $"{Speaker.Name} is debating \"{MotionChain.Current.GetText()}\".";
+                return $"{Speaker.Name} is debating the motion {MotionChain.Current.GetText()}.";
             }
 
             return $"{Speaker.Name} is speaking freely.";

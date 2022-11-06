@@ -41,23 +41,29 @@ namespace Core.MeetingStates
             {
                 if (MotionChain.Current is GroupModifyingMotion groupModifyingMotion)
                 {
+                    GroupModifier.RecordMinute(
+                        $"The motion {MotionChain.Current.GetText()} is carried.");
                     groupModifyingMotion.TakeActionAsync();
                 }
                 
                 if (MotionChain.Current is PreviousQuestion)
                 {
+                    GroupModifier.RecordMinute(
+                        $"The motion to end debate and vote on {MotionChain.Previous.Last().GetText()} is carried.");
                     // The vote was on ending debate, so the next thing is to vote on the main motion.
                     return new VotingState(GroupModifier, MotionChain.Pop());
                 }
 
                 if (MotionChain.Current is Adjourn)
                 {
+                    GroupModifier.RecordMinute($"The motion to adjourn is carried.");
                     return new AdjournedState(GroupModifier);
                 }
             }
             else
             {
-                // TODO: Record that the motion didn't carry.
+                GroupModifier.RecordMinute(
+                    $"The motion {MotionChain.Current.GetText()} didn't get enough votes and is dropped.");
             }
             
             return MotionChain.Previous.Any()

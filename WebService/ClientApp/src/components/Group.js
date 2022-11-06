@@ -13,6 +13,7 @@ import { Modal, ModalBody, ModalHeader, ModalFooter, FormGroup, Input } from 're
 import ZoomMtgEmbedded from '@zoomus/websdk/embedded';
 import {MoveResolutionButton} from "./MoveResolutionButton";
 import {JoinMeetingComponent} from "./JoinMeetingComponent";
+import {NominateChairButton} from "./NominateChairButton";
 
 export class Group extends Component {
     static displayName = Group.name;
@@ -129,7 +130,10 @@ export class Group extends Component {
                     <div className="card-header">Minutes</div>
                     <div className="card-body">
                         <ul>
-                            {group.minutes.map(text => <li key={text} className="card-text">{text}</li>)}
+                            {group.minutes.map(minute => {
+                                let formattedTime = new Date(Date.parse(minute.time));
+                                return <li key={minute.time} className="card-text">{formattedTime.toString()}: {minute.text}</li>
+                            })}
                         </ul>
                     </div>
                 </div>
@@ -201,9 +205,12 @@ export class Group extends Component {
                     <button className="btn btn-primary" onClick={() => this.takeAction("declaremotionpassed")}>Declare
                         motion passed</button>
                 }
-                {this.state.actions.includes('Core.Motions.ElectChair') &&
-                    <button className="btn btn-primary" onClick={() => this.moveElectChair("Rawan Hammoud")}>Elect Roni
-                        chair</button>
+                {this.state.actions.includes('MoveMainMotion') &&
+                    <NominateChairButton
+                        groupId={this.props.match.params.id}
+                        personId={this.state.userId}
+                        members={this.state.group.members}
+                        onSuccess={() => this.updateState()} />
                 }
                 {this.state.actions.includes('MoveMainMotion') &&
                     <MoveResolutionButton groupId={this.props.match.params.id} personId={this.state.userId} onSuccess={() => this.updateState()} />

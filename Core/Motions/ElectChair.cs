@@ -17,7 +17,7 @@ namespace Core.Motions
         
         public override string GetText()
         {
-            return $"Elect {_nominee.Name} as the chair of the group.";
+            return $"that {_nominee.Name} chair the group";
         }
 
         public override Task TakeActionAsync()

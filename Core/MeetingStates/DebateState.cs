@@ -74,6 +74,7 @@ namespace Core.MeetingStates
                 throw new PersonOutOfOrderException(explanation);
             }
 
+            GroupModifier.RecordMinute($"{actor.Person.Name} takes the floor.");
             return new SpeakerHasFloorState(GroupModifier, actor.Person, MotionChain);
         }
 
@@ -89,7 +90,7 @@ namespace Core.MeetingStates
 
         public override string GetDescription()
         {
-            return $"The suggestion is to {MotionChain.Current.GetText()}. Any debate?";
+            return $"The suggestion is {MotionChain.Current.GetText()}. Any debate?";
         }
 
         protected override bool CanMoveToAdjourn(PersonRole actor, out string explanation)

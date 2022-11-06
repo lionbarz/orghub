@@ -54,15 +54,23 @@ namespace InterfaceAdapters
                 }),
                 Resolutions = x.Resolutions,
                 Name = x.Bylaws.Name,
-                Minutes = x.Minutes,
+                Minutes = x.Minutes.Select(m => new UXMinute()
+                {
+                    Text = m.Text,
+                    Time = m.Time
+                }),
                 State = x.State.GetDescription()
             };
         }
 
-        public async Task<IEnumerable<string>> GetMinutes(Guid groupId)
+        public async Task<IEnumerable<UXMinute>> GetMinutes(Guid groupId)
         {
             var group = await _db.GetGroupAsync(groupId);
-            return group.Minutes;
+            return group.Minutes.Select(m => new UXMinute()
+            {
+                Text = m.Text,
+                Time = m.Time
+            });
         }
         
         public async Task AddMemberAsync(Guid groupId, Guid personId)
@@ -159,6 +167,16 @@ namespace InterfaceAdapters
             var person = await _db.GetPersonAsync(personId);
             var personRole = group.CreatePersonRole(person);
             group.State.MoveToAdjourn(personRole);
+            await _db.UpdateGroupAsync(group);
+        }
+        
+        public async Task NominateChair(Guid groupId, Guid personId, Guid nomineePersonId)
+        {
+            var group = await _db.GetGroupAsync(groupId);
+            var actor = await _db.GetPersonAsync(personId);
+            var actorRole = group.CreatePersonRole(actor);
+            var nominee = await _db.GetPersonAsync(nomineePersonId);
+            group.State.MoveMainMotion(actorRole, new ElectChair(nominee, group));
             await _db.UpdateGroupAsync(group);
         }
     }

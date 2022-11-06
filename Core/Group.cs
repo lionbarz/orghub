@@ -53,7 +53,7 @@ namespace Core
         /// <summary>
         /// What states and actions have happened so far.
         /// </summary>
-        public IList<string> Minutes { get; private init;  }
+        public IList<MeetingMinute> Minutes { get; private init;  }
         
         /// <summary>
         /// Whether this is an established group.
@@ -70,7 +70,7 @@ namespace Core
             Members = new List<Person>();
             Meetings = new List<Meeting>();
             Resolutions = new List<string>();
-            Minutes = new List<string>();
+            Minutes = new List<MeetingMinute>();
             
             // TODO: This is always true for now.
             IsMassMeeting = true;
@@ -151,6 +151,7 @@ namespace Core
 
         public void SetChair(Person person)
         {
+            Minutes.Add(MeetingMinute.FromText($"{person.Name} is now the chair."));
             Chair = person;
         }
 
@@ -169,9 +170,14 @@ namespace Core
             if (Members.Contains(member)) return;
             
             Members.Add(member);
-            Minutes.Add($"{member.Name} was added as a member.");
+            Minutes.Add(MeetingMinute.FromText($"{member.Name} is added as a member."));
         }
-        
+
+        public void RecordMinute(string text)
+        {
+            Minutes.Add(MeetingMinute.FromText(text));
+        }
+
         public PersonRole CreatePersonRole(Person person)
         {
             if (person == Chair)

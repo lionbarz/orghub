@@ -33,7 +33,7 @@ namespace InterfaceAdapters.Models
         /// <summary>
         /// The minutes, ie activity log.
         /// </summary>
-        public IEnumerable<string> Minutes { get; set; }
+        public IEnumerable<UXMinute> Minutes { get; set; }
 
         /// <summary>
         /// A string description in plain English about the

@@ -20,5 +20,12 @@ namespace Core
         /// Hooray! A new member!
         /// </summary>
         void AddMember(Person member);
+
+        /// <summary>
+        /// Add something to the meeting minutes.
+        /// In the future, this can be structured, with fields for
+        /// agenda items, actors, etc. so they can be linked.
+        /// </summary>
+        void RecordMinute(string text);
     }
 }
