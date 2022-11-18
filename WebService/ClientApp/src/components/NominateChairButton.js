@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import Button from '@mui/material/Button';
 import Icon from '@mui/icons-material/EmojiPeople';
-import { Modal, ModalBody, ModalHeader, ModalFooter, FormGroup, Input, Label } from 'reactstrap';
+import { Modal, ModalBody, ModalHeader, ModalFooter, FormGroup, Input } from 'reactstrap';
 
 // Has a dialog for specifying resolution text.
 export class NominateChairButton extends Component {
