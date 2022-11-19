@@ -1,39 +1,23 @@
-import React, {Component} from 'react';
+import React, {useEffect, useState} from 'react';
 import { Card, CardBody, CardText } from 'reactstrap';
+import {Link} from "react-router-dom";
 
-export class Groups extends Component {
-    static displayName = Groups.name;
+export function Groups({history}) {
+    const [groups, setGroups] = useState([]);
+    const [loading, setLoading] = useState(true);
 
-    constructor(props) {
-        super(props);
-        this.state = {groups: null, loading: true};
+    async function populateGroupData() {
+        const response = await fetch('api/group');
+        const data = await response.json();
+        setLoading(false);
+        setGroups(data);
     }
 
-    componentDidMount() {
-        this.populateGroupData();
+    function visitGroup(path) {
+        history.push(path);
     }
 
-    visitGroup = (path) => {
-        this.props.history.push(path);
-    }
-
-    static render(groups, visitGroup) {
-        return (
-            <div>
-                {groups.map(group =>
-                    <Card key={group.id}>
-                        <CardBody>
-                            <h5 className="card-title">{group.name || "New Group"}</h5>
-                            <CardText>{group.state}</CardText>
-                            <button className="btn btn-primary" onClick={() => visitGroup('/group/' + group.id)}>View Group</button>
-                        </CardBody>
-                    </Card>
-                )}
-            </div>
-        );
-    }
-
-    addGroup = async () => {
+    async function addGroup() {
         let userId = localStorage.getItem('userId');
         const requestOptions = {
             method: 'POST',
@@ -41,26 +25,35 @@ export class Groups extends Component {
             body: JSON.stringify({userId: userId})
         };
         await fetch('api/group', requestOptions);
-        await this.populateGroupData();
+        await populateGroupData();
+    }
+    
+    useEffect(() => {
+        if (loading) {
+            populateGroupData();
+        }
+    });
+
+    if (loading) {
+        return <p><em>Loading...</em></p>;
     }
 
-    render() {
-        let contents = this.state.loading
-            ? <p><em>Loading...</em></p>
-            : Groups.render(this.state.groups, this.visitGroup);
-
-        return (
+    return (
+        <div>
+            <h1 id="tabelLabel">Groups</h1>
+            <button className="btn btn-primary mb-3" onClick={() => addGroup()}>Create Group</button>
             <div>
-                <h1 id="tabelLabel">Groups</h1>
-                <button className="btn btn-primary mb-3" onClick={() => this.addGroup()}>Create Group</button>
-                {contents}
+                {groups.map(group =>
+                    <Card key={group.id}>
+                        <CardBody>
+                            <Link to={'/group/' + group.id}>
+                                <h5 className="card-title">{group.name || "New Group"}</h5>
+                            </Link>
+                            <CardText>{group.state}</CardText>
+                        </CardBody>
+                    </Card>
+                )}
             </div>
-        );
-    }
-
-    async populateGroupData() {
-        const response = await fetch('api/group');
-        const data = await response.json();
-        this.setState({groups: data, loading: false});
-    }
+        </div>
+    );
 }
