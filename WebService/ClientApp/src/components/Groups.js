@@ -2,7 +2,7 @@ import React, {useEffect, useState} from 'react';
 import { Card, CardBody, CardText } from 'reactstrap';
 import {Link} from "react-router-dom";
 
-export function Groups({history}) {
+export function Groups() {
     const [groups, setGroups] = useState([]);
     const [loading, setLoading] = useState(true);
 
@@ -11,10 +11,6 @@ export function Groups({history}) {
         const data = await response.json();
         setLoading(false);
         setGroups(data);
-    }
-
-    function visitGroup(path) {
-        history.push(path);
     }
 
     async function addGroup() {
