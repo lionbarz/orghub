@@ -14,7 +14,7 @@ import {MoveResolutionButton} from "./MoveResolutionButton";
 import {JoinMeetingComponent} from "./JoinMeetingComponent";
 import {NominateChairButton} from "./NominateChairButton";
 import {useParams} from "react-router-dom";
-import useToken from "../useToken";
+import usePerson from "../usePerson";
 
 export function Group() {
     const [group, setGroup] = useState(null);
@@ -24,7 +24,7 @@ export function Group() {
     const [allPeople] = useState([]);
     const [selectedPersonId, setSelectedPersonId] = useState(null);
     const {groupId} = useParams();
-    const {token, setToken} = useToken();
+    const {person, addPerson} = usePerson();
     
     const populateGroupData = useCallback(async () => {
         const response = await fetch(`api/group/${groupId}`);
@@ -34,27 +34,27 @@ export function Group() {
     }, [groupId]);
 
     const markAttendance = useCallback(async () => {
-        if (!token) {
+        if (!person) {
             return;
         }
 
         const requestOptions = {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ userId: token })
+            body: JSON.stringify({ userId: person.id })
         };
         await fetch(`api/group/${groupId}/markattendance`, requestOptions);
-    }, [token, groupId]);
+    }, [person, groupId]);
 
     const getAvailableActions = useCallback(async () => {
-        if (!token) {
+        if (!person) {
             return;
         }
         
-        const response = await fetch(`api/group/${groupId}/action?userId=${token}`);
+        const response = await fetch(`api/group/${groupId}/action?userId=${person.id}`);
         const data = await response.json();
         setActions(data);
-    }, [token, groupId]);
+    }, [person, groupId]);
     
     const updateState = useCallback(async () => {
         await populateGroupData();
@@ -141,12 +141,12 @@ export function Group() {
                 {actions.includes('MoveMainMotion') &&
                     <NominateChairButton
                         groupId={groupId}
-                        personId={token}
+                        personId={person.id}
                         members={group.members}
                         onSuccess={() => updateState()} />
                 }
                 {actions.includes('MoveMainMotion') &&
-                    <MoveResolutionButton groupId={groupId} personId={token} onSuccess={() => updateState()} />
+                    <MoveResolutionButton groupId={groupId} personId={person.id} onSuccess={() => updateState()} />
                 }
                 {actions.includes('MoveToAdjourn') &&
                     <div className="mt-3 mb-3">
@@ -163,7 +163,7 @@ export function Group() {
         const requestOptions = {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ userId: token })
+            body: JSON.stringify({ userId: person.id })
         };
         await fetch(`api/group/${groupId}/${action}`, requestOptions);
         await updateState();
@@ -173,7 +173,7 @@ export function Group() {
         const requestOptions = {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ userId: token, voteType: voteType })
+            body: JSON.stringify({ userId: person.id, voteType: voteType })
         };
         await fetch(`api/group/${groupId}/vote`, requestOptions);
         await updateState();
@@ -183,7 +183,7 @@ export function Group() {
         const requestOptions = {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ personId: personId, userId: token })
+            body: JSON.stringify({ personId: personId, userId: person.id })
         };
         await fetch(`api/group/${groupId}/action/movegrantmembership`, requestOptions);
         await updateState();
@@ -203,12 +203,9 @@ export function Group() {
     }
         return (
             <div>
-                {!token &&
+                {!person &&
                     <div className="mb-3">
-                        <JoinMeetingComponent onPersonCreate={(userId) => {
-                            setToken(userId);
-                            markAttendance();
-                        }} />
+                        <JoinMeetingComponent person={person} addPerson={addPerson} />
                     </div>
                 }
         <div>

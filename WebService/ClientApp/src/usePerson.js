@@ -4,16 +4,7 @@ import useToken from "./useToken";
 export default function usePerson() {
     const {token, setToken} = useToken();
     const [person, setPerson] = useState(null);
-
-    async function getPerson(personId) {
-        const requestOptions = {
-            method: 'GET',
-            headers: { 'Content-Type': 'application/json' }
-        };
-        const response = await fetch('api/person/' + personId, requestOptions);
-        return await response.json();
-    }
-
+    
     async function savePerson(name) {
         const requestOptions = {
             method: 'POST',
@@ -26,7 +17,16 @@ export default function usePerson() {
     }
     
     useEffect(() => {
-        if (token && !person) {
+        async function getPerson(personId) {
+            const requestOptions = {
+                method: 'GET',
+                headers: { 'Content-Type': 'application/json' }
+            };
+            const response = await fetch('api/person/' + personId, requestOptions);
+            return await response.json();
+        }
+        
+        if (token) {
             getPerson(token)
                 .then((person) => {
                     setPerson(person);  
@@ -35,13 +35,13 @@ export default function usePerson() {
                     // then the token is an old testing user ID and the
                     // user doesn't exist anymore so we clear the token.
                     // TODO: Sign the user out if it's a 404 or some response that indicates the user doesn't exist.
-                    setToken(null);     
+                    setPerson(null);
             });
         }
-    }, [token, person, setToken]);
+    }, [token]);
 
     return {
-        setPerson: savePerson,
+        addPerson: savePerson,
         person
     }
 }

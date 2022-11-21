@@ -7,7 +7,7 @@ import {JoinMeetingComponent} from "./JoinMeetingComponent";
 export function Groups() {
     const [groups, setGroups] = useState([]);
     const [loading, setLoading] = useState(true);
-    const {person} = usePerson();
+    const {person, addPerson} = usePerson();
 
     async function populateGroupData() {
         const response = await fetch('api/group');
@@ -45,7 +45,7 @@ export function Groups() {
             }
             {!person && <div>
                 <p>Sign in to create a group.</p>
-                <JoinMeetingComponent />
+                <JoinMeetingComponent person={person} addPerson={addPerson} />
             </div>}
             <div>
                 {groups.map(group =>

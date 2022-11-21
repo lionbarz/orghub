@@ -1,22 +1,16 @@
-import React, {useEffect, useState} from 'react';
+import React, {useState} from 'react';
 import {Button, CardBody} from 'reactstrap';
 import { Card, CardHeader, FormGroup, Input, Label } from 'reactstrap';
-import usePerson from "../usePerson";
 
-// Has a dialog for specifying resolution text.
-export function JoinMeetingComponent() {
-    const [name, setName] = useState('');
-    const {person, setPerson} = usePerson();
+// Allows creating a person from specifying a name.
+// It's the temporary substitute for a login.
+// Meant for guests.
+export function JoinMeetingComponent({ person, addPerson }) {
+    const [name, setName] = useState(person ? person.name : '');
     
     function handleChangeName(event) {
         setName(event.target.value);
     }
-    
-    useEffect(() => {
-       if (person) {
-           setName(person.name);
-       } 
-    }, [person]);
 
     return (
         <div>
@@ -41,7 +35,9 @@ export function JoinMeetingComponent() {
                     </FormGroup>
                     <Button
                         color="primary"
-                        onClick={() => setPerson(name)}>
+                        onClick={() => {
+                            addPerson(name);
+                        }}>
                         Save
                     </Button>
                 </CardBody>
