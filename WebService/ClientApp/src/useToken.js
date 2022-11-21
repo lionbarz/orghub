@@ -1,5 +1,8 @@
 import { useState } from 'react';
 
+// Saves and gets a string token.
+// Right now I'm using it to store user IDs in local storage.
+// Later it should be user IDs and an actual auth token.
 export default function useToken() {
     const getToken = () => {
         const tokenString = localStorage.getItem('token');
@@ -10,7 +13,7 @@ export default function useToken() {
 
     const saveToken = userToken => {
         localStorage.setItem('token', JSON.stringify(userToken));
-        setToken(userToken.token);
+        setToken(userToken);
     };
 
     return {

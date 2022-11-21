@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import Button from '@mui/material/Button';
 import GavelIcon from '@mui/icons-material/Gavel';
 import MicIcon from '@mui/icons-material/Mic';
@@ -17,26 +17,23 @@ import {useParams} from "react-router-dom";
 import useToken from "../useToken";
 
 export function Group() {
-    // The ID of the interval that is refreshing the state.
-    let intervalId = null;
-
     const [group, setGroup] = useState(null);
     const [loading, setLoading] = useState(true);
     const [actions, setActions] = useState([]);
     const [showMembershipModal, setShowMembershipModal] = useState(false);
-    const [allPeople, setAllPeople] = useState([]);
+    const [allPeople] = useState([]);
     const [selectedPersonId, setSelectedPersonId] = useState(null);
     const {groupId} = useParams();
     const {token, setToken} = useToken();
     
-    async function populateGroupData() {
+    const populateGroupData = useCallback(async () => {
         const response = await fetch(`api/group/${groupId}`);
         const data = await response.json();
         setGroup(data);
         setLoading(false);
-    }
+    }, [groupId]);
 
-    async function markAttendance() {
+    const markAttendance = useCallback(async () => {
         if (!token) {
             return;
         }
@@ -47,10 +44,9 @@ export function Group() {
             body: JSON.stringify({ userId: token })
         };
         await fetch(`api/group/${groupId}/markattendance`, requestOptions);
-        await updateState();
-    }
+    }, [token, groupId]);
 
-    async function getAvailableActions() {
+    const getAvailableActions = useCallback(async () => {
         if (!token) {
             return;
         }
@@ -58,30 +54,25 @@ export function Group() {
         const response = await fetch(`api/group/${groupId}/action?userId=${token}`);
         const data = await response.json();
         setActions(data);
-    }
+    }, [token, groupId]);
     
-    async function getAllPeople() {
-        const response = await fetch(`person`);
-        const data = await response.json();
-        setAllPeople(data);
-    }
-    
-    async function updateState() {
-        populateGroupData();
-        getAvailableActions();
-    }
+    const updateState = useCallback(async () => {
+        await populateGroupData();
+        await getAvailableActions();
+    }, [populateGroupData, getAvailableActions]);
     
     useEffect(() => {
-        updateState();
         markAttendance();
-    }, [groupId]);
+        updateState();
+    }, [groupId, updateState, markAttendance]);
     
     useEffect(() => {
-        intervalId = setInterval(updateState, 5000);
+        // The ID of the interval that is refreshing the state.
+        const intervalId = setInterval(updateState, 5000);
         return () => {
             clearInterval(intervalId);
         };
-    }, [groupId]);
+    }, [updateState]);
 
     function renderActions() {
         return (
@@ -188,26 +179,6 @@ export function Group() {
         await updateState();
     }
 
-    async function moveElectChair(nomineeName) {
-        const requestOptions = {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ nomineeName: nomineeName, userId: token })
-        };
-        await fetch(`api/group/${groupId}/action/electchair`, requestOptions);
-        await updateState();
-    }
-
-    async function moveGroupName(text) {
-        const requestOptions = {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ name: text, userId: token })
-        };
-        await fetch(`api/group/${groupId}/action/movechangegroupname`, requestOptions);
-        await updateState();
-    }
-
     async function moveGrantMembership(personId) {
         const requestOptions = {
             method: 'POST',
@@ -216,11 +187,6 @@ export function Group() {
         };
         await fetch(`api/group/${groupId}/action/movegrantmembership`, requestOptions);
         await updateState();
-    }
-
-    async function moveGrantMembershipPrompt() {
-        getAllPeople();
-        setShowMembershipModal(true);
     }
     
     function closeGrantMembershipPrompt() {

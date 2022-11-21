@@ -1,10 +1,13 @@
 import React, {useEffect, useState} from 'react';
 import { Card, CardBody, CardText } from 'reactstrap';
 import {Link} from "react-router-dom";
+import usePerson from "../usePerson";
+import {JoinMeetingComponent} from "./JoinMeetingComponent";
 
 export function Groups() {
     const [groups, setGroups] = useState([]);
     const [loading, setLoading] = useState(true);
+    const {person} = usePerson();
 
     async function populateGroupData() {
         const response = await fetch('api/group');
@@ -14,11 +17,10 @@ export function Groups() {
     }
 
     async function addGroup() {
-        let userId = localStorage.getItem('userId');
         const requestOptions = {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({userId: userId})
+            body: JSON.stringify({userId: person.id})
         };
         await fetch('api/group', requestOptions);
         await populateGroupData();
@@ -26,7 +28,8 @@ export function Groups() {
     
     useEffect(() => {
         if (loading) {
-            populateGroupData();
+            populateGroupData()
+                .then(() => {});
         }
     });
 
@@ -37,7 +40,13 @@ export function Groups() {
     return (
         <div>
             <h1 id="tabelLabel">Groups</h1>
-            <button className="btn btn-primary mb-3" onClick={() => addGroup()}>Create Group</button>
+            {person &&
+                <button className="btn btn-primary mb-3" onClick={() => addGroup()}>Create Group</button>
+            }
+            {!person && <div>
+                <p>Sign in to create a group.</p>
+                <JoinMeetingComponent />
+            </div>}
             <div>
                 {groups.map(group =>
                     <Card key={group.id}>
