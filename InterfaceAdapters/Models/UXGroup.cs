@@ -40,5 +40,11 @@ namespace InterfaceAdapters.Models
         /// state of this group. Ex: Mohamed is speaking.
         /// </summary>
         public string State { get; set; }
+        
+        /// <summary>
+        /// The current meeting, either in progress or
+        /// hasn't started yet.
+        /// </summary>
+        public UXMeeting CurrentMeeting { get; set; }
     }
 }

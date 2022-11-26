@@ -19,24 +19,24 @@ namespace Core
         public Guid Id { get; }
         
         /// <summary>
-        /// The ID of the group that is meeting.
+        /// The call for the meeting. What's on the invitation.
         /// </summary>
-        public Guid GroupId { get; private init; }
-
+        public string Description { get; private init; }
+        
         /// <summary>
-        /// When the meeting will start.
+        /// When the meeting is scheduled to take place.
         /// </summary>
         public DateTimeOffset StartTime { get; private init; }
+        
+        /// <summary>
+        /// This can be an online meeting link or a physical address.
+        /// </summary>
+        public string Location { get; private init; }
 
         /// <summary>
         /// The attendees at any point of the meeting.
         /// </summary>
         public ICollection<PersonRole> Attendees { get; private set; }
-        
-        /// <summary>
-        /// The chair of the meeting. Usually the person who called the meeting.
-        /// </summary>
-        public Person Chair { get; private set; }
 
         /// <summary>
         /// How many members need to be present in order
@@ -47,11 +47,6 @@ namespace Core
         public int Quorum { get; set; }
 
         /// <summary>
-        /// The state of the meeting. This handles actions.
-        /// </summary>
-        public StateManager State { get; private init; }
-
-        /// <summary>
         /// Whether there is a quorum among the attendees.
         /// </summary>
         public bool HasQuorum()
@@ -60,15 +55,14 @@ namespace Core
             return numCanVote >= Quorum;
         }
 
-        private Meeting(Guid groupId, IGroupModifier groupModifier, Person chair, DateTimeOffset startTime, int quorum)
+        private Meeting(DateTimeOffset startTime, string description, string location, int quorum)
         {
             Id = Guid.NewGuid();
+            Description = description;
             StartTime = startTime;
             Attendees = new List<PersonRole>();
-            Chair = chair;
             Quorum = quorum;
-            State = new StateManager(groupModifier);
-            GroupId = groupId;
+            Location = location;
         }
 
         /// <summary>
@@ -79,10 +73,9 @@ namespace Core
         /// <param name="startTime"></param>
         /// <returns></returns>
         /// <exception cref="ArgumentException"></exception>
-        public static Meeting NewInstance(Guid groupId, IGroupModifier groupModifier, Person chair,
-            DateTimeOffset startTime, int quorum)
+        public static Meeting NewInstance(DateTimeOffset startTime, string description, string location, int quorum)
         {
-            return new Meeting(groupId, groupModifier, chair, startTime, quorum);
+            return new Meeting(startTime, description, location, quorum);
         }
 
         public void AddAttendee(PersonRole attendee)

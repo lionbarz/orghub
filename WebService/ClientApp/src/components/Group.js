@@ -15,6 +15,7 @@ import {JoinMeetingComponent} from "./JoinMeetingComponent";
 import {NominateChairButton} from "./NominateChairButton";
 import {useParams} from "react-router-dom";
 import usePerson from "../usePerson";
+import moment from "moment";
 
 export function Group() {
     const [group, setGroup] = useState(null);
@@ -214,6 +215,13 @@ export function Group() {
                 {renderActions()}
             </div>
             <div className="card mb-3" style={{maxWidth: "36rem"}}>
+                <div className="card-header">Meeting</div>
+                <div className="card-body">
+                    <p className="card-text">{moment(group.currentMeeting.startTime).format("dddd, MMMM Do YYYY, h:mm a")}</p>
+                    <p className="card-text">{group.currentMeeting.description}</p>
+                </div>
+            </div>
+            <div className="card mb-3" style={{maxWidth: "36rem"}}>
                 <div className="card-header">Group name</div>
                 <div className="card-body">
                     <p className="card-text">{group.name}</p>
@@ -245,7 +253,8 @@ export function Group() {
                     <ul>
                         {group.minutes.map(minute => {
                             let formattedTime = new Date(Date.parse(minute.time));
-                            return <li key={minute.time} className="card-text">{formattedTime.toString()}: {minute.text}</li>
+                            formattedTime = moment(minute.time).fromNow();
+                            return <li key={minute.time} className="card-text">{minute.text} ({formattedTime.toString()})</li>
                         })}
                     </ul>
                 </div>

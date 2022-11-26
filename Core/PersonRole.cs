@@ -8,7 +8,7 @@ namespace Core
         {
             Person = person;
         }
-        
+
         public static PersonRole AsGuest(Person person)
         {
             return new PersonRole(person)
@@ -17,7 +17,7 @@ namespace Core
                 IsChair = false
             };
         }
-        
+
         public static PersonRole AsMember(Person person)
         {
             return new PersonRole(person)
@@ -35,17 +35,17 @@ namespace Core
                 IsChair = true
             };
         }
-        
+
         /// <summary>
         /// Who the person is.
         /// </summary>
         public Person Person { get; private init; }
-        
+
         /// <summary>
         /// Is this a voting member?
         /// </summary>
         public bool IsMember { get; private set; }
-        
+
         /// <summary>
         /// Whether this person is chairing the meeting.
         /// </summary>
@@ -54,6 +54,19 @@ namespace Core
         public override bool Equals(object? obj) => this.Equals(obj as PersonRole);
 
         public bool IsGuest => !IsMember && !IsChair;
+
+        public string Title
+        {
+            get
+            {
+                if (IsChair)
+                {
+                    return "Chair";
+                }
+
+                return IsMember ? "Member" : "Guest";
+            }
+        }
         
         public bool Equals(PersonRole? obj)
         {

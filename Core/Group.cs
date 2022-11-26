@@ -35,9 +35,16 @@ namespace Core
         public Person? Chair { get; private set; }
 
         /// <summary>
-        /// Past and future meetings of this group.
+        /// The currently set meeting for the group,
+        /// either coming up or in progress. It becomes
+        /// a past meeting when it is adjourned.
         /// </summary>
-        public ICollection<Meeting> Meetings { get; }
+        public Meeting? CurrentMeeting { get; set; }
+        
+        /// <summary>
+        /// Past meetings of this group.
+        /// </summary>
+        public ICollection<Meeting> PastMeetings { get; }
         
         /// <summary>
         /// All resolutions passed by this group.
@@ -68,7 +75,7 @@ namespace Core
         {
             Id = Guid.NewGuid();
             Members = new List<Person>();
-            Meetings = new List<Meeting>();
+            PastMeetings = new List<Meeting>();
             Resolutions = new List<string>();
             Minutes = new List<MeetingMinute>();
             

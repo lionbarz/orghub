@@ -8,15 +8,20 @@ namespace InterfaceAdapters.Models
         /// Id of this meeting.
         /// </summary>
         public Guid Id { get; set; }
+
+        /// <summary>
+        /// Why this meeting was called, and other details.
+        /// </summary>
+        public string Description { get; set; }
+
+        /// <summary>
+        /// When this meeting was scheduled to start.
+        /// </summary>
+        public string StartTime { get; set; }
         
         /// <summary>
-        /// The current state of the meeting.
+        /// The Zoom link or physical address.
         /// </summary>
-        public string State { get; set; }
-        
-        /// <summary>
-        /// The person chairing the meeting.
-        /// </summary>
-        public string Chair { get; set; }
+        public string Location { get; set; }
     }
 }

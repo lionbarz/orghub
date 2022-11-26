@@ -17,10 +17,17 @@ export function Groups() {
     }
 
     async function addGroup() {
+        const meetingTime = (new Date()).toISOString();
         const requestOptions = {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({userId: person.id})
+            body: JSON.stringify({
+                personId: person.id,
+                nextMeeting: {
+                    description: "Talk about eating pumpkins",
+                    startTime: meetingTime
+                }
+            })
         };
         await fetch('api/group', requestOptions);
         await populateGroupData();

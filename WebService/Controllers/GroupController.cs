@@ -32,9 +32,9 @@ public class GroupController : ControllerBase
     
     [HttpPost]
     [Route("api/group")]
-    public async Task AddGroup([FromBody] GenericUserRequest request)
+    public async Task<UXGroup> AddGroup([FromBody] AddGroupRequest request)
     {
-        await _groupService.AddGroupAsync(Guid.Parse(request.UserId));
+        return await _groupService.AddGroupAsync(Guid.Parse(request.PersonId), request.NextMeeting);
     }
     
     /// <summary>

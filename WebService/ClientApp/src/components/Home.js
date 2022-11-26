@@ -1,6 +1,13 @@
 import React from 'react';
+import { useHistory } from "react-router-dom";
 
 export function Home() {
+    const history = useHistory();
+    
+    function handleTryItNow() {
+        history.push('/add-mass-meeting');
+    }
+    
     return (
         <div>
             <div className="px-4 py-5 my-5 text-center">
@@ -10,7 +17,7 @@ export function Home() {
                             Parlilly, a quick and easy online service, featuring elections, voting,
                             meeting minutes, agendas, and much more.</p>
                         <div className="d-grid gap-2 d-sm-flex justify-content-sm-center">
-                            <button type="button" className="btn btn-primary btn-lg px-4 gap-3">Try it now
+                            <button type="button" className="btn btn-primary btn-lg px-4 gap-3" onClick={handleTryItNow}>Try it now
                             </button>
                         </div>
                     </div>

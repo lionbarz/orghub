@@ -35,6 +35,6 @@ public class MeetingController : ControllerBase
     [Route("meeting/{id}/action")]
     public async Task<UXMeeting> CreateMassMeeting(string userId)
     {
-        return await MeetingService.CreateMassMeetingAsync(Guid.Parse(userId), DateTimeOffset.Now);
+        return await MeetingService.CreateMassMeetingAsync(Guid.Parse(userId), DateTimeOffset.Now, "", "");
     }
 }

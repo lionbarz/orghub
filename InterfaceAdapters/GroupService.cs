@@ -17,10 +17,16 @@ namespace InterfaceAdapters
             _db = database;
         }
 
-        public async Task<UXGroup> AddGroupAsync(Guid chairUserId)
+        public async Task<UXGroup> AddGroupAsync(Guid chairUserId, UXMeeting meeting)
         {
             var chair = await _db.GetPersonAsync(chairUserId);
             var group = Group.NewInstance(chair);
+            var meetingTime = DateTimeOffset.Parse(meeting.StartTime);
+            group.CurrentMeeting = Meeting.NewInstance(
+                meetingTime,
+                meeting.Description,
+                meeting.Location,
+                0);
             await _db.AddGroupAsync(group);
             return ToUxGroup(group);
         }
@@ -59,7 +65,8 @@ namespace InterfaceAdapters
                     Text = m.Text,
                     Time = m.Time
                 }),
-                State = x.State.GetDescription()
+                State = x.State.GetDescription(),
+                CurrentMeeting = x.CurrentMeeting != null ? MeetingService.ToUxMeeting(x.CurrentMeeting) : null
             };
         }
 

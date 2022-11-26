@@ -5,6 +5,7 @@ import { Home } from './components/Home';
 import { About } from './components/About';
 import { Groups } from './components/Groups';
 import { Group } from './components/Group';
+import { AddMassMeeting } from './components/AddMassMeeting';
 
 import './custom.css'
 
@@ -18,6 +19,7 @@ export default class App extends Component {
         <Route path='/about' component={About} />
         <Route path='/groups' component={Groups} />
         <Route path='/group/:groupId' component={Group} />
+        <Route path='/add-mass-meeting' component={AddMassMeeting} />
       </Layout>
     );
   }

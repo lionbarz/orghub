@@ -14,6 +14,7 @@ export default function usePerson() {
         const response = await fetch('api/person/addPerson', requestOptions);
         const person = await response.json();
         setToken(person.id);
+        return person;
     }
     
     useEffect(() => {
