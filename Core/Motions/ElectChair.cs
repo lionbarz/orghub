@@ -6,24 +6,24 @@ namespace Core.Motions
     /// <summary>
     /// Set the chair of a group to a specific person.
     /// </summary>
-    public class ElectChair : GroupModifyingMotion, IMainMotion
+    public class ElectChair : IGroupModifyingMotion, IMainMotion
     {
         private readonly Person _nominee;
 
-        public ElectChair(Person nominee, IGroupModifier groupModifier) : base(groupModifier)
+        public ElectChair(Person nominee)
         {
             _nominee = nominee;
         }
         
-        public override string GetText()
+        public string GetText()
         {
             return $"that {_nominee.Name} chair the group";
         }
 
-        public override Task TakeActionAsync()
+        public Task TakeActionAsync(IGroupModifier groupModifier)
         {
-            GroupModifier.SetChair(_nominee);
-            GroupModifier.AddResolution(GetText());
+            groupModifier.SetChair(_nominee);
+            groupModifier.AddResolution(GetText());
             return Task.CompletedTask;
         }
     }

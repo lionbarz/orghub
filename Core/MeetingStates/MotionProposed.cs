@@ -12,6 +12,8 @@ namespace Core.MeetingStates
         private MotionChain MotionChain { get; }
         private Person Mover { get; }
         private IGroupModifier GroupModifier { get; }
+
+        public override State Type => State.MotionProposed;
         
         public MotionProposed(IGroupModifier groupModifier, Person mover, MotionChain motionChain)
         {
@@ -20,12 +22,12 @@ namespace Core.MeetingStates
             MotionChain = motionChain;
         }
 
-        public override IMeetingState CallMeetingToOrder(PersonRole actor)
+        public override IMeetingState CallMeetingToOrder(MeetingAttendee actor)
         {
             throw new PersonOutOfOrderException("The meeting is already in order.");
         }
 
-        public override IMeetingState DeclareTimeExpired(PersonRole actor)
+        public override IMeetingState DeclareTimeExpired(MeetingAttendee actor)
         {
             GroupModifier.RecordMinute($"Nobody seconded the motion to {MotionChain.Current.GetText()}.");
             // Drop this motion and go to previous motions, or the open floor if this is the only motion.
@@ -34,17 +36,17 @@ namespace Core.MeetingStates
                 : OpenFloorState.InstanceOf(GroupModifier);
         }
 
-        public override IMeetingState MoveMainMotion(PersonRole actor, IMainMotion motion)
+        public override IMeetingState MoveMainMotion(MeetingAttendee actor, IMainMotion motion)
         {
             throw new PersonOutOfOrderException("Only seconding is allowed.");
         }
 
-        public override IMeetingState MoveSubsidiaryMotion(PersonRole actor, ISubsidiaryMotion motion)
+        public override IMeetingState MoveSubsidiaryMotion(MeetingAttendee actor, ISubsidiaryMotion motion)
         {
             throw new PersonOutOfOrderException("Only seconding is allowed.");
         }
 
-        public override IMeetingState Second(PersonRole actor)
+        public override IMeetingState Second(MeetingAttendee actor)
         {
             if (!CanSecond(actor, out string explanation))
             {
@@ -61,22 +63,22 @@ namespace Core.MeetingStates
             return new DebateState(GroupModifier, MotionChain);
         }
 
-        public override IMeetingState Speak(PersonRole actor)
+        public override IMeetingState Speak(MeetingAttendee actor)
         {
             throw new PersonOutOfOrderException("Only seconding is allowed.");
         }
 
-        public override IMeetingState Vote(PersonRole actor, VoteType type)
+        public override IMeetingState Vote(MeetingAttendee actor, VoteType type)
         {
             throw new PersonOutOfOrderException("There is no vote in progress.");
         }
 
-        public override IMeetingState Yield(PersonRole actor)
+        public override IMeetingState Yield(MeetingAttendee actor)
         {
             throw new PersonOutOfOrderException("Only seconding is allowed.");
         }
 
-        public override IMeetingState MoveToAdjourn(PersonRole actor)
+        public override IMeetingState MoveToAdjourn(MeetingAttendee actor)
         {
             throw new PersonOutOfOrderException("Only seconding is allowed.");
         }
@@ -86,19 +88,19 @@ namespace Core.MeetingStates
             return $"{Mover.Name} moves {MotionChain.Current.GetText()}. Does anyone second?";
         }
 
-        protected override bool CanMoveToAdjourn(PersonRole actor, out string explanation)
+        protected override bool CanMoveToAdjourn(MeetingAttendee actor, out string explanation)
         {
             explanation = "Only seconding is allowed.";
             return false;
         }
 
-        protected override bool CanCallToOrder(PersonRole actor, out string explanation)
+        protected override bool CanCallToOrder(MeetingAttendee actor, out string explanation)
         {
             explanation = "The meeting is already in order.";
             return false;
         }
 
-        protected override bool CanDeclareTimeExpired(PersonRole actor, out string explanation)
+        protected override bool CanDeclareTimeExpired(MeetingAttendee actor, out string explanation)
         {
             if (!actor.IsChair)
             {
@@ -110,7 +112,7 @@ namespace Core.MeetingStates
             return true;
         }
 
-        protected override bool CanSecond(PersonRole actor, out string explanation)
+        protected override bool CanSecond(MeetingAttendee actor, out string explanation)
         {
             if (actor.Person.Equals(Mover))
             {
@@ -128,31 +130,31 @@ namespace Core.MeetingStates
             return true;
         }
 
-        protected override bool CanSpeak(PersonRole actor, out string explanation)
+        protected override bool CanSpeak(MeetingAttendee actor, out string explanation)
         {
             explanation = "Only seconding is allowed.";
             return false;
         }
 
-        protected override bool CanMoveMainMotion(PersonRole actor, out string explanation)
+        protected override bool CanMoveMainMotion(MeetingAttendee actor, out string explanation)
         {
             explanation = "Only seconding is allowed.";
             return false;
         }
 
-        protected override bool CanMoveSubsidiaryMotion(PersonRole actor, out string explanation)
+        protected override bool CanMoveSubsidiaryMotion(MeetingAttendee actor, out string explanation)
         {
             explanation = "Only seconding is allowed.";
             return false;
         }
 
-        protected override bool CanVote(PersonRole actor, out string explanation)
+        protected override bool CanVote(MeetingAttendee actor, out string explanation)
         {
             explanation = "There is no vote in progress.";
             return false;
         }
 
-        protected override bool CanYield(PersonRole actor, out string explanation)
+        protected override bool CanYield(MeetingAttendee actor, out string explanation)
         {
             explanation = $"{actor.Person.Name} does not have the floor.";
             return false;

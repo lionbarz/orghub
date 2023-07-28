@@ -23,5 +23,17 @@ namespace InterfaceAdapters.Models
         /// The Zoom link or physical address.
         /// </summary>
         public string Location { get; set; }
+        
+        /// <summary>
+        /// A string description in plain English about the
+        /// state of this group. Ex: Mohamed is speaking.
+        /// </summary>
+        public string State { get; set; }
+        
+        /// <summary>
+        /// A unique string that identifies this state, such
+        /// as Adjourned or Voting.
+        /// </summary>
+        public string StateType { get; set; }
     }
 }

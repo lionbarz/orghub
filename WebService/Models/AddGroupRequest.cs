@@ -18,15 +18,13 @@ public class AddGroupRequest
     /// </summary>
     public UXMeeting NextMeeting { get; set; }
     
-    /*
     /// <summary>
-    /// The description of the first meeting.
+    /// The name of the group.
     /// </summary>
-    public string MeetingDescription { get; set; }
+    public string Name { get; set; }
     
     /// <summary>
-    /// When the group's first meeting is to take place.
+    /// The group's stated mission.
     /// </summary>
-    public DateTimeOffset MeetingStartTime { get; set; }
-    */
+    public string Mission { get; set; }
 }

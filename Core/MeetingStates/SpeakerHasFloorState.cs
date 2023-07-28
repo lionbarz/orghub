@@ -1,11 +1,12 @@
 ﻿using System;
-using System.Text;
 using Core.Motions;
 
 namespace Core.MeetingStates
 {
     public class SpeakerHasFloorState : MeetingStateBase
     {
+        public override State Type => State.SpeakerHasFloor;
+        
         // The speaker who has the floor.
         private Person Speaker { get; }
         
@@ -32,12 +33,12 @@ namespace Core.MeetingStates
             GroupModifier = groupModifier;
         }
 
-        public override IMeetingState CallMeetingToOrder(PersonRole actor)
+        public override IMeetingState CallMeetingToOrder(MeetingAttendee actor)
         {
             throw new PersonOutOfOrderException("Meeting already in order.");
         }
 
-        public override IMeetingState DeclareTimeExpired(PersonRole actor)
+        public override IMeetingState DeclareTimeExpired(MeetingAttendee actor)
         {
             if (!CanDeclareTimeExpired(actor, out string explanation))
             {
@@ -50,32 +51,32 @@ namespace Core.MeetingStates
                 : new DebateState(GroupModifier, MotionChain);
         }
 
-        public override IMeetingState MoveMainMotion(PersonRole actor, IMainMotion motion)
+        public override IMeetingState MoveMainMotion(MeetingAttendee actor, IMainMotion motion)
         {
             throw new PersonOutOfOrderException("Can't move a motion while someone is speaking.");
         }
 
-        public override IMeetingState MoveSubsidiaryMotion(PersonRole actor, ISubsidiaryMotion motion)
+        public override IMeetingState MoveSubsidiaryMotion(MeetingAttendee actor, ISubsidiaryMotion motion)
         {
             throw new PersonOutOfOrderException("Can't move a motion while someone is speaking.");
         }
 
-        public override IMeetingState Second(PersonRole actor)
+        public override IMeetingState Second(MeetingAttendee actor)
         {
             throw new PersonOutOfOrderException("There is no motion to second.");
         }
 
-        public override IMeetingState Speak(PersonRole actor)
+        public override IMeetingState Speak(MeetingAttendee actor)
         {
             throw new PersonOutOfOrderException("Can't speak while someone is speaking.");
         }
 
-        public override IMeetingState Vote(PersonRole actor, VoteType type)
+        public override IMeetingState Vote(MeetingAttendee actor, VoteType type)
         {
             throw new PersonOutOfOrderException("There is no vote in progress.");
         }
 
-        public override IMeetingState Yield(PersonRole actor)
+        public override IMeetingState Yield(MeetingAttendee actor)
         {
             GroupModifier.RecordMinute($"{actor.Person.Name} yields the floor.");
             
@@ -84,7 +85,7 @@ namespace Core.MeetingStates
                 : new DebateState(GroupModifier, MotionChain);
         }
 
-        public override IMeetingState MoveToAdjourn(PersonRole actor)
+        public override IMeetingState MoveToAdjourn(MeetingAttendee actor)
         {
             throw new PersonOutOfOrderException("Can't move to adjourn while someone is speaking.");
         }
@@ -96,22 +97,22 @@ namespace Core.MeetingStates
                 return $"{Speaker.Name} is debating the motion {MotionChain.Current.GetText()}.";
             }
 
-            return $"{Speaker.Name} is speaking freely.";
+            return $"{Speaker.Name} has the floor.";
         }
 
-        protected override bool CanMoveToAdjourn(PersonRole actor, out string explanation)
+        protected override bool CanMoveToAdjourn(MeetingAttendee actor, out string explanation)
         {
             explanation = "Can't move to adjourn while someone is speaking.";
             return false;
         }
 
-        protected override bool CanCallToOrder(PersonRole actor, out string explanation)
+        protected override bool CanCallToOrder(MeetingAttendee actor, out string explanation)
         {
             explanation = "The meeting is already in order.";
             return false;
         }
 
-        protected override bool CanDeclareTimeExpired(PersonRole actor, out string explanation)
+        protected override bool CanDeclareTimeExpired(MeetingAttendee actor, out string explanation)
         {
             // TODO: Use a timer and only allow if it's really expired.
             
@@ -125,37 +126,37 @@ namespace Core.MeetingStates
             return true;
         }
 
-        protected override bool CanSecond(PersonRole actor, out string explanation)
+        protected override bool CanSecond(MeetingAttendee actor, out string explanation)
         {
             explanation = "There is no motion to second.";
             return false;
         }
 
-        protected override bool CanSpeak(PersonRole actor, out string explanation)
+        protected override bool CanSpeak(MeetingAttendee actor, out string explanation)
         {
             explanation = "Can't speak while someone is speaking.";
             return false;
         }
 
-        protected override bool CanMoveMainMotion(PersonRole actor, out string explanation)
+        protected override bool CanMoveMainMotion(MeetingAttendee actor, out string explanation)
         {
             explanation = "Can't move a motion while someone is speaking.";
             return false;
         }
 
-        protected override bool CanMoveSubsidiaryMotion(PersonRole actor, out string explanation)
+        protected override bool CanMoveSubsidiaryMotion(MeetingAttendee actor, out string explanation)
         {
             explanation = "Can't move a motion while someone is speaking.";
             return false;
         }
 
-        protected override bool CanVote(PersonRole actor, out string explanation)
+        protected override bool CanVote(MeetingAttendee actor, out string explanation)
         {
             explanation = "There is no vote in progress.";
             return false;
         }
 
-        protected override bool CanYield(PersonRole actor, out string explanation)
+        protected override bool CanYield(MeetingAttendee actor, out string explanation)
         {
             if (!actor.Person.Equals(Speaker))
             {

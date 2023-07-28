@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Core.MeetingStates;
 using Core.Motions;
 
@@ -15,6 +14,12 @@ namespace Core
         /// The current state.
         /// </summary>
         private IMeetingState State { get; set; }
+     
+        /// <summary>
+        /// The type of this state is the type of the
+        /// underlying state.
+        /// </summary>
+        public State Type => State.Type;
         
         /// <summary>
         /// Creates a StateManager with an initial Adjourned state.
@@ -34,61 +39,61 @@ namespace Core
             return new StateManager(initialState);
         }
 
-        public IMeetingState CallMeetingToOrder(PersonRole actor)
+        public IMeetingState CallMeetingToOrder(MeetingAttendee actor)
         {
             State = State.CallMeetingToOrder(actor);
             return State;
         }
 
-        public IMeetingState DeclareTimeExpired(PersonRole actor)
+        public IMeetingState DeclareTimeExpired(MeetingAttendee actor)
         {
             State = State.DeclareTimeExpired(actor);
             return State;
         }
 
-        public IMeetingState MoveMainMotion(PersonRole actor, IMainMotion motion)
+        public IMeetingState MoveMainMotion(MeetingAttendee actor, IMainMotion motion)
         {
             State = State.MoveMainMotion(actor, motion);
             return State;
         }
 
-        public IMeetingState MoveSubsidiaryMotion(PersonRole actor, ISubsidiaryMotion motion)
+        public IMeetingState MoveSubsidiaryMotion(MeetingAttendee actor, ISubsidiaryMotion motion)
         {
             State = State.MoveSubsidiaryMotion(actor, motion);
             return State;
         }
 
-        public IMeetingState MoveToAdjourn(PersonRole actor)
+        public IMeetingState MoveToAdjourn(MeetingAttendee actor)
         {
             State = State.MoveToAdjourn(actor);
             return State;
         }
 
-        public IMeetingState Second(PersonRole actor)
+        public IMeetingState Second(MeetingAttendee actor)
         {
             State = State.Second(actor);
             return State;
         }
 
-        public IMeetingState Speak(PersonRole actor)
+        public IMeetingState Speak(MeetingAttendee actor)
         {
             State = State.Speak(actor);
             return State;
         }
 
-        public IMeetingState Vote(PersonRole actor, VoteType type)
+        public IMeetingState Vote(MeetingAttendee actor, VoteType type)
         {
             State = State.Vote(actor, type);
             return State;
         }
 
-        public IMeetingState Yield(PersonRole actor)
+        public IMeetingState Yield(MeetingAttendee actor)
         {
             State = State.Yield(actor);
             return State;
         }
 
-        public ICollection<ActionSupport> GetActionSupportForPerson(PersonRole actor)
+        public ICollection<ActionSupport> GetActionSupportForPerson(MeetingAttendee actor)
         {
             return State.GetActionSupportForPerson(actor);
         }

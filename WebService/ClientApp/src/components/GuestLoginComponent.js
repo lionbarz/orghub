@@ -5,7 +5,7 @@ import { Card, CardHeader, FormGroup, Input, Label } from 'reactstrap';
 // Allows creating a person from specifying a name.
 // It's the temporary substitute for a login.
 // Meant for guests.
-export function JoinMeetingComponent({ person, addPerson }) {
+export function GuestLoginComponent({ person, addPerson }) {
     const [name, setName] = useState(person ? person.name : '');
     
     function handleChangeName(event) {

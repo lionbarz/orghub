@@ -18,7 +18,7 @@ namespace UnitTests
         {
             var openFloorState = OpenFloorState.InstanceOf(new TestGroupModifier());
             var stateManager = StateManager.StartingWithState(openFloorState);
-            var personRole = PersonRole.AsMember(new Person());
+            var personRole = MeetingAttendee.AsMember(new Person());
             stateManager.Speak(personRole);
             var canYield = stateManager.GetActionSupportForPerson(personRole).First(x => x.Action == Action.Yield)
                 .IsSupported;

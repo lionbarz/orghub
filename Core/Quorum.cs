@@ -52,7 +52,7 @@ namespace Core
         {
             if (IsPercentageBased)
             {
-                float required = membershipSize / Percentage;
+                float required = membershipSize * Percentage;
 
                 if (MustBeGreater)
                 {

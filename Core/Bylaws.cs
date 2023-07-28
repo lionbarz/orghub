@@ -35,11 +35,12 @@ namespace Core
             Mission = mission;
         }
 
-        public static Bylaws Default(string groupName)
+        public static Bylaws Default(string groupName, string mission)
         {
-            return new Bylaws(groupName, "Make a difference.")
+            return new Bylaws(groupName, mission)
             {
-                MinimumMeetingNotice = TimeSpan.FromDays(3)
+                MinimumMeetingNotice = TimeSpan.FromDays(3),
+                MeetingQuorum = Quorum.SimpleMajority()
             };
         }
     }

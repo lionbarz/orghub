@@ -8,6 +8,7 @@
     "@mui/icons-material": "^5.8.4",
     "@mui/material": "^5.8.6",
     "@popperjs/core": "^2.11.5",
+    "@zoom/videosdk": "^1.6.0",
     "bootstrap": "^5.1.0",
     "http-proxy-middleware": "^0.19.1",
     "jquery": "^3.5.1",

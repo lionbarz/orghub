@@ -11,9 +11,9 @@ import SecondIcon from '@mui/icons-material/EmojiPeople';
 import AbstainIcon from '@mui/icons-material/NotInterested';
 import { Modal, ModalBody, ModalHeader, ModalFooter, FormGroup, Input } from 'reactstrap';
 import {MoveResolutionButton} from "./MoveResolutionButton";
-import {JoinMeetingComponent} from "./JoinMeetingComponent";
+import {GuestLoginComponent} from "./GuestLoginComponent";
 import {NominateChairButton} from "./NominateChairButton";
-import {useParams} from "react-router-dom";
+import {Link, useParams} from "react-router-dom";
 import usePerson from "../usePerson";
 import moment from "moment";
 
@@ -199,6 +199,24 @@ export function Group() {
         setSelectedPersonId(personId);
     }
 
+    const meetingTimeInFuture = true;
+    
+    let meetingCardBody = (
+        <div className="card-body">
+            <p className="card-text">No meeting scheduled.</p>
+        </div>);
+    
+    if (group && group.currentMeeting) {
+        const formattedCurrentMeeting = moment(group.currentMeeting.startTime).format("dddd, MMMM Do YYYY, h:mm a");
+        meetingCardBody = <h1>Next meeting is at {formattedCurrentMeeting}</h1>;
+        meetingCardBody = (
+            <div className="card-body">
+                <p className="card-text">{formattedCurrentMeeting}</p>
+                <p className="card-text">{group.currentMeeting.description}</p>
+                <p className="card-text"><Link to={"/group/" + groupId + "/meeting/" + group.currentMeeting.id}>Join Meeting</Link></p>
+            </div>);
+    }
+    
     if (loading) {
         return <p><em>Loading...</em></p>;
     }
@@ -206,7 +224,7 @@ export function Group() {
             <div>
                 {!person &&
                     <div className="mb-3">
-                        <JoinMeetingComponent person={person} addPerson={addPerson} />
+                        <GuestLoginComponent person={person} addPerson={addPerson} />
                     </div>
                 }
         <div>
@@ -215,11 +233,8 @@ export function Group() {
                 {renderActions()}
             </div>
             <div className="card mb-3" style={{maxWidth: "36rem"}}>
-                <div className="card-header">Meeting</div>
-                <div className="card-body">
-                    <p className="card-text">{moment(group.currentMeeting.startTime).format("dddd, MMMM Do YYYY, h:mm a")}</p>
-                    <p className="card-text">{group.currentMeeting.description}</p>
-                </div>
+                <div className="card-header">Next Meeting</div>
+                {meetingCardBody}
             </div>
             <div className="card mb-3" style={{maxWidth: "36rem"}}>
                 <div className="card-header">Group name</div>

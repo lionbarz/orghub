@@ -12,3 +12,9 @@ code {
   background-color: #1b6ec2;
   border-color: #1861ac;
 }
+
+#self-view-video, #self-view-canvas {
+  width: 100%;
+  height: auto;
+  display: none;
+}

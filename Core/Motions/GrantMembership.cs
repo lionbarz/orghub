@@ -2,24 +2,24 @@ using System.Threading.Tasks;
 
 namespace Core.Motions
 {
-    public class GrantMembership : GroupModifyingMotion, IMainMotion
+    public class GrantMembership : IGroupModifyingMotion, IMainMotion
     {
         private readonly Person _applicant;
         
-        public GrantMembership(Person applicant, IGroupModifier groupModifier) : base(groupModifier)
+        public GrantMembership(Person applicant, IGroupModifier groupModifier)
         {
             _applicant = applicant;
         }
         
-        public override string GetText()
+        public string GetText()
         {
-            return $"Make {_applicant.Name} a member of {GroupModifier.GetName()}.";
+            return $"Grant membership to {_applicant.Name}.";
         }
 
-        public override Task TakeActionAsync()
+        public Task TakeActionAsync(IGroupModifier groupModifier)
         {
-            GroupModifier.AddMember(_applicant);
-            GroupModifier.AddResolution(GetText());
+            groupModifier.AddMember(_applicant);
+            groupModifier.AddResolution(GetText());
             return Task.CompletedTask;
         }
     }

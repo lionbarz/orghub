@@ -2,7 +2,7 @@ import React, {useEffect, useState} from 'react';
 import { Card, CardBody, CardText } from 'reactstrap';
 import {Link} from "react-router-dom";
 import usePerson from "../usePerson";
-import {JoinMeetingComponent} from "./JoinMeetingComponent";
+import {GuestLoginComponent} from "./GuestLoginComponent";
 
 export function Groups() {
     const [groups, setGroups] = useState([]);
@@ -52,7 +52,7 @@ export function Groups() {
             }
             {!person && <div>
                 <p>Sign in to create a group.</p>
-                <JoinMeetingComponent person={person} addPerson={addPerson} />
+                <GuestLoginComponent person={person} addPerson={addPerson} />
             </div>}
             <div>
                 {groups.map(group =>

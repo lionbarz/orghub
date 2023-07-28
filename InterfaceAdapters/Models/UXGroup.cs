@@ -34,12 +34,6 @@ namespace InterfaceAdapters.Models
         /// The minutes, ie activity log.
         /// </summary>
         public IEnumerable<UXMinute> Minutes { get; set; }
-
-        /// <summary>
-        /// A string description in plain English about the
-        /// state of this group. Ex: Mohamed is speaking.
-        /// </summary>
-        public string State { get; set; }
         
         /// <summary>
         /// The current meeting, either in progress or

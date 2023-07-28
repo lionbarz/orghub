@@ -7,7 +7,7 @@
             return $"{person.Name} called the meeting to order.";
         }
 
-        public bool IsPermitted(PersonRole person)
+        public bool IsPermitted(MeetingAttendee person)
         {
             return person.IsChair;
         }

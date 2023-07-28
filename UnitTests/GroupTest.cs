@@ -13,76 +13,60 @@ namespace UnitTests
         public void GroupAttendance()
         {
             var mo = new Person("Mo");
-            var zaki = new Person("Zaki");
-            var group = Group.NewInstance(mo);
-            
-            Assert.IsTrue(group.IsMember(zaki.Id));
+            var roni = new Person("Roni");
+            var group = Group.NewInstance(mo, "Alliance for Lebanese Reform", "Defeating the corrupt Lebanese warlords that are controlling the country.");
+            Assert.IsFalse(group.IsMember(roni.Id));
             Assert.IsTrue(group.IsMember(mo.Id));
         }
         
         [TestMethod]
-        public void RegularGroupAttendance()
-        {
-            var mo = new Person("Mo");
-            var zaki = new Person("Zaki");
-            var members = new Person[] { mo };
-            var group = Group.WithMembership(members);
-            
-            Assert.IsFalse(group.IsMember(zaki.Id));
-            Assert.IsTrue(group.IsMember(mo.Id));
-        }
-        /*
-        [TestMethod]
-        public void GroupSetChair()
+        public void ElectChair()
         {
             var mo = new Person("Mo");
             var omar = new Person("Omar");
-            var group = Group.NewInstance(mo, new List<Person>() { omar });
+            var group = Group.NewInstance(mo, "Lebanese-American Union", "Reform Lebanon", new List<Person>() { omar });
             group.AddMember(omar);
-            var moRole = group.CreatePersonRole(mo);
-            var omarRole = group.CreatePersonRole(omar);
-            var meeting = Meeting.NewInstance(group.Id, group, mo, DateTimeOffset.Now, 0);
-
-            meeting.State.CallMeetingToOrder(moRole);
+            var meeting = Meeting.NewInstance(group, DateTimeOffset.Now, "talknstuff", "online");
+            var moAttendee = meeting.AddAttendee(mo);
+            var omarAttendee = meeting.AddAttendee(omar);
             
-        
-            group.TakeAction(mo, new Move(new ElectChair(omar, group)));
-            Assert.IsInstanceOfType(group.GetState(), typeof(DebateState));
-            
-            group.TakeAction(mo, new DeclareMotionPassed());
-            Assert.AreEqual(omar, group.Chair);
-            Assert.IsInstanceOfType(group.GetState(), typeof(OpenFloorState));
-
-            group.TakeAction(mo, new MoveToAdjourn());
-            Assert.IsInstanceOfType(group.GetState(), typeof(AdjournedState));
-            
-        }
-        
-        [TestMethod]
-        public void SecondAndVoteOnMotion()
-        {
-            var mo = new Person("Mo");
-            var omar = new Person("Omar");
-            var group = Group.NewInstance(mo, new List<Person>() { omar });
-            group.AddMember(omar);
-            var moRole = group.CreatePersonRole(mo);
-            var omarRole = group.CreatePersonRole(omar);
-            var meeting = Meeting.NewInstance(group.Id, group, mo, DateTimeOffset.Now, 0);
-
-            meeting.State.CallMeetingToOrder(moRole);
-            meeting.State.MoveMainMotion(omarRole, new ElectChair(omar, group));
-            meeting.State.Second(moRole);
+            meeting.State.CallMeetingToOrder(moAttendee);
+            meeting.State.MoveMainMotion(omarAttendee, new ElectChair(omar));
+            meeting.State.Second(moAttendee);
             
             // Moves to a vote.
-            meeting.State.DeclareTimeExpired(moRole);
+            meeting.State.DeclareTimeExpired(moAttendee);
 
-            meeting.State.Vote(moRole, VoteType.Aye);
-            meeting.State.Vote(omarRole, VoteType.Aye);
-            meeting.State.DeclareTimeExpired(moRole);
+            meeting.State.Vote(moAttendee, VoteType.Aye);
+            meeting.State.Vote(omarAttendee, VoteType.Aye);
+            meeting.State.DeclareTimeExpired(moAttendee);
             
             Assert.AreEqual(omar, group.Chair);
         }
+
+        [TestMethod]
+        public void TestHasQuorum()
+        {
+            var mo = new Person("Mo");
+            var omar = new Person("Omar");
+            var group = Group.NewInstance(mo, "Lebanese-Americans For Change", "Reform Lebanon", new List<Person>() { omar });
+            group.AddMember(omar);
+            var meeting = Meeting.NewInstance(group, DateTimeOffset.Now, "talknstuff", "online");
+            meeting.AddAttendee(mo);
+            meeting.AddAttendee(omar);
+            Assert.IsTrue(meeting.HasQuorum());
+        }
         
-        */
+        [TestMethod]
+        public void TestNoQuorum()
+        {
+            var mo = new Person("Mo");
+            var omar = new Person("Omar");
+            var group = Group.NewInstance(mo, "Lebanese-Americans For Change", "Reform Lebanon", new List<Person>() { omar });
+            group.AddMember(omar);
+            var meeting = Meeting.NewInstance(group, DateTimeOffset.Now, "talknstuff", "online");
+            meeting.AddAttendee(mo);
+            Assert.IsFalse(meeting.HasQuorum());
+        }
     }
 }

@@ -52,12 +52,6 @@ namespace Core
         public ICollection<string> Resolutions { get; }
 
         /// <summary>
-        /// The state of this group (adjourned, voting, etc).
-        /// This handles actions.
-        /// </summary>
-        public StateManager State { get; private init; }
-        
-        /// <summary>
         /// What states and actions have happened so far.
         /// </summary>
         public IList<MeetingMinute> Minutes { get; private init;  }
@@ -81,57 +75,31 @@ namespace Core
             
             // TODO: This is always true for now.
             IsMassMeeting = true;
-            
-            // TODO: Is there a better way to do this than pass this?
-            State = new StateManager(this);
         }
 
-        public static Group NewInstance(Person creator)
+        /// <summary>
+        /// Create a group using default bylaws.
+        /// </summary>
+        public static Group NewInstance(Person creator, string name, string mission)
         {
             var group = new Group
             {
                 Chair = creator,
-                Bylaws = Bylaws.Default("New group"),
+                Bylaws = Bylaws.Default(name, mission),
                 Members = new List<Person>() { creator }
             };
 
             return group;
         }
         
-        public static Group NewInstance(Person creator, IEnumerable<Person> members)
+        public static Group NewInstance(Person creator, string name, string mission, IEnumerable<Person> members)
         {
-            var group = new Group
-            {
-                Chair = creator,
-                Bylaws = Bylaws.Default($"{creator.Name}'s new group"),
-                Members = new List<Person>() { creator }
-            };
+            var group = NewInstance(creator, name, mission);
             
             foreach (var member in members)
             {
                 group.AddMember(member);
             }
-
-            return group;
-        }
-
-        public static Group WithMembership(IEnumerable<Person> members)
-        {
-            var membersArray = members as Person[] ?? members.ToArray();
-
-            if (!membersArray.Any())
-            {
-                throw new ArgumentException("A group must have at least one member.");
-            }
-
-            var group = new Group();
-
-            foreach (var member in membersArray)
-            {
-                group.Members.Add(member);
-            }
-
-            group.Bylaws = Bylaws.Default("New group");
 
             return group;
         }
@@ -183,21 +151,6 @@ namespace Core
         public void RecordMinute(string text)
         {
             Minutes.Add(MeetingMinute.FromText(text));
-        }
-
-        public PersonRole CreatePersonRole(Person person)
-        {
-            if (person == Chair)
-            {
-                return PersonRole.AsChair(person);
-            }
-
-            if (IsMember(person.Id))
-            {
-                return PersonRole.AsMember(person);
-            }
-
-            return PersonRole.AsGuest(person);
         }
 
         public void MarkAttendance(Person person)

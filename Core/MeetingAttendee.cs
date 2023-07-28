@@ -2,34 +2,35 @@
 
 namespace Core
 {
-    public class PersonRole
+    public class MeetingAttendee
     {
-        private PersonRole(Person person)
+        private MeetingAttendee(Person person)
         {
             Person = person;
         }
 
-        public static PersonRole AsGuest(Person person)
+        public static MeetingAttendee AsGuest(Person person)
         {
-            return new PersonRole(person)
+            return new MeetingAttendee(person)
             {
+                // TODO: Replace this with a Role variable.
                 IsMember = false,
                 IsChair = false
             };
         }
 
-        public static PersonRole AsMember(Person person)
+        public static MeetingAttendee AsMember(Person person)
         {
-            return new PersonRole(person)
+            return new MeetingAttendee(person)
             {
                 IsMember = true,
                 IsChair = false
             };
         }
 
-        public static PersonRole AsChair(Person person)
+        public static MeetingAttendee AsChair(Person person)
         {
-            return new PersonRole(person)
+            return new MeetingAttendee(person)
             {
                 IsMember = true,
                 IsChair = true
@@ -51,7 +52,7 @@ namespace Core
         /// </summary>
         public bool IsChair { get; private set; }
 
-        public override bool Equals(object? obj) => this.Equals(obj as PersonRole);
+        public override bool Equals(object? obj) => this.Equals(obj as MeetingAttendee);
 
         public bool IsGuest => !IsMember && !IsChair;
 
@@ -68,7 +69,7 @@ namespace Core
             }
         }
         
-        public bool Equals(PersonRole? obj)
+        public bool Equals(MeetingAttendee? obj)
         {
             if (obj is null)
             {

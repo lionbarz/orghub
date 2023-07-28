@@ -9,6 +9,8 @@ namespace Core.MeetingStates
     /// </summary>
     public class OpenFloorState : MeetingStateBase
     {
+        public override State Type => State.OpenFloor;
+        
         private IGroupModifier GroupModifier { get; }
 
         private OpenFloorState(IGroupModifier groupModifier)
@@ -21,7 +23,7 @@ namespace Core.MeetingStates
             return new OpenFloorState(groupModifier);
         }
 
-        public override IMeetingState CallMeetingToOrder(PersonRole actor)
+        public override IMeetingState CallMeetingToOrder(MeetingAttendee actor)
         {
             if (!CanCallToOrder(actor, out var explanation))
             {
@@ -31,22 +33,22 @@ namespace Core.MeetingStates
             throw new Exception("Bad state. Shouldn't be here.");
         }
 
-        public override IMeetingState DeclareTimeExpired(PersonRole actor)
+        public override IMeetingState DeclareTimeExpired(MeetingAttendee actor)
         {
             throw new PersonOutOfOrderException("There is nothing being timed.");
         }
 
-        public override IMeetingState MoveSubsidiaryMotion(PersonRole actor, ISubsidiaryMotion motion)
+        public override IMeetingState MoveSubsidiaryMotion(MeetingAttendee actor, ISubsidiaryMotion motion)
         {
             throw new PersonOutOfOrderException("Cannot move a subsidiary motion when there is no main motion.");
         }
 
-        public override IMeetingState Second(PersonRole actor)
+        public override IMeetingState Second(MeetingAttendee actor)
         {
             throw new PersonOutOfOrderException("There is no motion to second.");
         }
 
-        public override IMeetingState MoveToAdjourn(PersonRole actor)
+        public override IMeetingState MoveToAdjourn(MeetingAttendee actor)
         {
             if (!CanMoveToAdjourn(actor, out string? error))
             {
@@ -59,7 +61,7 @@ namespace Core.MeetingStates
             return new MotionProposed(GroupModifier, actor.Person, motionChain);
         }
 
-        public override IMeetingState MoveMainMotion(PersonRole actor, IMainMotion motion)
+        public override IMeetingState MoveMainMotion(MeetingAttendee actor, IMainMotion motion)
         {
             if (!CanMoveMainMotion(actor, out string explanation))
             {
@@ -70,7 +72,7 @@ namespace Core.MeetingStates
             return new MotionProposed(GroupModifier, actor.Person, MotionChain.FromMotion(motion));
         }
 
-        public override IMeetingState Speak(PersonRole actor)
+        public override IMeetingState Speak(MeetingAttendee actor)
         {
             if (!CanSpeak(actor, out string? error))
             {
@@ -81,12 +83,12 @@ namespace Core.MeetingStates
             return new SpeakerHasFloorState(GroupModifier, actor.Person);
         }
 
-        public override IMeetingState Vote(PersonRole actor, VoteType type)
+        public override IMeetingState Vote(MeetingAttendee actor, VoteType type)
         {
             throw new PersonOutOfOrderException("There is no vote in progress.");
         }
 
-        public override IMeetingState Yield(PersonRole actor)
+        public override IMeetingState Yield(MeetingAttendee actor)
         {
             throw new PersonOutOfOrderException($"{actor.Person.Name} does not have the floor.");
         }
@@ -96,7 +98,7 @@ namespace Core.MeetingStates
             return "The floor is open.";
         }
         
-        protected override bool CanMoveToAdjourn(PersonRole actor, out string explanation)
+        protected override bool CanMoveToAdjourn(MeetingAttendee actor, out string explanation)
         {
             if (actor.IsGuest)
             {
@@ -108,31 +110,31 @@ namespace Core.MeetingStates
             return true;
         }
         
-        protected override bool CanCallToOrder(PersonRole actor, out string explanation)
+        protected override bool CanCallToOrder(MeetingAttendee actor, out string explanation)
         {
             explanation = $"{actor.Person.Name} cannot call the meeting to order because the meeting is already in order.";
             return false;
         }
 
-        protected override bool CanDeclareTimeExpired(PersonRole actor, out string explanation)
+        protected override bool CanDeclareTimeExpired(MeetingAttendee actor, out string explanation)
         {
             explanation = "There is nothing being timed.";
             return false;
         }
 
-        protected override bool CanSecond(PersonRole actor, out string explanation)
+        protected override bool CanSecond(MeetingAttendee actor, out string explanation)
         {
             explanation = "There is no motion to second.";
             return false;
         }
 
-        protected override bool CanSpeak(PersonRole actor, out string explanation)
+        protected override bool CanSpeak(MeetingAttendee actor, out string explanation)
         {
             explanation = "Anybody can speak when the floor is open.";
             return true;
         }
 
-        protected override bool CanMoveMainMotion(PersonRole actor, out string explanation)
+        protected override bool CanMoveMainMotion(MeetingAttendee actor, out string explanation)
         {
             if (actor.IsGuest)
             {
@@ -144,19 +146,19 @@ namespace Core.MeetingStates
             return true;
         }
 
-        protected override bool CanMoveSubsidiaryMotion(PersonRole actor, out string explanation)
+        protected override bool CanMoveSubsidiaryMotion(MeetingAttendee actor, out string explanation)
         {
             explanation = $"There must be a main motion for a subsidiary motion to be moved.";
             return false;
         }
 
-        protected override bool CanVote(PersonRole actor, out string explanation)
+        protected override bool CanVote(MeetingAttendee actor, out string explanation)
         {
             explanation = "There is no vote in progress.";
             return false;
         }
 
-        protected override bool CanYield(PersonRole actor, out string explanation)
+        protected override bool CanYield(MeetingAttendee actor, out string explanation)
         {
             explanation = $"{actor.Person.Name} does not have the floor.";
             return false;

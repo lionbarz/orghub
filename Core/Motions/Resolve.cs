@@ -5,23 +5,23 @@ namespace Core.Motions
     /// <summary>
     /// Resolve whatever the resolution text says.
     /// </summary>
-    public class Resolve : GroupModifyingMotion, IMainMotion
+    public class Resolve : IGroupModifyingMotion, IMainMotion
     {
         private string Resolution { get; }
 
-        public Resolve(string resolution, IGroupModifier groupModifier) : base(groupModifier)
+        public Resolve(string resolution)
         {
             Resolution = resolution;
         }
 
-        public override string GetText()
+        public string GetText()
         {
-            return $"adopt \"{Resolution}\"";
+            return $"adopt resolution: \"{Resolution}\"";
         }   
 
-        public override Task TakeActionAsync()
+        public Task TakeActionAsync(IGroupModifier groupModifier)
         {
-            GroupModifier.AddResolution(Resolution);
+            groupModifier.AddResolution(Resolution);
             return Task.CompletedTask;
         }
     }
