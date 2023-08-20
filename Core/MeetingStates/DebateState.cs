@@ -97,7 +97,7 @@ namespace Core.MeetingStates
 
         protected override bool CanMoveToAdjourn(MeetingAttendee actor, out string explanation)
         {
-            if (actor.IsGuest)
+            if (actor.Roles.HasFlag(AttendeeRole.Guest))
             {
                 explanation = $"{actor.Person.Name} is a guest and cannot move to adjourn.";
                 return false;
@@ -117,7 +117,7 @@ namespace Core.MeetingStates
         {
             // TODO: This action should be "DeclareNoMoreDebate" instead of recycling this.
             
-            if (!actor.IsChair)
+            if (!actor.Roles.HasFlag(AttendeeRole.Chair))
             {
                 explanation = "Only the chair can declare that there is no more debate.";
                 return false;
@@ -148,7 +148,7 @@ namespace Core.MeetingStates
 
         protected override bool CanMoveSubsidiaryMotion(MeetingAttendee actor, out string explanation)
         {
-            if (actor.IsGuest)
+            if (actor.Roles.HasFlag(AttendeeRole.Guest))
             {
                 explanation = "Guests cannot move motions.";
                 return false;

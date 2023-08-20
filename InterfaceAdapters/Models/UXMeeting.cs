@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace InterfaceAdapters.Models
 {
@@ -35,5 +36,16 @@ namespace InterfaceAdapters.Models
         /// as Adjourned or Voting.
         /// </summary>
         public string StateType { get; set; }
+
+        /// <summary>
+        /// The people attending the meeting.
+        /// </summary>
+        public IEnumerable<UXMeetingAttendee> Attendees { get; set; }
+
+        /// <summary>
+        /// Whether there are enough members to constitute
+        /// a quorum according to the bylaws of the organization.
+        /// </summary>
+        public bool HasQuorum { get; set; }
     }
 }

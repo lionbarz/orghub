@@ -35,7 +35,7 @@ namespace InterfaceAdapters
             return people.Select(ToUXPerson);
         }
 
-        private UXPerson ToUXPerson(Person person)
+        public static UXPerson ToUXPerson(Person person)
         {
             return new UXPerson()
             {

@@ -9,7 +9,7 @@
 
         public bool IsPermitted(MeetingAttendee person)
         {
-            return person.IsChair;
+            return person.Roles.HasFlag(AttendeeRole.Chair);
         }
     }
 }

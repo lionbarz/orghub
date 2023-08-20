@@ -7,6 +7,8 @@ import {GuestLoginComponent} from "./GuestLoginComponent";
 export function Groups() {
     const [groups, setGroups] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [name, setName] = useState('New group');
+    const [mission, setMission] = useState('New group mission');
     const {person, addPerson} = usePerson();
 
     async function populateGroupData() {
@@ -23,6 +25,8 @@ export function Groups() {
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({
                 personId: person.id,
+                name: name,
+                mission: mission,
                 nextMeeting: {
                     description: "Talk about eating pumpkins",
                     startTime: meetingTime

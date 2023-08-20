@@ -1,14 +1,5 @@
 import React, {useCallback, useEffect, useState} from 'react';
 import Button from '@mui/material/Button';
-import GavelIcon from '@mui/icons-material/Gavel';
-import MicIcon from '@mui/icons-material/Mic';
-import AdjournIcon from '@mui/icons-material/DirectionsRun';
-import YieldIcon from '@mui/icons-material/MicOff';
-import VoteAyeIcon from '@mui/icons-material/ThumbUp';
-import VoteNayIcon from '@mui/icons-material/ThumbDown';
-import TimeExpiredIcon from '@mui/icons-material/Timer';
-import SecondIcon from '@mui/icons-material/EmojiPeople';
-import AbstainIcon from '@mui/icons-material/NotInterested';
 import { Modal, ModalBody, ModalHeader, ModalFooter, FormGroup, Input } from 'reactstrap';
 import {MoveResolutionButton} from "./MoveResolutionButton";
 import {GuestLoginComponent} from "./GuestLoginComponent";
@@ -33,39 +24,14 @@ export function Group() {
         setGroup(data);
         setLoading(false);
     }, [groupId]);
-
-    const markAttendance = useCallback(async () => {
-        if (!person) {
-            return;
-        }
-
-        const requestOptions = {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ userId: person.id })
-        };
-        await fetch(`api/group/${groupId}/markattendance`, requestOptions);
-    }, [person, groupId]);
-
-    const getAvailableActions = useCallback(async () => {
-        if (!person) {
-            return;
-        }
-        
-        const response = await fetch(`api/group/${groupId}/action?userId=${person.id}`);
-        const data = await response.json();
-        setActions(data);
-    }, [person, groupId]);
     
     const updateState = useCallback(async () => {
         await populateGroupData();
-        await getAvailableActions();
-    }, [populateGroupData, getAvailableActions]);
+    }, [populateGroupData]);
     
     useEffect(() => {
-        markAttendance();
         updateState();
-    }, [groupId, updateState, markAttendance]);
+    }, [groupId, updateState]);
     
     useEffect(() => {
         // The ID of the interval that is refreshing the state.
@@ -74,111 +40,6 @@ export function Group() {
             clearInterval(intervalId);
         };
     }, [updateState]);
-
-    function renderActions() {
-        return (
-            <div>
-                {actions.includes('Vote') &&
-                    <div>
-                        <div className="mt-3 mb-3">
-                            <Button variant="outlined" startIcon={<VoteAyeIcon />} onClick={() => takeActionVote("Aye")}>
-                                Vote Aye
-                            </Button>
-                        </div>
-                        <div className="mt-3 mb-3">
-                            <Button variant="outlined" startIcon={<VoteNayIcon />} onClick={() => takeActionVote("Nay")}>
-                                Vote Nay
-                            </Button>
-                        </div>
-                        <div className="mt-3 mb-3">
-                            <Button variant="outlined" startIcon={<AbstainIcon />} onClick={() => takeActionVote("Abstain")}>
-                                Abstain from voting
-                            </Button>
-                        </div>
-                    </div>
-                }
-                {actions.includes('CallToOrder') &&
-                    <div className="mt-3 mb-3">
-                        <Button variant="outlined" startIcon={<GavelIcon />} onClick={() => takeAction("calltoorder")}>
-                            Call to order
-                        </Button>
-                    </div>
-                }
-                {actions.includes('DeclareTimeExpired') &&
-                    <div className="mt-3 mb-3">
-                        <Button variant="outlined" startIcon={<TimeExpiredIcon />} onClick={() => takeAction("DeclareTimeExpired")}>
-                            Declare time has expired
-                        </Button>
-                    </div>
-                }
-                {actions.includes('Speak') &&
-                    <div className="mt-3 mb-3">
-                        <Button variant="outlined" startIcon={<MicIcon />} onClick={() => takeAction("speak")}>
-                            Speak
-                        </Button>
-                    </div>
-                }
-                {actions.includes('Yield') &&
-                    <div className="mt-3 mb-3">
-                        <Button variant="outlined" startIcon={<YieldIcon />} onClick={() => takeAction("yield")}>
-                            Yield
-                        </Button>
-                    </div>
-                }
-                {actions.includes('Second') &&
-                    <div className="mt-3 mb-3">
-                        <Button variant="outlined" startIcon={<SecondIcon />} onClick={() => takeAction("second")}>
-                            Second
-                        </Button>
-                    </div>
-                }
-                {actions.includes('Core.Motions.EndDebate') &&
-                    <button className="btn btn-primary" onClick={() => takeAction("moveenddebate")}>Suggest voting now</button>
-                }
-                {actions.includes('Core.Actions.DeclareMotionPassed') &&
-                    <button className="btn btn-primary" onClick={() => takeAction("declaremotionpassed")}>Declare
-                        motion passed</button>
-                }
-                {actions.includes('MoveMainMotion') &&
-                    <NominateChairButton
-                        groupId={groupId}
-                        personId={person.id}
-                        members={group.members}
-                        onSuccess={() => updateState()} />
-                }
-                {actions.includes('MoveMainMotion') &&
-                    <MoveResolutionButton groupId={groupId} personId={person.id} onSuccess={() => updateState()} />
-                }
-                {actions.includes('MoveToAdjourn') &&
-                    <div className="mt-3 mb-3">
-                        <Button variant="outlined" startIcon={<AdjournIcon />} onClick={() => takeAction("movetoadjourn")}>
-                            Move to adjourn
-                        </Button>
-                    </div>
-                }
-            </div>
-        );
-    }
-
-    async function takeAction(action) {
-        const requestOptions = {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ userId: person.id })
-        };
-        await fetch(`api/group/${groupId}/${action}`, requestOptions);
-        await updateState();
-    }
-
-    async function takeActionVote(voteType) {
-        const requestOptions = {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ userId: person.id, voteType: voteType })
-        };
-        await fetch(`api/group/${groupId}/vote`, requestOptions);
-        await updateState();
-    }
 
     async function moveGrantMembership(personId) {
         const requestOptions = {
@@ -213,7 +74,7 @@ export function Group() {
             <div className="card-body">
                 <p className="card-text">{formattedCurrentMeeting}</p>
                 <p className="card-text">{group.currentMeeting.description}</p>
-                <p className="card-text"><Link to={"/group/" + groupId + "/meeting/" + group.currentMeeting.id}>Join Meeting</Link></p>
+                <p className="card-text"><Link to={"/meeting/" + group.currentMeeting.id}>Join Meeting</Link></p>
             </div>);
     }
     
@@ -228,10 +89,8 @@ export function Group() {
                     </div>
                 }
         <div>
+            {group && group.name && <h1>{group.name}</h1>}
             <h1>{group.state}</h1>
-            <div>
-                {renderActions()}
-            </div>
             <div className="card mb-3" style={{maxWidth: "36rem"}}>
                 <div className="card-header">Next Meeting</div>
                 {meetingCardBody}

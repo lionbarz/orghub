@@ -4,6 +4,13 @@ namespace Core
 {
     public class MeetingAttendee
     {
+        /// <summary>
+        /// Who the person is.
+        /// </summary>
+        public Person Person { get; private init; }
+        
+        public AttendeeRole Roles { get; private init; }
+        
         private MeetingAttendee(Person person)
         {
             Person = person;
@@ -13,9 +20,7 @@ namespace Core
         {
             return new MeetingAttendee(person)
             {
-                // TODO: Replace this with a Role variable.
-                IsMember = false,
-                IsChair = false
+                Roles = AttendeeRole.Guest
             };
         }
 
@@ -23,8 +28,7 @@ namespace Core
         {
             return new MeetingAttendee(person)
             {
-                IsMember = true,
-                IsChair = false
+                Roles = AttendeeRole.Member
             };
         }
 
@@ -32,42 +36,13 @@ namespace Core
         {
             return new MeetingAttendee(person)
             {
-                IsMember = true,
-                IsChair = true
+                // Chairs are always members (for now?)
+                // because they are elected from membership.
+                Roles = AttendeeRole.Chair | AttendeeRole.Member
             };
         }
 
-        /// <summary>
-        /// Who the person is.
-        /// </summary>
-        public Person Person { get; private init; }
-
-        /// <summary>
-        /// Is this a voting member?
-        /// </summary>
-        public bool IsMember { get; private set; }
-
-        /// <summary>
-        /// Whether this person is chairing the meeting.
-        /// </summary>
-        public bool IsChair { get; private set; }
-
         public override bool Equals(object? obj) => this.Equals(obj as MeetingAttendee);
-
-        public bool IsGuest => !IsMember && !IsChair;
-
-        public string Title
-        {
-            get
-            {
-                if (IsChair)
-                {
-                    return "Chair";
-                }
-
-                return IsMember ? "Member" : "Guest";
-            }
-        }
         
         public bool Equals(MeetingAttendee? obj)
         {

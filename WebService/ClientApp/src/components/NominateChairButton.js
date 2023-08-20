@@ -9,7 +9,7 @@ export class NominateChairButton extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            nomineeId: this.props.members[0].id,
+            nomineeId: this.props.members[0].id, // TODO: This is null. It needs to query the backend for all members.
             showModal: false, text: ''};
     }
 

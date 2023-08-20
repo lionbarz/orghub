@@ -116,7 +116,7 @@ namespace Core.MeetingStates
         {
             // TODO: Use a timer and only allow if it's really expired.
             
-            if (!actor.IsChair)
+            if (!actor.Roles.HasFlag(AttendeeRole.Chair))
             {
                 explanation = "Only the chair can declare the time as expired.";
                 return false;

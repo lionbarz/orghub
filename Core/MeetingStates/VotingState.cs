@@ -136,7 +136,7 @@ namespace Core.MeetingStates
         {
             // TODO: Have a timer dictate this.
             
-            if (actor.IsChair)
+            if (actor.Roles.HasFlag(AttendeeRole.Chair))
             {
                 explanation = "The chair can declare the time for voting as expired.";
                 return true;
@@ -172,7 +172,7 @@ namespace Core.MeetingStates
 
         protected override bool CanVote(MeetingAttendee actor, out string explanation)
         {
-            if (actor.IsGuest)
+            if (actor.Roles.HasFlag(AttendeeRole.Guest))
             {
                 explanation = "Voting is only open to members.";
                 return false;

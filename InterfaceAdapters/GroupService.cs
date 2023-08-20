@@ -28,6 +28,7 @@ namespace InterfaceAdapters
                 meeting.Description,
                 meeting.Location);
             await _db.AddGroupAsync(group);
+            await _db.AddMeetingAsync(group.CurrentMeeting);
             return ToUxGroup(group);
         }
 

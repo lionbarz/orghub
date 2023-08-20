@@ -64,7 +64,7 @@ export function AddGroup() {
     return (
         <Grid container spacing={2}>
             <Grid item xs={12}>
-            <h1 id="add-group-label">Create group</h1>
+            <h1 id="add-group-label">New group</h1>
             </Grid>
             <Grid item xs={12}>
                 <TextField fullWidth id="outlined-basic" label="Name" variant="outlined" onChange={handleChangeGroupName} />
@@ -73,11 +73,11 @@ export function AddGroup() {
                 <TextField multiline fullWidth id="outlined-basic" label="Mission" variant="outlined" onChange={handleChangeGroupMission} />
             </Grid>
             <Grid item xs={12}>
-                <TextField fullWidth disabled id="outlined-basic" label="Chairperson" variant="outlined" value={person.name} helperText='As the group creator, you will be the temporary chairperson until the group holds an election.'/>
+                <TextField fullWidth disabled id="outlined-basic" label="Chairperson" variant="outlined" value={person.name} helperText='As the group creator, you will be the temporary chairperson until the group elects someone else.'/>
             </Grid>
             <Grid item xs={12}>
                 <p><strong>Members</strong></p>
-                <p>Specify the names of the initial members of the group. Members can be added and removed later by the group.</p>
+                <p>Specify the members of the group. Removing or adding members will require a vote after the group is created.</p>
                 <Grid item xs={12}>
                     <TextField fullWidth id="outlined-basic" label="Name" variant="outlined" value={newGroupMember} onChange={e => setNewGroupMember(e.target.value)} />
                 </Grid>

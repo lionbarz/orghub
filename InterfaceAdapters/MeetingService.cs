@@ -56,7 +56,11 @@ namespace InterfaceAdapters
                 Id = meeting.Id,
                 Description = meeting.Description,
                 StartTime = meeting.StartTime.ToString("o", CultureInfo.InvariantCulture),
-                Location = meeting.Location
+                Location = meeting.Location,
+                State = meeting.State.GetDescription(),
+                StateType = meeting.State.Type.ToString(),
+                Attendees = meeting.Attendees.Select(x => UXMeetingAttendee.FromAttendee(x)),
+                HasQuorum = meeting.HasQuorum()
             };
         }
         

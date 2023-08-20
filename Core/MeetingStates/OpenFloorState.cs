@@ -100,7 +100,7 @@ namespace Core.MeetingStates
         
         protected override bool CanMoveToAdjourn(MeetingAttendee actor, out string explanation)
         {
-            if (actor.IsGuest)
+            if (actor.Roles.HasFlag(AttendeeRole.Guest))
             {
                 explanation = $"{actor.Person.Name} is a guest but only members and the chair can move to adjourn.";
                 return false;
@@ -136,7 +136,7 @@ namespace Core.MeetingStates
 
         protected override bool CanMoveMainMotion(MeetingAttendee actor, out string explanation)
         {
-            if (actor.IsGuest)
+            if (actor.Roles.HasFlag(AttendeeRole.Guest))
             {
                 explanation = $"{actor.Person.Name} is a guest but only members and the chair can move to primary motion.";
                 return false;

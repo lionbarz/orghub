@@ -102,7 +102,7 @@ namespace Core.MeetingStates
 
         protected override bool CanDeclareTimeExpired(MeetingAttendee actor, out string explanation)
         {
-            if (!actor.IsChair)
+            if (!actor.Roles.HasFlag(AttendeeRole.Chair))
             {
                 explanation = "Only the chair can declare the time as expired.";
                 return false;
@@ -120,7 +120,7 @@ namespace Core.MeetingStates
                 return false;
             }
 
-            if (actor.IsGuest)
+            if (actor.Roles.HasFlag(AttendeeRole.Guest))
             {
                 explanation = "Guests cannot second motions.";
                 return false;

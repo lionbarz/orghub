@@ -81,7 +81,7 @@ namespace Core.MeetingStates
         /// </summary>
         protected override bool CanCallToOrder(MeetingAttendee actor, out string explanation)
         {
-            if (!actor.IsChair)
+            if (!actor.Roles.HasFlag(AttendeeRole.Chair))
             {
                 explanation = $"{actor.Person.Name} is not the chair and only the chair can call the meeting to order.";
                 return false;
@@ -138,7 +138,7 @@ namespace Core.MeetingStates
 
         public override string GetDescription()
         {
-            return "The group is adjourned.";
+            return "The meeting is adjourned.";
         }
     }
 }

@@ -11,11 +11,9 @@ export function Home() {
     return (
         <div>
             <div className="px-4 py-5 my-5 text-center">
-                    <h1 className="display-5 fw-bold">Community organizers, this is for you</h1>
+                    <h1 className="display-5 fw-bold">One tool for your community organization or non-profit</h1>
                     <div className="col-lg-6 mx-auto">
-                        <p className="lead mb-4">Organize, raise money, grow, and make a difference with
-                            Parlilly, a quick and easy online service, featuring elections, voting,
-                            meeting minutes, agendas, and much more.</p>
+                        <p className="lead mb-4">Organize, raise money, grow, and make a difference quickly and easily.</p>
                         <div className="d-grid gap-2 d-sm-flex justify-content-sm-center">
                             <button type="button" className="btn btn-primary btn-lg px-4 gap-3" onClick={handleTryItNow}>Try it now
                             </button>
@@ -25,13 +23,13 @@ export function Home() {
             <div className="row align-items-md-stretch">
                 <div className="col-md-4">
                     <div className="h-100 p-5 bg-light border rounded-3">
-                        <h2>Better than WhatsApp</h2>
+                        <h2>What about WhatsApp?</h2>
                         <p>WhatsApp has group admins who stay admins forever. Deliberate Assemblies have leaders who are elected and have terms. It's democratic!</p>
                     </div>
                 </div>
                 <div className="col-md-4">
                     <div className="h-100 p-5 bg-light border rounded-3">
-                        <h2>Better than Zoom</h2>
+                        <h2>What about Zoom?</h2>
                         <p>Zoom meetings are started and ended by one person. During the meeting anything goes and there's no record of what happened. Inclusive meetings can be called by members, attendees can only speak when its their turn, a timer limits speaker times, an agenda is displayed, votes are conducted, minutes are automatically recorded, and they are adjourned by a motion. It's parliamentary!</p>
                     </div>
                 </div>

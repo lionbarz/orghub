@@ -59,7 +59,7 @@ namespace Core
         /// </summary>
         public bool HasQuorum()
         {
-            var numCanVote = Attendees.Count(x => x.IsMember);
+            var numCanVote = Attendees.Count(x => x.Roles.HasFlag(AttendeeRole.Member));
             var numberRequired = Group.Bylaws.MeetingQuorum.GetQuorumNumber(Group.Members.Count);   
             return numCanVote >= numberRequired;
         }
@@ -69,7 +69,7 @@ namespace Core
             Id = Guid.NewGuid();
             Description = description;
             StartTime = startTime;
-            Attendees = new List<MeetingAttendee>();
+            Attendees = new HashSet<MeetingAttendee>();
             Location = location;
             State = new StateManager(group);
             Group = group;
