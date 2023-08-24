@@ -3,12 +3,12 @@ import { Card, CardBody, CardText } from 'reactstrap';
 import {Link} from "react-router-dom";
 import usePerson from "../usePerson";
 import {GuestLoginComponent} from "./GuestLoginComponent";
+import { useHistory } from "react-router-dom";
 
 export function Groups() {
+    const history = useHistory();
     const [groups, setGroups] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [name, setName] = useState('New group');
-    const [mission, setMission] = useState('New group mission');
     const {person, addPerson} = usePerson();
 
     async function populateGroupData() {
@@ -18,23 +18,8 @@ export function Groups() {
         setGroups(data);
     }
 
-    async function addGroup() {
-        const meetingTime = (new Date()).toISOString();
-        const requestOptions = {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({
-                personId: person.id,
-                name: name,
-                mission: mission,
-                nextMeeting: {
-                    description: "Talk about eating pumpkins",
-                    startTime: meetingTime
-                }
-            })
-        };
-        await fetch('api/group', requestOptions);
-        await populateGroupData();
+    async function handleAddGroup() {
+        history.push('/add-group');
     }
     
     useEffect(() => {
@@ -51,14 +36,8 @@ export function Groups() {
     return (
         <div>
             <h1 id="tabelLabel">Groups</h1>
-            {person &&
-                <button className="btn btn-primary mb-3" onClick={() => addGroup()}>Create Group</button>
-            }
-            {!person && <div>
-                <p>Sign in to create a group.</p>
-                <GuestLoginComponent person={person} addPerson={addPerson} />
-            </div>}
             <div>
+                {groups.length === 0 && <p>There are no groups yet.</p>}
                 {groups.map(group =>
                     <Card key={group.id}>
                         <CardBody>
@@ -70,6 +49,7 @@ export function Groups() {
                     </Card>
                 )}
             </div>
+            <button className="btn btn-primary mb-3" onClick={() => handleAddGroup()}>Create a new group</button>
         </div>
     );
 }

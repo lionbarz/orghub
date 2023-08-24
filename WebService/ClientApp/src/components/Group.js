@@ -1,9 +1,7 @@
 import React, {useCallback, useEffect, useState} from 'react';
 import Button from '@mui/material/Button';
 import { Modal, ModalBody, ModalHeader, ModalFooter, FormGroup, Input } from 'reactstrap';
-import {MoveResolutionButton} from "./MoveResolutionButton";
 import {GuestLoginComponent} from "./GuestLoginComponent";
-import {NominateChairButton} from "./NominateChairButton";
 import {Link, useParams} from "react-router-dom";
 import usePerson from "../usePerson";
 import moment from "moment";
