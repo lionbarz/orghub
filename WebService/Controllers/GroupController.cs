@@ -38,6 +38,7 @@ public class GroupController : ControllerBase
             Guid.Parse(request.PersonId),
             request.Name,
             request.Mission,
-            request.NextMeeting);
+            request.NextMeeting,
+            request.MemberEmails);
     }
 }

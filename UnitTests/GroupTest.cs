@@ -12,8 +12,8 @@ namespace UnitTests
         [TestMethod]
         public void GroupAttendance()
         {
-            var mo = new Person("Mo");
-            var roni = new Person("Roni");
+            var mo = new Person("Mo", "mo@gmail.com");
+            var roni = new Person("Roni", "roni@gmail.com");
             var group = Group.NewInstance(mo, "Alliance for Lebanese Reform", "Defeating the corrupt Lebanese warlords that are controlling the country.");
             Assert.IsFalse(group.IsMember(roni.Id));
             Assert.IsTrue(group.IsMember(mo.Id));

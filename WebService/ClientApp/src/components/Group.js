@@ -110,7 +110,7 @@ export function Group() {
             <div className="card mb-3" style={{maxWidth: "36rem"}}>
                 <div className="card-header">Members</div>
                 <div className="card-body">
-                    {group.members.map(member => <p key={member.id} className="card-text">{member.name}</p>)}
+                    {group.members.map(member => <p key={member.id} className="card-text">{member.name ?? member.email}</p>)}
                 </div>
             </div>
             <div className="card mb-3" style={{maxWidth: "36rem"}}>

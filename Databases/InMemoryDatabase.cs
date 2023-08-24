@@ -15,6 +15,7 @@ namespace Databases
     {
         private readonly Dictionary<Guid, Group> _groupDict = new();
         private readonly Dictionary<Guid, Person> _personDict = new();
+        private readonly Dictionary<string, Person> _personEmailDict = new();
         private readonly Dictionary<Guid, Meeting> _meetingDict = new();
 
         public Task AddGroupAsync(Group group)
@@ -41,12 +42,18 @@ namespace Databases
         public Task AddPersonAsync(Person person)
         {
             _personDict[person.Id] = person;
+            _personEmailDict[person.Email] = person;
             return Task.CompletedTask;
         }
 
         public Task<Person> GetPersonAsync(Guid personId)
         {
             return Task.FromResult(_personDict[personId]);
+        }
+
+        public Task<bool> TryGetPersonByEmailAsync(string email, out Person person)
+        {
+            return Task.FromResult(_personEmailDict.TryGetValue(email, out person));
         }
 
         public async Task<IEnumerable<Person>> GetPersonsAsync()

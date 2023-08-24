@@ -13,12 +13,12 @@ namespace InterfaceAdapters.Models
         /// <summary>
         /// The people in this group.
         /// </summary>
-        public IEnumerable<UXPerson> Members { get; set; }
+        public IEnumerable<UxPerson> Members { get; set; }
         
         /// <summary>
         /// The person chairing the group.
         /// </summary>
-        public UXPerson Chair { get; set; }
+        public UxPerson Chair { get; set; }
 
         /// <summary>
         /// All resolutions passed by the group.

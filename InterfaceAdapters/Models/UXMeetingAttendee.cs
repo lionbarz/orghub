@@ -7,7 +7,7 @@ namespace InterfaceAdapters.Models
         /// <summary>
         /// The person attending.
         /// </summary>
-        public UXPerson Person { get; set; }
+        public UxPerson Person { get; set; }
         
         /// <summary>
         /// The role of this attendee.
@@ -18,7 +18,7 @@ namespace InterfaceAdapters.Models
         {
             return new UXMeetingAttendee()
             {
-                Person = PersonService.ToUXPerson(attendee.Person),
+                Person = PersonService.ToUxPerson(attendee.Person),
                 Roles = attendee.Roles
             };
         }

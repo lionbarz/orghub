@@ -27,4 +27,9 @@ public class AddGroupRequest
     /// The group's stated mission.
     /// </summary>
     public string Mission { get; set; }
+    
+    /// <summary>
+    /// The emails of the members of the group.
+    /// </summary>
+    public IEnumerable<string> MemberEmails { get; set; }
 }

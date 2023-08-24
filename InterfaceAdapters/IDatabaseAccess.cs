@@ -15,6 +15,7 @@ namespace InterfaceAdapters
         
         Task AddPersonAsync(Person person);
         Task<Person> GetPersonAsync(Guid personId);
+        Task<bool> TryGetPersonByEmailAsync(string email, out Person person);
         Task<IEnumerable<Person>> GetPersonsAsync();
 
         Task AddMeetingAsync(Meeting meeting);

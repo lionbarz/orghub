@@ -18,21 +18,21 @@ public class PersonController : ControllerBase
     
     [HttpPost]
     [Route("api/person/addPerson")]
-    public async Task<UXPerson> AddPerson(AddPersonRequest request)
+    public async Task<UxPerson> AddPerson(AddPersonRequest request)
     {
-        return await _personService.AddPerson(request.UserName);
+        return await _personService.AddPerson(request.UserName, request.Email);
     }
     
     [HttpGet]
     [Route("api/person")]
-    public async Task<IEnumerable<UXPerson>> GetPersons()
+    public async Task<IEnumerable<UxPerson>> GetPersons()
     {
         return await _personService.GetPersons();
     }
     
     [HttpGet]
     [Route("api/person/{id}")]
-    public async Task<UXPerson> GetPersons(string id)
+    public async Task<UxPerson> GetPersons(string id)
     {
         return await _personService.GetPersonAsync(Guid.Parse(id));
     }

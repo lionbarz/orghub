@@ -2,7 +2,7 @@
 
 namespace InterfaceAdapters.Models
 {
-    public class UXPerson
+    public class UxPerson
     {
         /// <summary>
         /// Id of this person.
@@ -13,5 +13,10 @@ namespace InterfaceAdapters.Models
         /// Full name of the person.
         /// </summary>
         public string Name { get; set; }
+
+        /// <summary>
+        /// Email of the person.
+        /// </summary>
+        public string Email { get; set; }
     }
 }

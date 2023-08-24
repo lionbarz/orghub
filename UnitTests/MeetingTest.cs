@@ -12,8 +12,8 @@ namespace UnitTests
         [TestMethod]
         public void ElectChair()
         {
-            var mo = new Person("Mo");
-            var omar = new Person("Omar");
+            var mo = new Person("Mo", "mo@gmail.com");
+            var omar = new Person("Omar", "omar@gmail.com");
             var group = Group.NewInstance(mo, "Lebanese-American Union", "Reform Lebanon", new List<Person>() { omar });
             group.AddMember(omar);
             var meeting = Meeting.NewInstance(group, DateTimeOffset.Now, "talknstuff", "online");
@@ -37,8 +37,8 @@ namespace UnitTests
         [TestMethod]
         public void TestHasQuorum()
         {
-            var mo = new Person("Mo");
-            var omar = new Person("Omar");
+            var mo = new Person("Mo", "mo@gmail.com");
+            var omar = new Person("Omar", "omar@gmail.com");
             var group = Group.NewInstance(mo, "Lebanese-Americans For Change", "Reform Lebanon", new List<Person>() { omar });
             group.AddMember(omar);
             var meeting = Meeting.NewInstance(group, DateTimeOffset.Now, "talknstuff", "online");
@@ -53,7 +53,7 @@ namespace UnitTests
         [TestMethod]
         public void TestHasQuorumWithChair()
         {
-            var mo = new Person("Mo");
+            var mo = new Person("Mo", "mo@gmail.com");
             var group = Group.NewInstance(mo, "Lebanese-Americans For Change", "Reform Lebanon");
             var meeting = Meeting.NewInstance(group, DateTimeOffset.Now, "talknstuff", "online");
             meeting.AddAttendee(mo);
@@ -63,8 +63,8 @@ namespace UnitTests
         [TestMethod]
         public void TestNoQuorum()
         {
-            var mo = new Person("Mo");
-            var omar = new Person("Omar");
+            var mo = new Person("Mo", "mo@gmail.com");
+            var omar = new Person("Omar", "omar@gmail.com");
             var group = Group.NewInstance(mo, "Lebanese-Americans For Change", "Reform Lebanon", new List<Person>() { omar });
             group.AddMember(omar);
             var meeting = Meeting.NewInstance(group, DateTimeOffset.Now, "talknstuff", "online");
@@ -75,8 +75,8 @@ namespace UnitTests
         [TestMethod]
         public void TestAttendance()
         {
-            var mo = new Person("Mo");
-            var omar = new Person("Omar");
+            var mo = new Person("Mo", "mo@gmail.com");
+            var omar = new Person("Omar", "omar@gmail.com");
             var group = Group.NewInstance(mo, "Lebanese-Americans For Change", "Reform Lebanon", new List<Person>() { omar });
             group.AddMember(omar);
             var meeting = Meeting.NewInstance(group, DateTimeOffset.Now, "talknstuff", "online");

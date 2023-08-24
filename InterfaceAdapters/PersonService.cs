@@ -16,31 +16,46 @@ namespace InterfaceAdapters
             _database = database;
         }
 
-        public async Task<UXPerson> AddPerson(string name)
+        public async Task<UxPerson> AddPerson(string name, string email)
         {
-            var person = new Person(name);
+            // Check if a person with the same email already exists.
+            if (await _database.TryGetPersonByEmailAsync(email, out Person existingPerson))
+            {
+                if (string.IsNullOrEmpty(existingPerson.Name))
+                {
+                    // Update the name in the database.
+                    existingPerson.Name = name;
+                    await _database.AddPersonAsync(existingPerson);
+                }
+                
+                return ToUxPerson(existingPerson);
+            }
+            
+            var person = new Person(name, email);
             await _database.AddPersonAsync(person);
-            return ToUXPerson(person);
+            return ToUxPerson(person);
         }
 
-        public async Task<UXPerson> GetPersonAsync(Guid id)
+        public async Task<UxPerson> GetPersonAsync(Guid id)
         {
             var person = await _database.GetPersonAsync(id);
-            return ToUXPerson(person);
+            return ToUxPerson(person);
         }
 
-        public async Task<IEnumerable<UXPerson>> GetPersons()
+        public async Task<IEnumerable<UxPerson>> GetPersons()
         {
             var people = await _database.GetPersonsAsync();
-            return people.Select(ToUXPerson);
+            return people.Select(ToUxPerson);
         }
 
-        public static UXPerson ToUXPerson(Person person)
+        public static UxPerson ToUxPerson(Person person)
         {
-            return new UXPerson()
+            return new UxPerson()
             {
                 Id = person.Id,
-                Name = person.Name
+                Name = person.Name,
+                // TODO: Don't send everyone's emails to the frontend.
+                Email = person.Email
             };
         }
     }

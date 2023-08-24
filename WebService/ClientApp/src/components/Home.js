@@ -5,7 +5,7 @@ export function Home() {
     const history = useHistory();
     
     function handleTryItNow() {
-        history.push('/add-mass-meeting');
+        history.push('/add-group');
     }
     
     return (
@@ -57,6 +57,15 @@ export function Home() {
                         <p>Knowledge is power, and transparency empowers your members.
                             Parlilly automatically records basic meeting minutes and makes it easy to see
                             the group's officers, members, agenda, decisions, and more.</p>
+                    </div>
+                </div>
+                <div className="col-md-4">
+                    <div className="h-100 p-5 bg-light border rounded-3">
+                        <h2>Diversity</h2>
+                        <p>The strongest organizations are diverse. Make sure that your
+                        group is diverse and prove that it's diverse by having a dashboard
+                        that shows that your group is made up of people all categories
+                        that your organization defines as important.</p>
                     </div>
                 </div>
             </div>

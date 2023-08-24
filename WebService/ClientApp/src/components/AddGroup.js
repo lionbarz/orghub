@@ -13,7 +13,7 @@ import Button from "@mui/material/Button";
 export function AddGroup() {
     const [groupName, setGroupName] = useState('');
     const [groupMission, setGroupMission] = useState('');
-    const [groupMembers, setGroupMembers] = useState([]);
+    const [memberEmails, setMemberEmails] = useState([]);
     const [newGroupMember, setNewGroupMember] = useState('');
     const {person, addPerson} = usePerson();
 
@@ -26,8 +26,8 @@ export function AddGroup() {
     }
     
     function handleAddMember() {
-        setGroupMembers([
-            ...groupMembers,
+        setMemberEmails([
+            ...memberEmails,
             newGroupMember
         ])
         setNewGroupMember('');
@@ -40,7 +40,7 @@ export function AddGroup() {
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({
                 personId: person.id,
-                members: groupMembers,
+                memberEmails: memberEmails,
                 name: groupName,
                 mission: groupMission,
                 nextMeeting: {
@@ -55,7 +55,7 @@ export function AddGroup() {
     if (!person) {
         return (
             <div>
-                <p>Sign in to create a group.</p>
+                <h1>Sign in to create a group</h1>
                 <GuestLoginComponent person={person} addPerson={addPerson} />
             </div>
         );
@@ -79,11 +79,11 @@ export function AddGroup() {
                 <p><strong>Members</strong></p>
                 <p>Specify the members of the group. Removing or adding members will require a vote after the group is created.</p>
                 <Grid item xs={12}>
-                    <TextField fullWidth id="outlined-basic" label="Name" variant="outlined" value={newGroupMember} onChange={e => setNewGroupMember(e.target.value)} />
+                    <TextField fullWidth id="outlined-basic" label="Email" variant="outlined" value={newGroupMember} onChange={e => setNewGroupMember(e.target.value)} />
                 </Grid>
                 <Button variant="contained" onClick={() => handleAddMember()}>Add member</Button>
                 <List sx={{ width: '100%', maxWidth: 360, bgcolor: 'background.paper' }}>
-                    {groupMembers.map(member =>
+                    {memberEmails.map(member =>
                         <ListItem key={member}>
                             <ListItemAvatar>
                                 <Avatar>

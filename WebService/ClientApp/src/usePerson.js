@@ -5,11 +5,11 @@ export default function usePerson() {
     const {token, setToken} = useToken();
     const [person, setPerson] = useState(null);
     
-    async function savePerson(name) {
+    async function createPerson(name, email) {
         const requestOptions = {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ userName: name })
+            body: JSON.stringify({ userName: name, email: email })
         };
         const response = await fetch('api/person/addPerson', requestOptions);
         const person = await response.json();
@@ -42,7 +42,7 @@ export default function usePerson() {
     }, [token]);
 
     return {
-        addPerson: savePerson,
+        addPerson: createPerson,
         person
     }
 }

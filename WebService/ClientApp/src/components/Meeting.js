@@ -201,7 +201,7 @@ export function Meeting() {
                 <div className="card-body">
                     {meeting.attendees
                         .filter(attendee => attendee.roles & AttendeeRole.chair)
-                        .map(attendee => <p key={attendee.id} className="card-text">{attendee.person.name}</p>)}
+                        .map(attendee => <p key={attendee.id} className="card-text">{attendee.person.name ?? attendee.person.email}</p>)}
                 </div>
             </div>
             <div className="card mb-3" style={{maxWidth: "36rem"}}>
@@ -209,7 +209,7 @@ export function Meeting() {
                 <div className="card-body">
                     {meeting.attendees
                         .filter(attendee => attendee.roles & AttendeeRole.member)
-                        .map(attendee => <p key={attendee.id} className="card-text">{attendee.person.name}</p>)}
+                        .map(attendee => <p key={attendee.id} className="card-text">{attendee.person.name ?? attendee.person.email}</p>)}
                 </div>
             </div>
             <div className="card mb-3" style={{maxWidth: "36rem"}}>
@@ -217,7 +217,7 @@ export function Meeting() {
                 <div className="card-body">
                     {meeting.attendees
                         .filter(attendee => attendee.roles & AttendeeRole.guest)
-                        .map(attendee => <p key={attendee.id} className="card-text">{attendee.person.name}</p>)}
+                        .map(attendee => <p key={attendee.id} className="card-text">{attendee.person.name ?? attendee.person.email}</p>)}
                 </div>
             </div>
         </div>
