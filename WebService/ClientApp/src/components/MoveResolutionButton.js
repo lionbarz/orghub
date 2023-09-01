@@ -8,7 +8,7 @@ export class MoveResolutionButton extends Component {
 
     constructor(props) {
         super(props);
-        this.state = { groupId: props.groupId, showModal: false, text: ''};
+        this.state = { meetingId: props.meetingId, showModal: false, text: ''};
     }
 
     showModal = async () => {
@@ -41,7 +41,7 @@ export class MoveResolutionButton extends Component {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ text: text, userId: this.props.personId })
         };
-        let response = await fetch(`api/group/${this.props.groupId}/moveresolution`, requestOptions);
+        let response = await fetch(`api/meeting/${this.props.meetingId}/moveresolution`, requestOptions);
         return response.ok;
     }
 

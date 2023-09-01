@@ -9,8 +9,10 @@ import ListItemAvatar from '@mui/material/ListItemAvatar';
 import Avatar from '@mui/material/Avatar';
 import PersonIcon from '@mui/icons-material/Person';
 import Button from "@mui/material/Button";
+import {useHistory} from "react-router-dom";
 
 export function AddGroup() {
+    const history = useHistory();
     const [groupName, setGroupName] = useState('');
     const [groupMission, setGroupMission] = useState('');
     const [memberEmails, setMemberEmails] = useState([]);
@@ -49,7 +51,23 @@ export function AddGroup() {
                 }
             })
         };
-        await fetch('api/group', requestOptions);
+        
+        let newGroupId = undefined;
+        
+        try {
+            const response = await fetch('api/group', requestOptions);
+            const newGroup = await response.json();
+            newGroupId = newGroup.id;
+        } catch (e) {
+            alert('Failed to create group! ' + e);
+        }
+
+        if (!newGroupId) {
+            // TODO: Handle this better.
+            alert('New group created but no ID was found.');
+        } else {
+            history.push('/group/' + newGroupId);
+        }
     }
     
     if (!person) {

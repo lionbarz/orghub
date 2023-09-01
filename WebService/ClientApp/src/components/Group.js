@@ -9,7 +9,6 @@ import moment from "moment";
 export function Group() {
     const [group, setGroup] = useState(null);
     const [loading, setLoading] = useState(true);
-    const [actions, setActions] = useState([]);
     const [showMembershipModal, setShowMembershipModal] = useState(false);
     const [allPeople] = useState([]);
     const [selectedPersonId, setSelectedPersonId] = useState(null);
@@ -57,8 +56,6 @@ export function Group() {
         let personId = event.target.value;
         setSelectedPersonId(personId);
     }
-
-    const meetingTimeInFuture = true;
     
     let meetingCardBody = (
         <div className="card-body">
@@ -112,7 +109,7 @@ export function Group() {
                 </div>
             </div>
             <div className="card mb-3" style={{maxWidth: "36rem"}}>
-                <div className="card-header">Decisions made</div>
+                <div className="card-header">Resolutions</div>
                 <div className="card-body">
                     <ul>
                         {group.resolutions.map(text => <li key={text} className="card-text">{text}</li>)}

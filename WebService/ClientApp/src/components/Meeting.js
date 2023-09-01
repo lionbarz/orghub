@@ -14,6 +14,7 @@ import {NominateChairButton} from "./NominateChairButton";
 import {MoveResolutionButton} from "./MoveResolutionButton";
 import AdjournIcon from "@mui/icons-material/DirectionsRun";
 import {AttendeeRole} from "./AttendeeRole";
+import {GuestLoginComponent} from "./GuestLoginComponent";
 
 export function Meeting() {
     const {meetingId} = useParams();
@@ -186,6 +187,12 @@ export function Meeting() {
     
     return (
         <div>
+            {!person &&
+                <div>
+                    <h1>Sign in to attend the meeting.</h1>
+                    <GuestLoginComponent person={person} addPerson={addPerson} />
+                </div>
+            }
             <h1>{meeting.state}</h1>
             <div>
                 {renderActions()}

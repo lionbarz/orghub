@@ -1,15 +1,12 @@
 import React, {useEffect, useState} from 'react';
 import { Card, CardBody, CardText } from 'reactstrap';
 import {Link} from "react-router-dom";
-import usePerson from "../usePerson";
-import {GuestLoginComponent} from "./GuestLoginComponent";
 import { useHistory } from "react-router-dom";
 
 export function Groups() {
     const history = useHistory();
     const [groups, setGroups] = useState([]);
     const [loading, setLoading] = useState(true);
-    const {person, addPerson} = usePerson();
 
     async function populateGroupData() {
         const response = await fetch('api/group');
