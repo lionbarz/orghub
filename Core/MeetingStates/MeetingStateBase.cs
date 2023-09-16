@@ -7,7 +7,7 @@ namespace Core.MeetingStates
 {
     public abstract class MeetingStateBase : IMeetingState
     {
-        public abstract State Type { get; }
+        public abstract StateType Type { get; }
         public abstract IMeetingState CallMeetingToOrder(MeetingAttendee actor);
         public abstract IMeetingState DeclareTimeExpired(MeetingAttendee actor);
         public abstract IMeetingState MoveToAdjourn(MeetingAttendee actor);

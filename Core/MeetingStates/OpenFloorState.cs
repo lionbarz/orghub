@@ -1,4 +1,5 @@
 ﻿using System;
+using Core.Meetings;
 using Core.Motions;
 
 namespace Core.MeetingStates
@@ -9,18 +10,21 @@ namespace Core.MeetingStates
     /// </summary>
     public class OpenFloorState : MeetingStateBase
     {
-        public override State Type => State.OpenFloor;
+        public override StateType Type => StateType.OpenFloor;
         
         private IGroupModifier GroupModifier { get; }
+        
+        private MeetingAgenda Agenda { get; }
 
-        private OpenFloorState(IGroupModifier groupModifier)
+        private OpenFloorState(IGroupModifier groupModifier, MeetingAgenda agenda)
         {
             GroupModifier = groupModifier;
+            Agenda = agenda;
         }
 
-        public static OpenFloorState InstanceOf(IGroupModifier groupModifier)
+        public static OpenFloorState InstanceOf(IGroupModifier groupModifier, MeetingAgenda agenda)
         {
-            return new OpenFloorState(groupModifier);
+            return new OpenFloorState(groupModifier, agenda);
         }
 
         public override IMeetingState CallMeetingToOrder(MeetingAttendee actor)
@@ -58,7 +62,7 @@ namespace Core.MeetingStates
             GroupModifier.RecordMinute($"{actor.Person.Name} moves to adjourn the meeting.");
             var motion = new Adjourn(actor.Person);
             var motionChain = MotionChain.FromMotion(motion);
-            return new MotionProposed(GroupModifier, actor.Person, motionChain);
+            return new MotionProposed(GroupModifier, actor.Person, motionChain, Agenda);
         }
 
         public override IMeetingState MoveMainMotion(MeetingAttendee actor, IMainMotion motion)
@@ -69,7 +73,7 @@ namespace Core.MeetingStates
             }
             
             GroupModifier.RecordMinute($"{actor.Person.Name} moves {motion.GetText()}.");
-            return new MotionProposed(GroupModifier, actor.Person, MotionChain.FromMotion(motion));
+            return new MotionProposed(GroupModifier, actor.Person, MotionChain.FromMotion(motion), Agenda);
         }
 
         public override IMeetingState Speak(MeetingAttendee actor)
@@ -80,7 +84,7 @@ namespace Core.MeetingStates
             }
             
             GroupModifier.RecordMinute($"{actor.Person.Name} takes the floor.");
-            return new SpeakerHasFloorState(GroupModifier, actor.Person);
+            return new SpeakerHasFloorState(GroupModifier, actor.Person, Agenda);
         }
 
         public override IMeetingState Vote(MeetingAttendee actor, VoteType type)

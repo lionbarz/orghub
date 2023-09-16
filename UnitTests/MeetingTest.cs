@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Core;
+using Core.Meetings;
 using Core.Motions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -16,7 +17,7 @@ namespace UnitTests
             var omar = new Person("Omar", "omar@gmail.com");
             var group = Group.NewInstance(mo, "Lebanese-American Union", "Reform Lebanon", new List<Person>() { omar });
             group.AddMember(omar);
-            var meeting = Meeting.NewInstance(group, DateTimeOffset.Now, "talknstuff", "online");
+            var meeting = Meeting.NewInstance(group, DateTimeOffset.Now, "talknstuff", "online", MeetingAgenda.EmptyAgenda());
             var moAttendee = meeting.AddAttendee(mo);
             var omarAttendee = meeting.AddAttendee(omar);
             
@@ -41,7 +42,7 @@ namespace UnitTests
             var omar = new Person("Omar", "omar@gmail.com");
             var group = Group.NewInstance(mo, "Lebanese-Americans For Change", "Reform Lebanon", new List<Person>() { omar });
             group.AddMember(omar);
-            var meeting = Meeting.NewInstance(group, DateTimeOffset.Now, "talknstuff", "online");
+            var meeting = Meeting.NewInstance(group, DateTimeOffset.Now, "talknstuff", "online", MeetingAgenda.EmptyAgenda());
             meeting.AddAttendee(mo);
             meeting.AddAttendee(omar);
             Assert.IsTrue(meeting.HasQuorum());
@@ -55,7 +56,7 @@ namespace UnitTests
         {
             var mo = new Person("Mo", "mo@gmail.com");
             var group = Group.NewInstance(mo, "Lebanese-Americans For Change", "Reform Lebanon");
-            var meeting = Meeting.NewInstance(group, DateTimeOffset.Now, "talknstuff", "online");
+            var meeting = Meeting.NewInstance(group, DateTimeOffset.Now, "talknstuff", "online", MeetingAgenda.EmptyAgenda());
             meeting.AddAttendee(mo);
             Assert.IsTrue(meeting.HasQuorum());
         }
@@ -67,7 +68,7 @@ namespace UnitTests
             var omar = new Person("Omar", "omar@gmail.com");
             var group = Group.NewInstance(mo, "Lebanese-Americans For Change", "Reform Lebanon", new List<Person>() { omar });
             group.AddMember(omar);
-            var meeting = Meeting.NewInstance(group, DateTimeOffset.Now, "talknstuff", "online");
+            var meeting = Meeting.NewInstance(group, DateTimeOffset.Now, "talknstuff", "online", MeetingAgenda.EmptyAgenda());
             meeting.AddAttendee(mo);
             Assert.IsFalse(meeting.HasQuorum());
         }
@@ -79,7 +80,7 @@ namespace UnitTests
             var omar = new Person("Omar", "omar@gmail.com");
             var group = Group.NewInstance(mo, "Lebanese-Americans For Change", "Reform Lebanon", new List<Person>() { omar });
             group.AddMember(omar);
-            var meeting = Meeting.NewInstance(group, DateTimeOffset.Now, "talknstuff", "online");
+            var meeting = Meeting.NewInstance(group, DateTimeOffset.Now, "talknstuff", "online", MeetingAgenda.EmptyAgenda());
             meeting.AddAttendee(mo);
             meeting.AddAttendee(mo);
             meeting.AddAttendee(mo);

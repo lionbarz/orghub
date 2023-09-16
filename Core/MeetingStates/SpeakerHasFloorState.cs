@@ -1,11 +1,12 @@
 ﻿using System;
+using Core.Meetings;
 using Core.Motions;
 
 namespace Core.MeetingStates
 {
     public class SpeakerHasFloorState : MeetingStateBase
     {
-        public override State Type => State.SpeakerHasFloor;
+        public override StateType Type => StateType.SpeakerHasFloor;
         
         // The speaker who has the floor.
         private Person Speaker { get; }
@@ -19,18 +20,22 @@ namespace Core.MeetingStates
         
         // Need it to pass to other states.
         private IGroupModifier GroupModifier { get; }
+        
+        private MeetingAgenda Agenda { get; }
 
-        public SpeakerHasFloorState(IGroupModifier groupModifier, Person speaker)
+        public SpeakerHasFloorState(IGroupModifier groupModifier, Person speaker, MeetingAgenda agenda)
         {
             Speaker = speaker;
             GroupModifier = groupModifier;
+            Agenda = agenda;
         }
         
-        public SpeakerHasFloorState(IGroupModifier groupModifier, Person speaker, MotionChain motionChain)
+        public SpeakerHasFloorState(IGroupModifier groupModifier, Person speaker, MotionChain motionChain, MeetingAgenda agenda)
         {
             Speaker = speaker;
             MotionChain = motionChain;
             GroupModifier = groupModifier;
+            Agenda = agenda;
         }
 
         public override IMeetingState CallMeetingToOrder(MeetingAttendee actor)
@@ -47,8 +52,8 @@ namespace Core.MeetingStates
             
             GroupModifier.RecordMinute($"{actor.Person.Name}'s time on the floor is expired.");
             return MotionChain == null
-                ? OpenFloorState.InstanceOf(GroupModifier)
-                : new DebateState(GroupModifier, MotionChain);
+                ? OpenFloorState.InstanceOf(GroupModifier, Agenda)
+                : new DebateState(GroupModifier, MotionChain, Agenda);
         }
 
         public override IMeetingState MoveMainMotion(MeetingAttendee actor, IMainMotion motion)
@@ -81,8 +86,8 @@ namespace Core.MeetingStates
             GroupModifier.RecordMinute($"{actor.Person.Name} yields the floor.");
             
             return MotionChain == null
-                ? OpenFloorState.InstanceOf(GroupModifier)
-                : new DebateState(GroupModifier, MotionChain);
+                ? OpenFloorState.InstanceOf(GroupModifier, Agenda)
+                : new DebateState(GroupModifier, MotionChain, Agenda);
         }
 
         public override IMeetingState MoveToAdjourn(MeetingAttendee actor)

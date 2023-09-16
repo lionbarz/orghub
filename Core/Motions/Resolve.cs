@@ -16,7 +16,7 @@ namespace Core.Motions
 
         public string GetText()
         {
-            return $"adopt resolution: \"{Resolution}\"";
+            return $"to adopt resolution: \"{Resolution}\"";
         }   
 
         public Task TakeActionAsync(IGroupModifier groupModifier)

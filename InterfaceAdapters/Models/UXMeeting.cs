@@ -47,5 +47,10 @@ namespace InterfaceAdapters.Models
         /// a quorum according to the bylaws of the organization.
         /// </summary>
         public bool HasQuorum { get; set; }
+        
+        /// <summary>
+        /// What's on the agenda for this meeting.
+        /// </summary>
+        public IEnumerable<UxAgendaItem> Agenda { get; set; }
     }
 }

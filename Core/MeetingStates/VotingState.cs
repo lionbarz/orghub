@@ -1,26 +1,30 @@
 ﻿using System.Linq;
+using Core.Meetings;
 using Core.Motions;
 
 namespace Core.MeetingStates
 {
     public class VotingState : MeetingStateBase
     {
-        public override State Type => State.Voting;
+        public override StateType Type => StateType.Voting;
         
         private YesNoBallotBox BallotBox { get; }
         
-        private MotionChain MotionChain { get; init; }
+        private MotionChain MotionChain { get; }
+        
+        private MeetingAgenda Agenda { get; }
         
         /// <summary>
         /// Can be used to set group properties.
         /// </summary>
         private IGroupModifier GroupModifier { get; }
         
-        public VotingState(IGroupModifier groupModifier, MotionChain motionChain)
+        public VotingState(IGroupModifier groupModifier, MotionChain motionChain, MeetingAgenda agenda)
         {
             BallotBox = new YesNoBallotBox();
             GroupModifier = groupModifier;
             MotionChain = motionChain;
+            Agenda = agenda;
         }
 
         public override IMeetingState CallMeetingToOrder(MeetingAttendee actor)
@@ -53,13 +57,13 @@ namespace Core.MeetingStates
                     GroupModifier.RecordMinute(
                         $"The motion to end debate and vote on {MotionChain.Previous.Last().GetText()} is carried.");
                     // The vote was on ending debate, so the next thing is to vote on the main motion.
-                    return new VotingState(GroupModifier, MotionChain.Pop());
+                    return new VotingState(GroupModifier, MotionChain.Pop(), Agenda);
                 }
 
                 if (MotionChain.Current is Adjourn)
                 {
                     GroupModifier.RecordMinute($"The motion to adjourn is carried.");
-                    return new AdjournedState(GroupModifier);
+                    return new AdjournedState(GroupModifier, Agenda);
                 }
             }
             else
@@ -67,10 +71,23 @@ namespace Core.MeetingStates
                 GroupModifier.RecordMinute(
                     $"The motion {MotionChain.Current.GetText()} didn't get enough votes and is dropped.");
             }
+
+            // TODO: Centralize this logic. It's the same as in MotionProposed.
             
-            return MotionChain.Previous.Any()
-                ? new DebateState(GroupModifier, MotionChain.Pop())
-                : OpenFloorState.InstanceOf(GroupModifier);
+            if (MotionChain.Previous.Any())
+            {
+                // There was a previous motion, so go back to debating it.
+                return new DebateState(GroupModifier, MotionChain.Pop(), Agenda);
+            }
+            
+            // If there is something next on the agenda, do it.
+            if (Agenda.MoveToNextItem(out var nextItem))
+            {
+                return StateFactory.FromAgendaItem(nextItem, GroupModifier, Agenda);
+            }
+            
+            // No agenda items, so open the floor.
+            return OpenFloorState.InstanceOf(GroupModifier, Agenda);
         }
 
         public override IMeetingState MoveMainMotion(MeetingAttendee actor, IMainMotion motion)

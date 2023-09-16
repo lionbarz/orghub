@@ -5,7 +5,7 @@ namespace Core.MeetingStates
     /// frontend so it can customize view based on the
     /// current state.
     /// </summary>
-    public enum State
+    public enum StateType
     {
         Adjourned,
         Debate,

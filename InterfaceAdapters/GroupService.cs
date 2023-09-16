@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Core;
-using Core.Motions;
+using Core.Meetings;
 using InterfaceAdapters.Models;
 
 namespace InterfaceAdapters
@@ -44,7 +44,11 @@ namespace InterfaceAdapters
                 group,
                 meetingTime,
                 meeting.Description,
-                meeting.Location);
+                meeting.Location,
+                MeetingAgenda.FromItems(new []
+                {
+                    new ResolutionAgendaItem(chair, "Support all Lebanese")
+                }));
             await _db.AddGroupAsync(group);
             await _db.AddMeetingAsync(group.CurrentMeeting);
             return ToUxGroup(group);

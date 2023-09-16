@@ -198,6 +198,13 @@ export function Meeting() {
                 {renderActions()}
             </div>
             <div className="card mb-3" style={{maxWidth: "36rem"}}>
+                <div className="card-header">Agenda</div>
+                <div className="card-body">
+                    {meeting.agenda
+                        .map(item => <p key={item.title} className="card-text">{item.title}{item.isCurrent && " (now)"}</p>)}
+                </div>
+            </div>
+            <div className="card mb-3" style={{maxWidth: "36rem"}}>
                 <div className="card-header">Is Quorum Currently Present?</div>
                 <div className="card-body">
                     {meeting.hasQuorum ? "Yes" : "No"}
@@ -212,7 +219,7 @@ export function Meeting() {
                 </div>
             </div>
             <div className="card mb-3" style={{maxWidth: "36rem"}}>
-                <div className="card-header">Members</div>
+                <div className="card-header">Members present</div>
                 <div className="card-body">
                     {meeting.attendees
                         .filter(attendee => attendee.roles & AttendeeRole.member)
@@ -220,7 +227,7 @@ export function Meeting() {
                 </div>
             </div>
             <div className="card mb-3" style={{maxWidth: "36rem"}}>
-                <div className="card-header">Guests</div>
+                <div className="card-header">Guests present</div>
                 <div className="card-body">
                     {meeting.attendees
                         .filter(attendee => attendee.roles & AttendeeRole.guest)

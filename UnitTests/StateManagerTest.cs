@@ -1,6 +1,7 @@
 using System.Linq;
 using Core;
 using Core.Actions;
+using Core.Meetings;
 using Core.MeetingStates;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -16,7 +17,8 @@ namespace UnitTests
         [TestMethod]
         public void CanYieldAfterSpeaking()
         {
-            var openFloorState = OpenFloorState.InstanceOf(new TestGroupModifier());
+            var agenda = MeetingAgenda.EmptyAgenda();
+            var openFloorState = OpenFloorState.InstanceOf(new TestGroupModifier(), agenda);
             var stateManager = StateManager.StartingWithState(openFloorState);
             var personRole = MeetingAttendee.AsMember(new Person());
             stateManager.Speak(personRole);

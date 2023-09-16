@@ -1,5 +1,5 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
+using Core.Meetings;
 using Core.Motions;
 
 namespace Core.MeetingStates
@@ -12,14 +12,17 @@ namespace Core.MeetingStates
         private MotionChain MotionChain { get; }
         private Person Mover { get; }
         private IGroupModifier GroupModifier { get; }
-
-        public override State Type => State.MotionProposed;
         
-        public MotionProposed(IGroupModifier groupModifier, Person mover, MotionChain motionChain)
+        private MeetingAgenda Agenda { get; }
+
+        public override StateType Type => StateType.MotionProposed;
+        
+        public MotionProposed(IGroupModifier groupModifier, Person mover, MotionChain motionChain, MeetingAgenda agenda)
         {
             Mover = mover;
             GroupModifier = groupModifier;
             MotionChain = motionChain;
+            Agenda = agenda;
         }
 
         public override IMeetingState CallMeetingToOrder(MeetingAttendee actor)
@@ -29,11 +32,23 @@ namespace Core.MeetingStates
 
         public override IMeetingState DeclareTimeExpired(MeetingAttendee actor)
         {
-            GroupModifier.RecordMinute($"Nobody seconded the motion to {MotionChain.Current.GetText()}.");
-            // Drop this motion and go to previous motions, or the open floor if this is the only motion.
-            return MotionChain.Previous.Any()
-                ? new DebateState(GroupModifier, MotionChain.Pop())
-                : OpenFloorState.InstanceOf(GroupModifier);
+            GroupModifier.RecordMinute($"Nobody seconded the motion: \"{MotionChain.Current.GetText()}\".");
+            
+            // TODO: Centralize this logic. It's the same as in VotingState.
+            
+            // Drop this motion and go to debating a previous motion, if there is one.
+            if (MotionChain.Previous.Any())
+            {
+                return new DebateState(GroupModifier, MotionChain.Pop(), Agenda);
+            }
+            
+            // Try to go to next item on the agenda.
+            if (Agenda.MoveToNextItem(out var nextItem))
+            {
+                return StateFactory.FromAgendaItem(nextItem, GroupModifier, Agenda);
+            }
+            
+            return OpenFloorState.InstanceOf(GroupModifier, Agenda);
         }
 
         public override IMeetingState MoveMainMotion(MeetingAttendee actor, IMainMotion motion)
@@ -57,10 +72,10 @@ namespace Core.MeetingStates
             {
                 // Motion to end debate is not debated.
                 // TODO: Make "isDebatable" a property of a motion.
-                return new VotingState(GroupModifier, MotionChain);
+                return new VotingState(GroupModifier, MotionChain, Agenda);
             }
                 
-            return new DebateState(GroupModifier, MotionChain);
+            return new DebateState(GroupModifier, MotionChain, Agenda);
         }
 
         public override IMeetingState Speak(MeetingAttendee actor)

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Core.Meetings;
 using Core.MeetingStates;
 using Core.Motions;
 
@@ -6,7 +7,7 @@ namespace Core
 {
     /// <summary>
     /// Shuffles underlying state by passing the actions to an underlying state,
-    /// and this behaves as a state itself. See the State pattern.
+    /// and this behaves as a state itself. See the StateType pattern.
     /// </summary>
     public class StateManager : IMeetingState
     {
@@ -19,14 +20,16 @@ namespace Core
         /// The type of this state is the type of the
         /// underlying state.
         /// </summary>
-        public State Type => State.Type;
+        public StateType Type => State.Type;
         
         /// <summary>
         /// Creates a StateManager with an initial Adjourned state.
         /// </summary>
-        public StateManager(IGroupModifier groupModifier)
+        public StateManager(IGroupModifier groupModifier, MeetingAgenda agenda)
         {
-            State = new AdjournedState(groupModifier);
+            // The initial state of a meeting.
+            // TODO: Make this a new state like MeetingNotStarted or NotInOrder.
+            State = new AdjournedState(groupModifier, agenda);
         }
 
         private StateManager(IMeetingState state)

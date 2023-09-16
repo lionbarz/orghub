@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Core.Meetings;
+using Core.MeetingStates;
+using Core.Motions;
 
 namespace Core
 {
@@ -55,6 +58,13 @@ namespace Core
         private Group Group { get; init; }
 
         /// <summary>
+        /// The agenda that this meeting will follow.
+        /// It will go through the list of all the states in the agenda until they run out,
+        /// at which point it goes to the open floor.
+        /// </summary>
+        public MeetingAgenda Agenda { get; init; }
+
+        /// <summary>
         /// Whether there is a quorum among the attendees.
         /// </summary>
         public bool HasQuorum()
@@ -64,14 +74,15 @@ namespace Core
             return numCanVote >= numberRequired;
         }
 
-        private Meeting(Group group, DateTimeOffset startTime, string description, string location)
+        private Meeting(Group group, DateTimeOffset startTime, string description, string location, MeetingAgenda agenda)
         {
             Id = Guid.NewGuid();
             Description = description;
             StartTime = startTime;
             Attendees = new HashSet<MeetingAttendee>();
             Location = location;
-            State = new StateManager(group);
+            Agenda = agenda;
+            State = new StateManager(group, Agenda);
             Group = group;
         }
 
@@ -84,9 +95,9 @@ namespace Core
         /// <param name="startTime"></param>
         /// <returns></returns>
         /// <exception cref="ArgumentException"></exception>
-        public static Meeting NewInstance(Group group, DateTimeOffset startTime, string description, string location)
+        public static Meeting NewInstance(Group group, DateTimeOffset startTime, string description, string location, MeetingAgenda agenda)
         {
-            return new Meeting(group, startTime, description, location);
+            return new Meeting(group, startTime, description, location, agenda);
         }
 
         public MeetingAttendee AddAttendee(Person person)

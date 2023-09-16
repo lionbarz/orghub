@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using Core;
+using Core.Meetings;
 using Core.Motions;
 using InterfaceAdapters.Models;
 
@@ -21,7 +22,7 @@ namespace InterfaceAdapters
         public async Task<UXMeeting> CreateMeeting(Guid groupId, DateTimeOffset start, string location, string description)
         {
             var group = await _db.GetGroupAsync(groupId);
-            var meeting = Meeting.NewInstance(group, start, description, location);
+            var meeting = Meeting.NewInstance(group, start, description, location, MeetingAgenda.EmptyAgenda());
             throw new NotImplementedException();
             //group.AddMeeting(meeting); // HAVE MEETINGS DEPEND ON GROUPS!
             await _db.UpdateGroupAsync(group);
@@ -31,7 +32,7 @@ namespace InterfaceAdapters
         {
             var person = await _db.GetPersonAsync(chairPersonId);
             var group = Group.NewInstance(person, "Temporary Group", "Create a permanent group");
-            var meeting = Meeting.NewInstance(group, start, description, location);
+            var meeting = Meeting.NewInstance(group, start, description, location, MeetingAgenda.EmptyAgenda());
             await _db.AddGroupAsync(group);
             await _db.AddMeetingAsync(meeting);
             return ToUxMeeting(meeting);
@@ -59,8 +60,13 @@ namespace InterfaceAdapters
                 Location = meeting.Location,
                 State = meeting.State.GetDescription(),
                 StateType = meeting.State.Type.ToString(),
-                Attendees = meeting.Attendees.Select(x => UXMeetingAttendee.FromAttendee(x)),
-                HasQuorum = meeting.HasQuorum()
+                Attendees = meeting.Attendees.Select(UXMeetingAttendee.FromAttendee),
+                HasQuorum = meeting.HasQuorum(),
+                Agenda = meeting.Agenda.GetAllItems().Select(x => new UxAgendaItem()
+                {
+                    Title = x.GetTitle(),
+                    IsCurrent = x.IsCurrent
+                })
             };
         }
         

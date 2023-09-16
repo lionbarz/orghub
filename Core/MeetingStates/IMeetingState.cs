@@ -8,7 +8,7 @@ namespace Core.MeetingStates
         /// <summary>
         /// The type of this state. Ex: Adjourned, Voting.
         /// </summary>
-        State Type { get; }
+        StateType Type { get; }
         
         /// <summary>
         /// Action to call the meeting to order.

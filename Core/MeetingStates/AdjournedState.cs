@@ -1,4 +1,5 @@
 ﻿using System;
+using Core.Meetings;
 using Core.Motions;
 
 namespace Core.MeetingStates
@@ -6,23 +7,39 @@ namespace Core.MeetingStates
     public class AdjournedState : MeetingStateBase
     {
         private IGroupModifier GroupModifier { get; }
-
-        public override State Type => State.Adjourned;
         
-        public AdjournedState(IGroupModifier groupModifier)
+        private MeetingAgenda Agenda { get; }
+
+        public override StateType Type => StateType.Adjourned;
+        
+        public AdjournedState(IGroupModifier groupModifier, MeetingAgenda agenda)
         {
             GroupModifier = groupModifier;
+            Agenda = agenda;
         }
 
         public override IMeetingState CallMeetingToOrder(MeetingAttendee actor)
         {
+            // TODO: Shouldn't be able to call it to order after it adjourned.
             if (!CanCallToOrder(actor, out string explanation))
             {
                 throw new PersonOutOfOrderException(explanation);
             }
             
             GroupModifier.RecordMinute($"{actor.Person.Name} calls the meeting to order.");
-            return OpenFloorState.InstanceOf(GroupModifier);
+            
+            // If there is an item on the agenda, create a state from it
+            // and advance the agenda.
+            if (Agenda.MoveToNextItem(out var nextItem))
+            {
+                return StateFactory.FromAgendaItem(nextItem, GroupModifier, Agenda);
+            }
+            else
+            {
+                // No agenda item. Open the floor.
+                // TODO: The open floor should be on the agenda, too. So what happens after all agenda items are done?
+                return OpenFloorState.InstanceOf(GroupModifier, Agenda);
+            }
         }
 
         public override IMeetingState DeclareTimeExpired(MeetingAttendee actor)
