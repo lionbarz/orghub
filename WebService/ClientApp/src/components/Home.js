@@ -38,7 +38,7 @@ export function Home() {
                         <h2>Simplicity</h2>
                         <p>Bylaws. Parliamentary procedures. These are intimidating words. Luckily, you don't
                             need to know any of them.
-                            By using Parlilly, your group will leverage
+                            By using Deliberate Assembly, your group will leverage
                             timeless methods used by the most effective organizations,
                             without you knowing it.</p>
                     </div>
@@ -46,7 +46,7 @@ export function Home() {
                 <div className="col-md-4">
                     <div className="h-100 p-5 bg-light border rounded-3">
                         <h2>Democracy</h2>
-                        <p>Successful clubs have active members. Parlilly makes it easy for all members
+                        <p>Successful clubs have active members. Deliberate Assembly makes it easy for all members
                             to participate. Make suggestions, vote, debate, and much more, all with a press
                             of a button.</p>
                     </div>
@@ -55,7 +55,7 @@ export function Home() {
                     <div className="h-100 p-5 bg-light border rounded-3">
                         <h2>Transparency</h2>
                         <p>Knowledge is power, and transparency empowers your members.
-                            Parlilly automatically records basic meeting minutes and makes it easy to see
+                            Deliberate Assembly automatically records basic meeting minutes and makes it easy to see
                             the group's officers, members, agenda, decisions, and more.</p>
                     </div>
                 </div>
