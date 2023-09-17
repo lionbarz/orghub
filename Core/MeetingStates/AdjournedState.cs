@@ -12,10 +12,13 @@ namespace Core.MeetingStates
 
         public override StateType Type => StateType.Adjourned;
         
-        public AdjournedState(IGroupModifier groupModifier, MeetingAgenda agenda)
+        private IMinuteRecorder MinuteRecorder { get; }
+        
+        public AdjournedState(IGroupModifier groupModifier, MeetingAgenda agenda, IMinuteRecorder minuteRecorder)
         {
             GroupModifier = groupModifier;
             Agenda = agenda;
+            MinuteRecorder = minuteRecorder;
         }
 
         public override IMeetingState CallMeetingToOrder(MeetingAttendee actor)
@@ -26,19 +29,19 @@ namespace Core.MeetingStates
                 throw new PersonOutOfOrderException(explanation);
             }
             
-            GroupModifier.RecordMinute($"{actor.Person.Name} calls the meeting to order.");
+            MinuteRecorder.RecordMinute($"{actor.Person.Name} calls the meeting to order.");
             
             // If there is an item on the agenda, create a state from it
             // and advance the agenda.
             if (Agenda.MoveToNextItem(out var nextItem))
             {
-                return StateFactory.FromAgendaItem(nextItem, GroupModifier, Agenda);
+                return StateFactory.FromAgendaItem(nextItem, GroupModifier, Agenda, MinuteRecorder);
             }
             else
             {
                 // No agenda item. Open the floor.
                 // TODO: The open floor should be on the agenda, too. So what happens after all agenda items are done?
-                return OpenFloorState.InstanceOf(GroupModifier, Agenda);
+                return OpenFloorState.InstanceOf(GroupModifier, Agenda, MinuteRecorder);
             }
         }
 

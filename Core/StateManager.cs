@@ -25,11 +25,11 @@ namespace Core
         /// <summary>
         /// Creates a StateManager with an initial Adjourned state.
         /// </summary>
-        public StateManager(IGroupModifier groupModifier, MeetingAgenda agenda)
+        public StateManager(IGroupModifier groupModifier, MeetingAgenda agenda, IMinuteRecorder minuteRecorder)
         {
             // The initial state of a meeting.
             // TODO: Make this a new state like MeetingNotStarted or NotInOrder.
-            State = new AdjournedState(groupModifier, agenda);
+            State = new AdjournedState(groupModifier, agenda, minuteRecorder);
         }
 
         private StateManager(IMeetingState state)

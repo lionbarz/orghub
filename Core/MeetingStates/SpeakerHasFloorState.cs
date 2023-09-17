@@ -22,20 +22,24 @@ namespace Core.MeetingStates
         private IGroupModifier GroupModifier { get; }
         
         private MeetingAgenda Agenda { get; }
+        
+        private IMinuteRecorder MinuteRecorder { get; }
 
-        public SpeakerHasFloorState(IGroupModifier groupModifier, Person speaker, MeetingAgenda agenda)
+        public SpeakerHasFloorState(IGroupModifier groupModifier, Person speaker, MeetingAgenda agenda, IMinuteRecorder minuteRecorder)
         {
             Speaker = speaker;
             GroupModifier = groupModifier;
             Agenda = agenda;
+            MinuteRecorder = minuteRecorder;
         }
         
-        public SpeakerHasFloorState(IGroupModifier groupModifier, Person speaker, MotionChain motionChain, MeetingAgenda agenda)
+        public SpeakerHasFloorState(IGroupModifier groupModifier, Person speaker, MotionChain motionChain, MeetingAgenda agenda, IMinuteRecorder minuteRecorder)
         {
             Speaker = speaker;
             MotionChain = motionChain;
             GroupModifier = groupModifier;
             Agenda = agenda;
+            MinuteRecorder = minuteRecorder;
         }
 
         public override IMeetingState CallMeetingToOrder(MeetingAttendee actor)
@@ -50,10 +54,10 @@ namespace Core.MeetingStates
                 throw new PersonOutOfOrderException(explanation);
             }
             
-            GroupModifier.RecordMinute($"{actor.Person.Name}'s time on the floor is expired.");
+            MinuteRecorder.RecordMinute($"{actor.Person.Name}'s time on the floor is expired.");
             return MotionChain == null
-                ? OpenFloorState.InstanceOf(GroupModifier, Agenda)
-                : new DebateState(GroupModifier, MotionChain, Agenda);
+                ? OpenFloorState.InstanceOf(GroupModifier, Agenda, MinuteRecorder)
+                : new DebateState(GroupModifier, MotionChain, Agenda, MinuteRecorder);
         }
 
         public override IMeetingState MoveMainMotion(MeetingAttendee actor, IMainMotion motion)
@@ -83,11 +87,11 @@ namespace Core.MeetingStates
 
         public override IMeetingState Yield(MeetingAttendee actor)
         {
-            GroupModifier.RecordMinute($"{actor.Person.Name} yields the floor.");
+            MinuteRecorder.RecordMinute($"{actor.Person.Name} yields the floor.");
             
             return MotionChain == null
-                ? OpenFloorState.InstanceOf(GroupModifier, Agenda)
-                : new DebateState(GroupModifier, MotionChain, Agenda);
+                ? OpenFloorState.InstanceOf(GroupModifier, Agenda, MinuteRecorder)
+                : new DebateState(GroupModifier, MotionChain, Agenda, MinuteRecorder);
         }
 
         public override IMeetingState MoveToAdjourn(MeetingAttendee actor)

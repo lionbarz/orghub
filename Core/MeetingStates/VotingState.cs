@@ -19,12 +19,15 @@ namespace Core.MeetingStates
         /// </summary>
         private IGroupModifier GroupModifier { get; }
         
-        public VotingState(IGroupModifier groupModifier, MotionChain motionChain, MeetingAgenda agenda)
+        private IMinuteRecorder MinuteRecorder { get; }
+        
+        public VotingState(IGroupModifier groupModifier, MotionChain motionChain, MeetingAgenda agenda, IMinuteRecorder minuteRecorder)
         {
             BallotBox = new YesNoBallotBox();
             GroupModifier = groupModifier;
             MotionChain = motionChain;
             Agenda = agenda;
+            MinuteRecorder = minuteRecorder;
         }
 
         public override IMeetingState CallMeetingToOrder(MeetingAttendee actor)
@@ -47,28 +50,28 @@ namespace Core.MeetingStates
             {
                 if (MotionChain.Current is IGroupModifyingMotion groupModifyingMotion)
                 {
-                    GroupModifier.RecordMinute(
+                    MinuteRecorder.RecordMinute(
                         $"The motion {MotionChain.Current.GetText()} is carried.");
                     groupModifyingMotion.TakeActionAsync(GroupModifier);
                 }
                 
                 if (MotionChain.Current is PreviousQuestion)
                 {
-                    GroupModifier.RecordMinute(
+                    MinuteRecorder.RecordMinute(
                         $"The motion to end debate and vote on {MotionChain.Previous.Last().GetText()} is carried.");
                     // The vote was on ending debate, so the next thing is to vote on the main motion.
-                    return new VotingState(GroupModifier, MotionChain.Pop(), Agenda);
+                    return new VotingState(GroupModifier, MotionChain.Pop(), Agenda, MinuteRecorder);
                 }
 
                 if (MotionChain.Current is Adjourn)
                 {
-                    GroupModifier.RecordMinute($"The motion to adjourn is carried.");
-                    return new AdjournedState(GroupModifier, Agenda);
+                    MinuteRecorder.RecordMinute($"The motion to adjourn is carried.");
+                    return new AdjournedState(GroupModifier, Agenda, MinuteRecorder);
                 }
             }
             else
             {
-                GroupModifier.RecordMinute(
+                MinuteRecorder.RecordMinute(
                     $"The motion {MotionChain.Current.GetText()} didn't get enough votes and is dropped.");
             }
 
@@ -77,17 +80,17 @@ namespace Core.MeetingStates
             if (MotionChain.Previous.Any())
             {
                 // There was a previous motion, so go back to debating it.
-                return new DebateState(GroupModifier, MotionChain.Pop(), Agenda);
+                return new DebateState(GroupModifier, MotionChain.Pop(), Agenda, MinuteRecorder);
             }
             
             // If there is something next on the agenda, do it.
             if (Agenda.MoveToNextItem(out var nextItem))
             {
-                return StateFactory.FromAgendaItem(nextItem, GroupModifier, Agenda);
+                return StateFactory.FromAgendaItem(nextItem, GroupModifier, Agenda, MinuteRecorder);
             }
             
             // No agenda items, so open the floor.
-            return OpenFloorState.InstanceOf(GroupModifier, Agenda);
+            return OpenFloorState.InstanceOf(GroupModifier, Agenda, MinuteRecorder);
         }
 
         public override IMeetingState MoveMainMotion(MeetingAttendee actor, IMainMotion motion)

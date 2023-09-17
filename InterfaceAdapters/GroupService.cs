@@ -75,23 +75,8 @@ namespace InterfaceAdapters
                 Members = x.Members.Select(PersonService.ToUxPerson),
                 Resolutions = x.Resolutions,
                 Name = x.Bylaws.Name,
-                Minutes = x.Minutes.Select(m => new UXMinute()
-                {
-                    Text = m.Text,
-                    Time = m.Time
-                }),
                 CurrentMeeting = x.CurrentMeeting != null ? MeetingService.ToUxMeeting(x.CurrentMeeting) : null
             };
-        }
-
-        public async Task<IEnumerable<UXMinute>> GetMinutes(Guid groupId)
-        {
-            var group = await _db.GetGroupAsync(groupId);
-            return group.Minutes.Select(m => new UXMinute()
-            {
-                Text = m.Text,
-                Time = m.Time
-            });
         }
         
         public async Task AddMemberAsync(Guid groupId, Guid personId)

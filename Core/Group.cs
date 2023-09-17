@@ -50,11 +50,6 @@ namespace Core
         /// All resolutions passed by this group.
         /// </summary>
         public ICollection<string> Resolutions { get; }
-
-        /// <summary>
-        /// What states and actions have happened so far.
-        /// </summary>
-        public IList<MeetingMinute> Minutes { get; private init;  }
         
         /// <summary>
         /// Whether this is an established group.
@@ -71,7 +66,6 @@ namespace Core
             Members = new List<Person>();
             PastMeetings = new List<Meeting>();
             Resolutions = new List<string>();
-            Minutes = new List<MeetingMinute>();
             
             // TODO: This is always true for now.
             IsMassMeeting = true;
@@ -126,7 +120,8 @@ namespace Core
 
         public void SetChair(Person person)
         {
-            Minutes.Add(MeetingMinute.FromText($"{person.Name} is now the chair."));
+            // TODO: Record somewhere.
+            //Minutes.Add(MeetingMinute.FromText($"{person.Name} is now the chair."));
             Chair = person;
         }
 
@@ -145,12 +140,8 @@ namespace Core
             if (Members.Contains(member)) return;
             
             Members.Add(member);
-            Minutes.Add(MeetingMinute.FromText($"{member.Name} is added as a member."));
-        }
-
-        public void RecordMinute(string text)
-        {
-            Minutes.Add(MeetingMinute.FromText(text));
+            // TODO: Record somewhere.
+            //Minutes.Add(MeetingMinute.FromText($"{member.Name} is added as a member."));
         }
 
         public void MarkAttendance(Person person)

@@ -31,11 +31,6 @@ namespace InterfaceAdapters.Models
         public string Name { get; set; }
         
         /// <summary>
-        /// The minutes, ie activity log.
-        /// </summary>
-        public IEnumerable<UXMinute> Minutes { get; set; }
-        
-        /// <summary>
         /// The current meeting, either in progress or
         /// hasn't started yet.
         /// </summary>

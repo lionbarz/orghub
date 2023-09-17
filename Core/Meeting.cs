@@ -19,7 +19,7 @@ namespace Core
     /// It also determines quorum using the attendance information.
     /// It uses the StateManager to track the state of the meeting.
     /// </summary>
-    public class Meeting
+    public class Meeting : IMinuteRecorder
     {
         /// <summary>
         /// Uniquely identifies this meeting.
@@ -63,6 +63,11 @@ namespace Core
         /// at which point it goes to the open floor.
         /// </summary>
         public MeetingAgenda Agenda { get; init; }
+        
+        /// <summary>
+        /// What states and actions have happened so far.
+        /// </summary>
+        public IList<MeetingMinute> Minutes { get; private init;  }
 
         /// <summary>
         /// Whether there is a quorum among the attendees.
@@ -82,8 +87,9 @@ namespace Core
             Attendees = new HashSet<MeetingAttendee>();
             Location = location;
             Agenda = agenda;
-            State = new StateManager(group, Agenda);
+            State = new StateManager(group, Agenda, this);
             Group = group;
+            Minutes = new List<MeetingMinute>();
         }
 
         /// <summary>
@@ -136,6 +142,11 @@ namespace Core
                 throw new Exception($"Person with ID {personId} is not in attendance of this meeting.");
             }
             return attendee;
+        }
+
+        public void RecordMinute(string text)
+        {
+            Minutes.Add(MeetingMinute.FromText(text));
         }
     }
 }

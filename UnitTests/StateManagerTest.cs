@@ -4,6 +4,7 @@ using Core.Actions;
 using Core.Meetings;
 using Core.MeetingStates;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Moq;
 
 namespace UnitTests
 {
@@ -17,8 +18,9 @@ namespace UnitTests
         [TestMethod]
         public void CanYieldAfterSpeaking()
         {
+            Mock<IMinuteRecorder> mockMinuteRecorder = new Mock<IMinuteRecorder>();
             var agenda = MeetingAgenda.EmptyAgenda();
-            var openFloorState = OpenFloorState.InstanceOf(new TestGroupModifier(), agenda);
+            var openFloorState = OpenFloorState.InstanceOf(new TestGroupModifier(), agenda, mockMinuteRecorder.Object);
             var stateManager = StateManager.StartingWithState(openFloorState);
             var personRole = MeetingAttendee.AsMember(new Person());
             stateManager.Speak(personRole);

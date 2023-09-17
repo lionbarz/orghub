@@ -15,16 +15,19 @@ namespace Core.MeetingStates
         private IGroupModifier GroupModifier { get; }
         
         private MeetingAgenda Agenda { get; }
+        
+        private IMinuteRecorder MinuteRecorder { get; }
 
-        private OpenFloorState(IGroupModifier groupModifier, MeetingAgenda agenda)
+        private OpenFloorState(IGroupModifier groupModifier, MeetingAgenda agenda, IMinuteRecorder minuteRecorder)
         {
             GroupModifier = groupModifier;
             Agenda = agenda;
+            MinuteRecorder = minuteRecorder;
         }
 
-        public static OpenFloorState InstanceOf(IGroupModifier groupModifier, MeetingAgenda agenda)
+        public static OpenFloorState InstanceOf(IGroupModifier groupModifier, MeetingAgenda agenda, IMinuteRecorder minuteRecorder)
         {
-            return new OpenFloorState(groupModifier, agenda);
+            return new OpenFloorState(groupModifier, agenda, minuteRecorder);
         }
 
         public override IMeetingState CallMeetingToOrder(MeetingAttendee actor)
@@ -59,10 +62,10 @@ namespace Core.MeetingStates
                 throw new PersonOutOfOrderException(error);
             }
             
-            GroupModifier.RecordMinute($"{actor.Person.Name} moves to adjourn the meeting.");
+            MinuteRecorder.RecordMinute($"{actor.Person.Name} moves to adjourn the meeting.");
             var motion = new Adjourn(actor.Person);
             var motionChain = MotionChain.FromMotion(motion);
-            return new MotionProposed(GroupModifier, actor.Person, motionChain, Agenda);
+            return new MotionProposed(GroupModifier, actor.Person, motionChain, Agenda, MinuteRecorder);
         }
 
         public override IMeetingState MoveMainMotion(MeetingAttendee actor, IMainMotion motion)
@@ -72,8 +75,8 @@ namespace Core.MeetingStates
                 throw new PersonOutOfOrderException(explanation);
             }
             
-            GroupModifier.RecordMinute($"{actor.Person.Name} moves {motion.GetText()}.");
-            return new MotionProposed(GroupModifier, actor.Person, MotionChain.FromMotion(motion), Agenda);
+            MinuteRecorder.RecordMinute($"{actor.Person.Name} moves {motion.GetText()}.");
+            return new MotionProposed(GroupModifier, actor.Person, MotionChain.FromMotion(motion), Agenda, MinuteRecorder);
         }
 
         public override IMeetingState Speak(MeetingAttendee actor)
@@ -83,8 +86,8 @@ namespace Core.MeetingStates
                 throw new PersonOutOfOrderException(error);
             }
             
-            GroupModifier.RecordMinute($"{actor.Person.Name} takes the floor.");
-            return new SpeakerHasFloorState(GroupModifier, actor.Person, Agenda);
+            MinuteRecorder.RecordMinute($"{actor.Person.Name} takes the floor.");
+            return new SpeakerHasFloorState(GroupModifier, actor.Person, Agenda, MinuteRecorder);
         }
 
         public override IMeetingState Vote(MeetingAttendee actor, VoteType type)

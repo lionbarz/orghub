@@ -52,5 +52,10 @@ namespace InterfaceAdapters.Models
         /// What's on the agenda for this meeting.
         /// </summary>
         public IEnumerable<UxAgendaItem> Agenda { get; set; }
+        
+        /// <summary>
+        /// The minutes, ie activity log.
+        /// </summary>
+        public IEnumerable<UXMinute> Minutes { get; set; }
     }
 }

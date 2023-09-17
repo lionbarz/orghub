@@ -116,18 +116,6 @@ export function Group() {
                     </ul>
                 </div>
             </div>
-            <div className="card mb-3" style={{maxWidth: "36rem"}}>
-                <div className="card-header">Minutes</div>
-                <div className="card-body">
-                    <ul>
-                        {group.minutes.map(minute => {
-                            let formattedTime = new Date(Date.parse(minute.time));
-                            formattedTime = moment(minute.time).fromNow();
-                            return <li key={minute.time} className="card-text">{minute.text} ({formattedTime.toString()})</li>
-                        })}
-                    </ul>
-                </div>
-            </div>
         </div>
                 <Modal isOpen={showMembershipModal} toggle={() => closeGrantMembershipPrompt()}>
                     <ModalHeader

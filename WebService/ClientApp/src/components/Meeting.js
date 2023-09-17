@@ -15,6 +15,7 @@ import {MoveResolutionButton} from "./MoveResolutionButton";
 import AdjournIcon from "@mui/icons-material/DirectionsRun";
 import {AttendeeRole} from "./AttendeeRole";
 import {GuestLoginComponent} from "./GuestLoginComponent";
+import moment from "moment/moment";
 
 export function Meeting() {
     const {meetingId} = useParams();
@@ -232,6 +233,18 @@ export function Meeting() {
                     {meeting.attendees
                         .filter(attendee => attendee.roles & AttendeeRole.guest)
                         .map(attendee => <p key={attendee.id} className="card-text">{attendee.person.name ?? attendee.person.email}</p>)}
+                </div>
+            </div>
+            <div className="card mb-3" style={{maxWidth: "36rem"}}>
+                <div className="card-header">Minutes</div>
+                <div className="card-body">
+                    <ul>
+                        {meeting.minutes.map(minute => {
+                            let formattedTime = new Date(Date.parse(minute.time));
+                            formattedTime = moment(minute.time).fromNow();
+                            return <li key={minute.time} className="card-text">{minute.text} ({formattedTime.toString()})</li>
+                        })}
+                    </ul>
                 </div>
             </div>
         </div>

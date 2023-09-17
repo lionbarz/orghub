@@ -66,6 +66,11 @@ namespace InterfaceAdapters
                 {
                     Title = x.GetTitle(),
                     IsCurrent = x.IsCurrent
+                }),
+                Minutes = meeting.Minutes.Select(m => new UXMinute()
+                {
+                    Text = m.Text,
+                    Time = m.Time
                 })
             };
         }

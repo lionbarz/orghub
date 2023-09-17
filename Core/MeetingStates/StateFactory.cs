@@ -6,15 +6,15 @@ namespace Core.MeetingStates
 {
     public static class StateFactory
     {
-        public static IMeetingState FromAgendaItem(IAgendaItem agendaItem, IGroupModifier groupModifier, MeetingAgenda agenda)
+        public static IMeetingState FromAgendaItem(IAgendaItem agendaItem, IGroupModifier groupModifier, MeetingAgenda agenda, IMinuteRecorder minuteRecorder)
         {
             if (agendaItem is ResolutionAgendaItem resolutionAgendaItem)
             {
-                groupModifier.RecordMinute(
+                minuteRecorder.RecordMinute(
                     $"Moving to next agenda item: {resolutionAgendaItem.GetTitle()}");
                 var motion = new Resolve(resolutionAgendaItem.Text);
                 return new MotionProposed(groupModifier, resolutionAgendaItem.Sponsor, MotionChain.FromMotion(motion),
-                    agenda);
+                    agenda, minuteRecorder);
             }
 
             throw new Exception($"Agenda has a type of item that isn't recognized: {agendaItem.GetType()}");
