@@ -33,29 +33,11 @@ namespace Core
         /// The person chairing the organization.
         /// </summary>
         public Person? Chair { get; private set; }
-
-        /// <summary>
-        /// The currently set meeting for the group,
-        /// either coming up or in progress. It becomes
-        /// a past meeting when it is adjourned.
-        /// </summary>
-        public Meeting? CurrentMeeting { get; set; }
-        
-        /// <summary>
-        /// Past meetings of this group.
-        /// </summary>
-        public ICollection<Meeting> PastMeetings { get; }
         
         /// <summary>
         /// All resolutions passed by this group.
         /// </summary>
         public ICollection<string> Resolutions { get; }
-        
-        /// <summary>
-        /// Whether this is an established group.
-        /// TODO: Create another class that implements the interface for mass meetings.
-        /// </summary>
-        public bool IsMassMeeting { get; }
 
         /// <summary>
         /// Constructor.
@@ -64,11 +46,7 @@ namespace Core
         {
             Id = Guid.NewGuid();
             Members = new List<Person>();
-            PastMeetings = new List<Meeting>();
             Resolutions = new List<string>();
-            
-            // TODO: This is always true for now.
-            IsMassMeeting = true;
         }
 
         /// <summary>
@@ -142,14 +120,6 @@ namespace Core
             Members.Add(member);
             // TODO: Record somewhere.
             //Minutes.Add(MeetingMinute.FromText($"{member.Name} is added as a member."));
-        }
-
-        public void MarkAttendance(Person person)
-        {
-            if (IsMassMeeting)
-            {
-                AddMember(person);
-            }
         }
     }
 }

@@ -1,5 +1,4 @@
-﻿using Core;
-using InterfaceAdapters;
+﻿using InterfaceAdapters;
 using InterfaceAdapters.Models;
 using Microsoft.AspNetCore.Mvc;
 using WebService.Models;
@@ -38,7 +37,6 @@ public class GroupController : ControllerBase
             Guid.Parse(request.PersonId),
             request.Name,
             request.Mission,
-            request.NextMeeting,
             request.MemberEmails);
     }
 }

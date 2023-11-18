@@ -17,10 +17,10 @@ public class MeetingController : ControllerBase
     }
     
     [HttpGet]
-    [Route("api/meeting")]
-    public async Task<IEnumerable<UXMeeting>> List()
+    [Route("api/meeting/group/{groupId}")]
+    public async Task<IEnumerable<UXMeeting>> List(string groupId)
     {
-        return await MeetingService.GetMeetingsAsync();
+        return await MeetingService.GetMeetingsForGroupAsync(Guid.Parse(groupId));
     }
     
     [HttpGet]
@@ -38,6 +38,31 @@ public class MeetingController : ControllerBase
     public async Task<UXMeeting> CreateMassMeeting(string userId)
     {
         return await MeetingService.CreateMassMeetingAsync(Guid.Parse(userId), DateTimeOffset.Now, "", "");
+    }
+    
+    /// <summary>
+    /// Create a new meeting.
+    /// </summary>
+    [HttpPost]
+    [Route("api/meeting")]
+    public async Task<UXMeeting> CreateMeeting([FromBody] CreateMeetingRequest request)
+    {
+        if (string.IsNullOrEmpty(request.UserId))
+        {
+            throw new ArgumentException("User ID is null");
+        }
+        
+        if (string.IsNullOrEmpty(request.GroupId))
+        {
+            throw new ArgumentException("Meeting ID is null");
+        }
+        
+        return await MeetingService.CreateMeetingAsync(
+            Guid.Parse(request.UserId),
+            Guid.Parse(request.GroupId),
+            request.MeetingStartTime,
+            request.Location, 
+            request.Description);
     }
     
     /// <summary>

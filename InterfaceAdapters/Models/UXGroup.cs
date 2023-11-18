@@ -29,11 +29,5 @@ namespace InterfaceAdapters.Models
         /// The group name.
         /// </summary>
         public string Name { get; set; }
-        
-        /// <summary>
-        /// The current meeting, either in progress or
-        /// hasn't started yet.
-        /// </summary>
-        public UXMeeting CurrentMeeting { get; set; }
     }
 }

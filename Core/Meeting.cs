@@ -56,6 +56,8 @@ namespace Core
         /// The group that the people are gathering to act on its behalf.
         /// </summary>
         private Group Group { get; init; }
+        
+        public Guid GroupId => Group.Id;
 
         /// <summary>
         /// The agenda that this meeting will follow.

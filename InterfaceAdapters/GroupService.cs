@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Core;
-using Core.Meetings;
 using InterfaceAdapters.Models;
 
 namespace InterfaceAdapters
@@ -17,7 +16,7 @@ namespace InterfaceAdapters
             _db = database;
         }
 
-        public async Task<UXGroup> AddGroupAsync(Guid chairUserId, string name, string mission, UXMeeting meeting, IEnumerable<string> memberEmails)
+        public async Task<UXGroup> AddGroupAsync(Guid chairUserId, string name, string mission, IEnumerable<string> memberEmails)
         {
             var chair = await _db.GetPersonAsync(chairUserId);
             var group = Group.NewInstance(chair, name, mission);
@@ -39,18 +38,7 @@ namespace InterfaceAdapters
                 group.AddMember(person);
             }
             
-            var meetingTime = DateTimeOffset.Parse(meeting.StartTime);
-            group.CurrentMeeting = Meeting.NewInstance(
-                group,
-                meetingTime,
-                meeting.Description,
-                meeting.Location,
-                MeetingAgenda.FromItems(new []
-                {
-                    new ResolutionAgendaItem(chair, "Support all Lebanese")
-                }));
             await _db.AddGroupAsync(group);
-            await _db.AddMeetingAsync(group.CurrentMeeting);
             return ToUxGroup(group);
         }
 
@@ -74,8 +62,7 @@ namespace InterfaceAdapters
                 Chair = PersonService.ToUxPerson(x.Chair),
                 Members = x.Members.Select(PersonService.ToUxPerson),
                 Resolutions = x.Resolutions,
-                Name = x.Bylaws.Name,
-                CurrentMeeting = x.CurrentMeeting != null ? MeetingService.ToUxMeeting(x.CurrentMeeting) : null
+                Name = x.Bylaws.Name
             };
         }
         

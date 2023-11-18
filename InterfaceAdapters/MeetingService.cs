@@ -19,13 +19,27 @@ namespace InterfaceAdapters
             _db = db;
         }
 
-        public async Task<UXMeeting> CreateMeeting(Guid groupId, DateTimeOffset start, string location, string description)
+        /// <summary>
+        /// Add a new meeting for the group.
+        /// </summary>
+        /// <param name="personId">The person creating this meeting.</param>
+        /// <param name="groupId"></param>
+        /// <param name="startTime"></param>
+        /// <param name="location"></param>
+        /// <param name="description"></param>
+        /// <returns></returns>
+        public async Task<UXMeeting> CreateMeetingAsync(Guid personId, Guid groupId, DateTimeOffset startTime, string location, string description)
         {
+            // TODO: Verify that the creator has permissions.
             var group = await _db.GetGroupAsync(groupId);
-            var meeting = Meeting.NewInstance(group, start, description, location, MeetingAgenda.EmptyAgenda());
-            throw new NotImplementedException();
-            //group.AddMeeting(meeting); // HAVE MEETINGS DEPEND ON GROUPS!
-            await _db.UpdateGroupAsync(group);
+            var meeting = Meeting.NewInstance(
+                group,
+                startTime,
+                description,
+                location,
+                MeetingAgenda.EmptyAgenda());
+            await _db.AddMeetingAsync(meeting);
+            return ToUxMeeting(meeting);
         }
         
         public async Task<UXMeeting> CreateMassMeetingAsync(Guid chairPersonId, DateTimeOffset start, string location, string description)
@@ -42,6 +56,14 @@ namespace InterfaceAdapters
         {
             var meetings = await _db.ListMeetingsAsync();
             return meetings.Select(ToUxMeeting);
+        }
+        
+        public async Task<IEnumerable<UXMeeting>> GetMeetingsForGroupAsync(Guid groupId)
+        {
+            // TODO: Optimize this so that it doesn't get all meetings from the database.
+            var meetings = await _db.ListMeetingsAsync();
+            var meetingForGroup = meetings.Where(x => x.GroupId == groupId);
+            return meetingForGroup.Select(ToUxMeeting);
         }
 
         public async Task<UXMeeting> GetMeetingAsync(Guid meetingId)
