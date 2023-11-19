@@ -13,8 +13,6 @@ import {ZoomTest} from "./components/ZoomTest";
 import {Meeting} from "./components/Meeting";
 
 export default class App extends Component {
-  static displayName = App.name;
-
   render () {
     return (
       <Layout>
